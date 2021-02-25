@@ -20,36 +20,19 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import glob
-import importlib
-import traceback
+import logging
 
-from typing import List
+from rich.logging import RichHandler
 
-from .. import log
+logging.basicConfig(
+    level="INFO",
+    format="%(message)s",
+    datefmt="[%X]",
+    handlers=[RichHandler(rich_tracebacks=True)],
+)
 
+# To avoid some pyrogram annoying log
+logging.getLogger("pyrogram.syncer").setLevel(logging.WARNING)
+logging.getLogger("pyrogram.client").setLevel(logging.WARNING)
 
-async def load(bot):
-    modules: List[Module] = []
-
-    files = glob.glob(f"amime/modules/*.py") + glob.glob(f"amime/modules/*/*.py")
-    for file_name in files:
-        try:
-            module = importlib.import_module(
-                file_name.replace("/", ".").replace(".py", "")
-            )
-            modules.append(module)
-        except:
-            log.error(f"Failed to import the module: {file_name}")
-            traceback.print_exc()
-            continue
-
-        functions = [*filter(callable, module.__dict__.values())]
-        functions = [*filter(lambda function: hasattr(function, "handler"), functions)]
-
-        for function in functions:
-            bot.add_handler(*function.handler)
-
-    log.info(
-        f"{len(modules)} module{'s' if len(modules) != 1 else ''} imported successfully!"
-    )
+log = logging.getLogger("rich")

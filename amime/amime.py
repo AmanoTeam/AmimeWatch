@@ -27,6 +27,7 @@ from pyrogram import __version__
 from pyrogram.raw.all import layer
 from pyrogram.types import Message
 
+from . import log
 from .utils import modules
 
 
@@ -47,7 +48,7 @@ class Amime(Client):
         await super().start()
 
         self.me = await self.get_me()
-        print(
+        log.info(
             f"AmimeWatch running with Pyrogram v{__version__} (Layer {layer}) started on @{self.me.username}. Hi."
         )
 
@@ -55,4 +56,4 @@ class Amime(Client):
 
     async def stop(self, *args):
         await super().stop()
-        print("AmimeWatch stopped. Bye.")
+        log.info("AmimeWatch stopped. Bye.")

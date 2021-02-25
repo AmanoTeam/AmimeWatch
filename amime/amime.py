@@ -27,7 +27,6 @@ from datetime import datetime
 from pyrogram import Client
 from pyrogram import __version__
 from pyrogram.raw.all import layer
-from pyrogram.types import Message
 
 from . import log
 from .utils import langs, modules

@@ -38,6 +38,7 @@ class Amime(Client):
             name,
             config_file=f"{name}.ini",
             workers=16,
+            workdir=".",
         )
 
         self.start_datetime = datetime.utcnow()
@@ -50,7 +51,7 @@ class Amime(Client):
             f"AmimeWatch running with Pyrogram v{__version__} (Layer {layer}) started on @{self.me.username}. Hi."
         )
 
-        await modules.load()
+        await modules.load(self)
 
     async def stop(self, *args):
         await super().stop()

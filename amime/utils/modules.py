@@ -26,10 +26,10 @@ import importlib
 from typing import List
 
 
-async def load():
+async def load(bot):
     modules: List[Module] = []
 
-    files = glob.glob(f"amime/modules/*.py")
+    files = glob.glob(f"amime/modules/*.py") + glob.glob(f"amime/modules/*/*.py")
     for file_name in files:
         try:
             module = importlib.import_module(
@@ -38,6 +38,12 @@ async def load():
             modules.append(module)
         except ImportError:
             print(f"Failed to import the module: {file_name}")
+            continue
+        functions = [*filter(callable, module.__dict__.values())]
+        functions = [*filter(lambda f: hasattr(f, "handler"), functions)]
+
+        for f in functions:
+            bot.add_handler(*f.handler)
 
     print(
         f"{len(modules)} module{'s' if len(modules) != 1 else ''} imported successfully!"

@@ -68,7 +68,7 @@ async def answer(bot: Amime, inline_query: InlineQuery):
                             text = ""
                         else:
                             text = f"<b>{result.title.romaji}</b> (<code>{result.title.native}</code>)\n"
-                            text += f"\n<b>{lang.id}</b>: <code>{result.id}</code>"
+                            text += f"\n<b>{lang.id}</b>: <code>{result.id}</code> (<b>{content_type.upper()}</b>)"
                             text += f"\n<b>{lang.score}</b>: (<b>{lang.mean} = <code>{result.score.mean or 0}</code>, {lang.average} = <code>{result.score.average or 0}</code></b>)"
                             text += (
                                 f"\n<b>{lang.status}</b>: <code>{result.status}</code>"

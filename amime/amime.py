@@ -57,4 +57,4 @@ class Amime(Client):
 
     async def stop(self, *args):
         await super().stop()
-        log.info("AmimeWatch stopped. Bye.")
+        log.warning("AmimeWatch stopped. Bye.")

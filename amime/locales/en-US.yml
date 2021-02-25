@@ -1,0 +1,50 @@
+NAME: 🇺🇸 English
+LANGUAGE_CODE: en-US
+
+
+# Texts
+not_found:
+    No <b>{type}</b> with {key} <code>{value}</code> was found.
+
+id:
+    ID
+
+score:
+    Score
+
+mean:
+    Mean
+
+average:
+    Average
+
+format:
+    Format
+
+status:
+    Status
+
+genres:
+    Genres
+
+studios:
+    Studios
+
+episode:
+    Epsisode
+
+duration:
+    Duration
+
+description:
+    Description
+
+short_description:
+    Short description
+
+# Buttons
+read_more_button:
+    🤓 Read more...
+
+trailer_button:
+    🎬 Trailer

@@ -20,41 +20,30 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from datetime import datetime
+import glob
+import re
+import yaml
 
-from pyrogram import Client
-from pyrogram import __version__
-from pyrogram.raw.all import layer
-from pyrogram.types import Message
+from langs import Langs
 
-from . import log
-from .utils import langs, modules
+from pyrogram.types import CallbackQuery, Message
+from typing import Dict
+
+from .. import log
 
 
-class Amime(Client):
-    def __init__(self):
-        name = self.__class__.__name__.lower()
+def load():
+    langs: Dict = {}
 
-        super().__init__(
-            name,
-            config_file=f"{name}.ini",
-            workers=16,
-            workdir=".",
-        )
+    files = glob.glob("amime/locales/*.yml")
+    for file_name in files:
+        language_code = re.match(r"amime/locales/(.+)\.yml$", file_name)[1]
+        with open(file_name) as file:
+            langs[language_code] = yaml.safe_load(file)
 
-        self.start_datetime = datetime.utcnow()
+    lang = Langs(**langs, escape_html=True)
 
-    async def start(self):
-        await super().start()
+    CallbackQuery._lang = lang
+    Message._lang = lang
 
-        self.me = await self.get_me()
-        log.info(
-            f"AmimeWatch running with Pyrogram v{__version__} (Layer {layer}) started on @{self.me.username}. Hi."
-        )
-
-        langs.load()
-        await modules.load(self)
-
-    async def stop(self, *args):
-        await super().stop()
-        log.info("AmimeWatch stopped. Bye.")
+    log.info(f"{len(langs)} language{'s' if len(langs) != 1 else ''} have been loaded.")

@@ -26,7 +26,7 @@ import yaml
 
 from langs import Langs
 
-from pyrogram.types import CallbackQuery, Message
+from pyrogram.types import CallbackQuery, Message, InlineQuery
 from typing import Dict
 
 from .. import log
@@ -45,5 +45,6 @@ def load():
 
     CallbackQuery._lang = lang
     Message._lang = lang
+    InlineQuery._lang = lang
 
     log.info(f"{len(langs)} language{'s' if len(langs) != 1 else ''} have been loaded.")

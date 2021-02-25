@@ -25,7 +25,15 @@ import logging
 from .amime import Amime
 
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(
+    level="INFO",
+    format="%(message)s",
+    datefmt="[%X]",
+)
+
+# To avoid some pyrogram annoying log
+logging.getLogger("pyrogram.syncer").setLevel(logging.WARNING)
+logging.getLogger("pyrogram.client").setLevel(logging.WARNING)
 
 if __name__ == "__main__":
     Amime().run()

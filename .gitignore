@@ -1,6 +1,7 @@
 # Personal files
 *.session
 *.ini
+*.sqlite
 
 # Byte-compiled
 __pycache__/

@@ -22,22 +22,30 @@
 
 import os
 
-from pyrogram import idle
-from tortoise import run_async
-
-from .amime import Amime
-from .database import connect_database
+from tortoise import fields, Tortoise
+from tortoise.models import Model
 
 
-async def main():
-    os.system("cls||clear")
+class Users(Model):
+    id = fields.IntField(pk=True)
+    name = fields.TextField()
+    username = fields.CharField(max_length=32)
+    language_bot = fields.CharField(max_length=6)
+    language_anime = fields.CharField(max_length=6)
+    is_collaborator = fields.BooleanField()
 
-    await connect_database()
 
-    await Amime().start()
+async def connect_database():
+    await Tortoise.init(
+        {
+            "connections": {
+                "bot_db": os.getenv(
+                    "DATABASE_URL", "sqlite://amime/database/database.sqlite"
+                )
+            },
+            "apps": {"bot": {"models": [__name__], "default_connection": "bot_db"}},
+        }
+    )
 
-    await idle()
-
-
-if __name__ == "__main__":
-    run_async(main())
+    # Generate the schema
+    await Tortoise.generate_schemas()

@@ -20,24 +20,4 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import os
-
-from pyrogram import idle
-from tortoise import run_async
-
-from .amime import Amime
-from .database import connect_database
-
-
-async def main():
-    os.system("cls||clear")
-
-    await connect_database()
-
-    await Amime().start()
-
-    await idle()
-
-
-if __name__ == "__main__":
-    run_async(main())
+from .database import *

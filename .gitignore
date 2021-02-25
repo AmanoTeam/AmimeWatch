@@ -1,0 +1,6 @@
+# Personal files
+*.session
+*.ini
+
+# Byte-compiled
+__pycache__/

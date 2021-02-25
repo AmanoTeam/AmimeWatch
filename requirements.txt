@@ -3,3 +3,5 @@ pyrogram==1.1.13
 pyromod==1.5
 PyYAML==5.4.1
 rich==9.12.0
+
+git+https://github.com/aioanilist/aioanilist

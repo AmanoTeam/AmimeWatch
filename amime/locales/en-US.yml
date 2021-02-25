@@ -30,11 +30,23 @@ genres:
 studios:
     Studios
 
+volume:
+    Volume
+
+chapter:
+    Chapter
+
 episode:
-    Epsisode
+    Episode
 
 duration:
     Duration
+
+start_date:
+    Start date
+
+end_date:
+    End date
 
 description:
     Description

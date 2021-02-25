@@ -49,28 +49,31 @@ async def view_anime(bot: Amime, union: Union[CallbackQuery, Message]):
         anime = await client.get("anime", anime_id)
 
         if anime:
-            if len(anime.description) > 700:
+            if anime.description and len(anime.description) > 700:
                 anime.description_short = anime.description[0:500] + "..."
 
             text = f"<b>{anime.title.romaji}</b> (<code>{anime.title.native}</code>)\n"
 
             text += f"\n<b>{lang.id}</b>: <code>{anime.id}</code>"
-            text += f"\n<b>{lang.score}</b>: (<b>{lang.mean} = <code>{anime.score.mean}</code>, {lang.average} = <code>{anime.score.average}</code></b>)"
+            text += f"\n<b>{lang.score}</b>: (<b>{lang.mean} = <code>{anime.score.mean or 0}</code>, {lang.average} = <code>{anime.score.average or 0}</code></b>)"
             text += f"\n<b>{lang.status}</b>: <code>{anime.status}</code>"
             text += f"\n<b>{lang.genres}</b>: <code>{', '.join(anime.genres)}</code>"
             if anime.studios.nodes:
                 text += f"\n<b>{lang.studios}</b>: <code>{', '.join(studio.name for studio in anime.studios.nodes)}</code>"
             text += f"\n<b>{lang.format}</b>: <code>{anime.format}</code>"
-            text += f"\n<b>{lang.duration}</b>: <code>{anime.duration}m</code>"
+            text += f"\n<b>{lang.duration}</b>: <code>{anime.duration or 24}m</code>"
             if not anime.format.lower() == "movie":
                 text += f"\n<b>{lang.episode}s</b>: <code>{anime.episodes}</code>"
+            text += f"\n<b>{lang.start_date}</b>: <code>{anime.start_date.day or 0}/{anime.start_date.month or 0}/{anime.start_date.year or 0}</code>"
+            text += f"\n<b>{lang.end_date}</b>: <code>{anime.end_date.day or 0}/{anime.end_date.month or 0}/{anime.end_date.year or 0}</code>"
 
             text += "\n"
 
-            if hasattr(anime, "description_short"):
-                text += f"\n<b>{lang.short_description}</b>: <i>{anime.description_short}</i>"
-            else:
-                text += f"\n<b>{lang.description}</b>: <i>{anime.description}</i>"
+            if anime.description:
+                if hasattr(anime, "description_short"):
+                    text += f"\n<b>{lang.short_description}</b>: <i>{anime.description_short}</i>"
+                else:
+                    text += f"\n<b>{lang.description}</b>: <i>{anime.description}</i>"
 
             keyboard = [[(lang.read_more_button, anime.url, "url")]]
 

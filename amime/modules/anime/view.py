@@ -65,7 +65,8 @@ async def view_anime(bot: Amime, union: Union[CallbackQuery, Message]):
             if not anime.format.lower() == "movie":
                 text += f"\n<b>{lang.episode}s</b>: <code>{anime.episodes}</code>"
             text += f"\n<b>{lang.start_date}</b>: <code>{anime.start_date.day or 0}/{anime.start_date.month or 0}/{anime.start_date.year or 0}</code>"
-            text += f"\n<b>{lang.end_date}</b>: <code>{anime.end_date.day or 0}/{anime.end_date.month or 0}/{anime.end_date.year or 0}</code>"
+            if not anime.status.lower() == "releasing":
+                text += f"\n<b>{lang.end_date}</b>: <code>{anime.end_date.day or 0}/{anime.end_date.month or 0}/{anime.end_date.year or 0}</code>"
 
             text += "\n"
 

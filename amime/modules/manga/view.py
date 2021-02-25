@@ -61,7 +61,8 @@ async def view_manga(bot: Amime, union: Union[CallbackQuery, Message]):
             text += f"\n<b>{lang.volume}s</b>: <code>{manga.volumes or 0}</code>"
             text += f"\n<b>{lang.chapter}s</b>: <code>{manga.chapters or 0}</code>"
             text += f"\n<b>{lang.start_date}</b>: <code>{manga.start_date.day or 0}/{manga.start_date.month or 0}/{manga.start_date.year or 0}</code>"
-            text += f"\n<b>{lang.end_date}</b>: <code>{manga.end_date.day or 0}/{manga.end_date.month or 0}/{manga.end_date.year or 0}</code>"
+            if not manga.status.lower() == "releasing":
+                text += f"\n<b>{lang.end_date}</b>: <code>{manga.end_date.day or 0}/{manga.end_date.month or 0}/{manga.end_date.year or 0}</code>"
 
             text += "\n"
 

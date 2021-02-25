@@ -75,7 +75,8 @@ async def answer(bot: Amime, inline_query: InlineQuery):
                             )
                             text += f"\n<b>{lang.genres}</b>: <code>{', '.join(result.genres)}</code>"
                             text += f"\n<b>{lang.start_date}</b>: <code>{result.start_date.day or 0}/{result.start_date.month or 0}/{result.start_date.year or 0}</code>"
-                            text += f"\n<b>{lang.end_date}</b>: <code>{result.end_date.day or 0}/{result.end_date.month or 0}/{result.end_date.year or 0}</code>"
+                            if not result.status.lower() == "releasing":
+                                text += f"\n<b>{lang.end_date}</b>: <code>{result.end_date.day or 0}/{result.end_date.month or 0}/{result.end_date.year or 0}</code>"
                         results.append(
                             InlineQueryResultPhoto(
                                 photo_url=photo,

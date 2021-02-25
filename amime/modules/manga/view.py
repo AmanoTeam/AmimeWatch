@@ -74,17 +74,16 @@ async def view_manga(bot: Amime, union: Union[CallbackQuery, Message]):
             keyboard = [[(lang.read_more_button, manga.url, "url")]]
 
             if not is_callback:
-                if manga.banner:
+                photo = (
+                    manga.banner
+                    or manga.cover.extra_large
+                    or manga.cover.large
+                    or manga.cover.medium
+                    or False
+                )
+                if photo:
                     await union.reply_photo(
-                        photo=manga.banner,
-                        caption=text,
-                        reply_markup=ikb(keyboard),
-                    )
-                elif manga.cover.extra_large or manga.cover.large or manga.cover.medium:
-                    await union.reply_photo(
-                        photo=manga.cover.extra_large
-                        or manga.cover.large
-                        or manga.cover.medium,
+                        photo=photo,
                         caption=text,
                         reply_markup=ikb(keyboard),
                     )

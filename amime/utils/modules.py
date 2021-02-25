@@ -22,7 +22,6 @@
 
 import glob
 import importlib
-import os
 
 from typing import List
 
@@ -32,7 +31,6 @@ async def load():
 
     files = glob.glob(f"amime/modules/*.py")
     for file_name in files:
-        base_name = os.path.basename(file_name)
         try:
             module = importlib.import_module(
                 file_name.replace("/", ".").replace(".py", "")

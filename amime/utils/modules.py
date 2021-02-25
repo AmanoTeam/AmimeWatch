@@ -20,38 +20,27 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from datetime import datetime
+import glob
+import importlib
+import os
 
-from pyrogram import Client
-from pyrogram import __version__
-from pyrogram.raw.all import layer
-from pyrogram.types import Message
-
-from .utils import modules
+from typing import List
 
 
-class Amime(Client):
-    def __init__(self):
-        name = self.__class__.__name__.lower()
+async def load():
+    modules: List[Module] = []
 
-        super().__init__(
-            name,
-            config_file=f"{name}.ini",
-            workers=16,
-        )
+    files = glob.glob(f"amime/modules/*.py")
+    for file_name in files:
+        base_name = os.path.basename(file_name)
+        try:
+            module = importlib.import_module(
+                file_name.replace("/", ".").replace(".py", "")
+            )
+            modules.append(module)
+        except ImportError:
+            print(f"Failed to import the module: {file_name}")
 
-        self.start_datetime = datetime.utcnow()
-
-    async def start(self):
-        await super().start()
-
-        self.me = await self.get_me()
-        print(
-            f"AmimeWatch running with Pyrogram v{__version__} (Layer {layer}) started on @{self.me.username}. Hi."
-        )
-
-        await modules.load()
-
-    async def stop(self, *args):
-        await super().stop()
-        print("AmimeWatch stopped. Bye.")
+    print(
+        f"{len(modules)} module{'s' if len(modules) != 1 else ''} imported successfully!"
+    )

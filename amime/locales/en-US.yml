@@ -65,6 +65,9 @@ start: |
     I am a <b>bot</b> created to provide you with the <i>best anime experience</i>, like detailed information directly from {anilist} and even get the latest episodes of your favorite anime.
 
     Explore my functions in the buttons below:
+    
+help:
+    Let's explore? Click on the buttons below and discover all my potential, I hope you enjoy it!
 
 
 # Buttons
@@ -79,3 +82,15 @@ help_button:
 
 about_button:
     👤 About
+
+back_button:
+    🔙 Back
+
+anime_button:
+    🧕 Anime
+
+manga_button:
+    📜 Manga
+
+inline_button:
+    ✍️ Inline

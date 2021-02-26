@@ -26,42 +26,32 @@ from pyromod.helpers import ikb
 from typing import Union
 
 from ..amime import Amime
-from ..database import Users
 
 
-@Amime.on_message(filters.cmd("start$"))
-async def start_message(bot: Amime, message: Message):
-    await start_union(bot, message)
+@Amime.on_message(filters.cmd("help$"))
+async def help_message(bot: Amime, message: Message):
+    await help_union(bot, message)
 
 
-@Amime.on_callback_query(filters.regex(r"^start$"))
-async def start_callback(bot: Amime, callback: CallbackQuery):
-    await start_union(bot, callback)
+@Amime.on_callback_query(filters.regex(r"^help$"))
+async def help_callback(bot: Amime, callback: CallbackQuery):
+    await help_union(bot, callback)
 
 
-async def start_union(bot: Amime, union: Union[CallbackQuery, Message]):
+async def help_union(bot: Amime, union: Union[CallbackQuery, Message]):
     is_callback = isinstance(union, CallbackQuery)
     lang = union._lang
 
-    keyboard = [[(lang.help_button, "help"), (lang.about_button, "about")]]
-    user = union.from_user
+    keyboard = [
+        [(lang.anime_button, "help anime"), (lang.manga_button, "help mamga")],
+        [(lang.inline_button, "help inline")],
+    ]
+
+    if is_callback:
+        keyboard.append([(lang.back_button, "start")])
 
     await (union.edit_message_text if is_callback else union.reply_text)(
-        lang.start.format(
-            mention=user.mention(),
-            bot_name=bot.me.first_name,
-            anilist="<a href='https://anilist.co'>Anilist</a>",
-        ),
+        lang.help,
         reply_markup=ikb(keyboard),
         disable_web_page_preview=True,
     )
-
-    if len(await Users.filter(id=user.id)) < 1:
-        await Users.create(
-            id=user.id,
-            name=user.first_name,
-            username=user.username or "",
-            language_bot=user.language_code or "en-US",
-            language_anime=user.language_code or "en-US",
-            is_collaborator=False,
-        )

@@ -54,13 +54,17 @@ description:
 short_description:
     Short description
 
-help:
-    ❓ Help
-
 inline: |
     Touch the button below to learn how to use my <b>inline mode</b>.
 
     You will be redirected to <b>my private one</b> and learn how to use it there.
+    
+start: |
+    Hello {mention}, my name is <b>{bot_name}</b>!
+
+    I am a <b>bot</b> created to provide you with the <i>best anime experience</i>, like detailed information directly from {anilist} and even get the latest episodes of your favorite anime.
+
+    Explore my functions in the buttons below:
 
 
 # Buttons
@@ -69,3 +73,9 @@ read_more_button:
 
 trailer_button:
     🎬 Trailer
+
+help_button:
+    ❓ Help
+
+about_button:
+    👤 About

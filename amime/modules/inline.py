@@ -109,7 +109,13 @@ async def answer(bot: Amime, inline_query: InlineQuery):
                         )
     else:
         keyboard = [
-            [(lang.help, f"https://t.me/{bot.me.username}?start=help_inline", "url")]
+            [
+                (
+                    lang.help_button,
+                    f"https://t.me/{bot.me.username}?start=help_inline",
+                    "url",
+                )
+            ]
         ]
         results.append(
             InlineQueryResultArticle(

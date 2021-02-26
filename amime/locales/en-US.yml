@@ -54,6 +54,15 @@ description:
 short_description:
     Short description
 
+help:
+    ❓ Help
+
+inline: |
+    Touch the button below to learn how to use my <b>inline mode</b>.
+
+    You will be redirected to <b>my private one</b> and learn how to use it there.
+
+
 # Buttons
 read_more_button:
     🤓 Read more...

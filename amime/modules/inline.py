@@ -24,7 +24,13 @@ import aioanilist
 import re
 
 from pyrogram import filters
-from pyrogram.types import InlineQuery, InlineQueryResultPhoto
+from pyrogram.types import (
+    InlineQuery,
+    InlineQueryResultArticle,
+    InlineQueryResultPhoto,
+    InputTextMessageContent,
+)
+from pyromod.helpers import ikb
 from typing import List
 
 from ..amime import Amime
@@ -49,7 +55,7 @@ async def answer(bot: Amime, inline_query: InlineQuery):
                 content_type = "anime" if query[0] == "!a" else "manga"
 
                 async with aioanilist.Client() as client:
-                    results_search = await client.search(content_type, search, limit=7)
+                    results_search = await client.search(content_type, search, limit=10)
                     for result in results_search:
                         result = await client.get(content_type, result.id)
                         photo = (
@@ -62,7 +68,7 @@ async def answer(bot: Amime, inline_query: InlineQuery):
                         description = result.description
                         if description:
                             description = re.sub(re.compile(r"<.*?>"), "", description)
-                            description = description[0:180] + "..."
+                            description = description[0:260] + "..."
 
                         if is_gallery:
                             text = ""
@@ -74,17 +80,49 @@ async def answer(bot: Amime, inline_query: InlineQuery):
                                 f"\n<b>{lang.status}</b>: <code>{result.status}</code>"
                             )
                             text += f"\n<b>{lang.genres}</b>: <code>{', '.join(result.genres)}</code>"
+                            if hasattr(result, "studios"):
+                                if result.studios.nodes:
+                                    text += f"\n<b>{lang.studios}</b>: <code>{', '.join(studio.name for studio in result.studios.nodes)}</code>"
+                            if hasattr(result, "format"):
+                                text += f"\n<b>{lang.format}</b>: <code>{result.format}</code>"
                             text += f"\n<b>{lang.start_date}</b>: <code>{result.start_date.day or 0}/{result.start_date.month or 0}/{result.start_date.year or 0}</code>"
                             if not result.status.lower() == "releasing":
                                 text += f"\n<b>{lang.end_date}</b>: <code>{result.end_date.day or 0}/{result.end_date.month or 0}/{result.end_date.year or 0}</code>"
+                            text += f"\n\n<b>{lang.short_description}</b>: <i>{description}</i>"
+
+                        keyboard = [[(lang.read_more_button, result.url, "url")]]
+
+                        if hasattr(result, "trailer"):
+                            if hasattr(result.trailer, "url"):
+                                keyboard[0].append(
+                                    (lang.trailer_button, result.trailer.url, "url")
+                                )
+
                         results.append(
                             InlineQueryResultPhoto(
                                 photo_url=photo,
                                 title=result.title.romaji,
                                 description=description,
                                 caption=text,
+                                reply_markup=ikb(keyboard),
                             )
                         )
+    else:
+        keyboard = [
+            [(lang.help, f"https://t.me/{bot.me.username}?start=help_inline", "url")]
+        ]
+        results.append(
+            InlineQueryResultArticle(
+                title="Usage",
+                input_message_content=InputTextMessageContent(
+                    lang.inline,
+                    parse_mode="html",
+                ),
+                description="How to use the inline mode",
+                thumb_url="https://i.pinimg.com/originals/9e/1d/41/9e1d4160d3b2fd214c664ca1724fc4b4.png",
+                reply_markup=ikb(keyboard),
+            )
+        )
 
     if len(results) > 0:
         await inline_query.answer(

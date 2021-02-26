@@ -68,7 +68,17 @@ start: |
     
 help:
     Let's explore? Click on the buttons below and discover all my potential, I hope you enjoy it!
+    
+about: |
+    <b>{bot_name}</b> is a bot developed in <i>Python</i> with the <b>MTProto Pyrogram</b> library, made to be fast, stable and complete when it comes to animes.
 
+    Links: {github} | {channel} | {group}
+
+channel:
+    Channel
+
+group:
+    Group
 
 # Buttons
 read_more_button:
@@ -94,3 +104,6 @@ manga_button:
 
 inline_button:
     ✍️ Inline
+
+collaborators_button:
+    👷‍♀️ Collaborators

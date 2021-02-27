@@ -27,6 +27,7 @@ from datetime import datetime
 from pyrogram import Client
 from pyrogram import __version__
 from pyrogram.raw.all import layer
+from pyrogram.types import User
 
 from . import log
 from .utils import langs, modules
@@ -63,3 +64,6 @@ class Amime(Client):
     async def stop(self, *args):
         await super().stop()
         log.warning("AmimeWatch stopped. Bye.")
+
+    def is_sudo(self, user: User) -> bool:
+        return user.id in self.sudos

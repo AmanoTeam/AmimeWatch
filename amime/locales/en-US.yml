@@ -2,7 +2,7 @@ NAME: 🇺🇸 English
 LANGUAGE_CODE: en-US
 
 
-# Texts
+# Words
 id:
     ID
 
@@ -69,6 +69,8 @@ name:
 type:
     Type
 
+
+# Texts
 not_found:
     No <b>{type}</b> with {key} <code>{value}</code> was found.
 
@@ -116,7 +118,32 @@ removed_from_favorites:
 collaborators: |
     Below is the list of <b>{bot_name}</b> collaborators
     
-    They are in the following format: <b>name</b> (<i>languages</i>)
+    They are in the following format:
+        <b>Name</b> (<i>languages</i>)
+
+user_is_sudo:
+    The user {mention} is a <b>sudo user</b>, you cannot do anything with him.
+
+is_already_a_collaborator_in_all_these_languages:
+    The user {mention} is already a contributor to all the languages ​​you specified.
+
+is_not_a_collaborator_in_all_of_these_languages:
+    The user {mention} is not a contributor in any language you have specified.
+
+promoted_to_collaborator: |
+    {mention_sudo} promoted {mention_user} to a <b>collaborator</b> in the following language(s): <code>{languages}</code>.
+
+demoted_collaborator: |
+    {mention_sudo} demoted {mention_user} to a normal user in the following language(s): <code>{languages}</code>.
+
+is_already_a_collaborator_in_some_languages: |
+    This user is already a <b>collaborator</b> in the following language(s): <code>{languages}</code>.
+
+is_not_a_collaborator_in_some_languages: |
+    This user is not a <b>collaborator</b> in the following language(s): <code>{languages}</code>.
+
+languages_not_exists: |
+    The following language(s) ​​have not been found or do not yet exist: <code>{languages}</code>.
 
 
 # Buttons

@@ -86,6 +86,9 @@ module:
 name:
     Name
 
+help_in_pm:
+    Contact me privately for help.
+
 
 # Buttons
 read_more_button:

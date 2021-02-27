@@ -28,9 +28,27 @@ from typing import Dict, Union
 from ..amime import Amime
 
 
-@Amime.on_message(filters.cmd(r"help$") & filters.private)
+@Amime.on_message(filters.cmd(r"help$"))
 async def help_message(bot: Amime, message: Message):
-    await help_union(bot, message)
+    lang = message._lang
+
+    if await filters.private(bot, message):
+        await help_union(bot, message)
+    else:
+        await message.reply_text(
+            lang.help_in_pm,
+            reply_markup=ikb(
+                [
+                    [
+                        (
+                            lang.help_button,
+                            f"https://t.me/{bot.me.username}?start=help",
+                            "url",
+                        )
+                    ]
+                ]
+            ),
+        )
 
 
 @Amime.on_callback_query(filters.regex(r"^help$"))

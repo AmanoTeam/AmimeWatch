@@ -26,7 +26,7 @@ from pyromod.helpers import ikb
 from typing import Union
 
 from ..amime import Amime
-from ..database import Users
+from ..database import Chats, Users
 from .help import help_union, help_module_union
 
 
@@ -78,7 +78,7 @@ async def start_union(bot: Amime, union: Union[CallbackQuery, Message]):
         disable_web_page_preview=True,
     )
 
-    if len(await Users.filter(id=user.id)) < 1:
+    if len(await Users.filter(id=user.id)) == 0:
         await Users.create(
             id=user.id,
             name=user.first_name,
@@ -97,3 +97,18 @@ async def start_help_message(bot: Amime, message: Message):
 @Amime.on_message(filters.cmd(r"start help_(?P<module>.+)") & filters.private)
 async def start_help_module_message(bot: Amime, message: Message):
     await help_module_union(bot, message)
+
+
+@Amime.on_message(filters.new_chat_members & filters.group)
+async def new_members_message(bot: Amime, message: Message):
+    chat = message.chat
+    members = message.new_chat_members
+    for member in members:
+        if member.id == bot.me.id and member.username == bot.me.username:
+            if len(await Chats.filter(id=chat.id)) == 0:
+                await Chats.create(
+                    id=chat.id,
+                    title=chat.title,
+                    username=chat.username or "",
+                    language="en-US",
+                )

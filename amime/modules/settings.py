@@ -26,7 +26,6 @@ from pyromod.helpers import ikb
 from typing import Union
 
 from ..amime import Amime
-from ..database import Chats, Users
 
 
 @Amime.on_message(filters.cmd(r"settings") & filters.private)

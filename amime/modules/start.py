@@ -27,9 +27,10 @@ from typing import Union
 
 from ..amime import Amime
 from ..database import Users
+from .help import help_module_union
 
 
-@Amime.on_message(filters.cmd("start$"))
+@Amime.on_message(filters.cmd(r"start$"))
 async def start_message(bot: Amime, message: Message):
     await start_union(bot, message)
 
@@ -65,3 +66,8 @@ async def start_union(bot: Amime, union: Union[CallbackQuery, Message]):
             language_anime=user.language_code or "en-US",
             is_collaborator=False,
         )
+
+
+@Amime.on_message(filters.cmd(r"start help_(?P<module>.+)"))
+async def start_help_message(bot: Amime, message: Message):
+    await help_module_union(bot, message)

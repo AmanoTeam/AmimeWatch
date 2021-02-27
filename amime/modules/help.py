@@ -23,12 +23,12 @@
 from pyrogram import filters
 from pyrogram.types import CallbackQuery, Message
 from pyromod.helpers import ikb
-from typing import Union
+from typing import Dict, Union
 
 from ..amime import Amime
 
 
-@Amime.on_message(filters.cmd("help$"))
+@Amime.on_message(filters.cmd(r"help$"))
 async def help_message(bot: Amime, message: Message):
     await help_union(bot, message)
 
@@ -43,7 +43,7 @@ async def help_union(bot: Amime, union: Union[CallbackQuery, Message]):
     lang = union._lang
 
     keyboard = [
-        [(lang.anime_button, "help anime"), (lang.manga_button, "help mamga")],
+        [(lang.anime_button, "help anime"), (lang.manga_button, "help manga")],
         [(lang.inline_button, "help inline")],
     ]
 
@@ -55,3 +55,45 @@ async def help_union(bot: Amime, union: Union[CallbackQuery, Message]):
         reply_markup=ikb(keyboard),
         disable_web_page_preview=True,
     )
+
+
+@Amime.on_message(filters.cmd(r"help (?P<module>.+)"))
+async def help_module_message(bot: Amime, message: Message):
+    await help_module_union(bot, message)
+
+
+@Amime.on_callback_query(filters.regex(r"help (?P<module>.+)"))
+async def help_module_callback(bot: Amime, callback: CallbackQuery):
+    await help_module_union(bot, callback)
+
+
+async def help_module_union(bot: Amime, union: Union[CallbackQuery, Message]):
+    module_name = union.matches[0]["module"]
+    is_callback = isinstance(union, CallbackQuery)
+    lang = union._lang
+
+    kwargs: Dict = {}
+    if is_callback:
+        kwargs["reply_markup"] = ikb([[(lang.back_button, "help")]])
+
+    module_help_name = f"{module_name}_help"
+    if module_help_name in lang.strings[lang.code].keys():
+        text = lang.strings[lang.code][module_help_name]
+
+        await (union.edit_message_text if is_callback else union.reply_text)(
+            text.format(
+                anilist="<a href='https://anilist.co'>Anilist</a>",
+                bot_username=bot.me.username,
+                request_episodes_button=lang.request_episodes_button,
+            ),
+            disable_web_page_preview=True,
+            **kwargs,
+        )
+    else:
+        await (union.edit_message_text if is_callback else union.reply_text)(
+            lang.not_found(
+                type=lang.module.lower(), key=lang.name.lower(), value=module_name
+            ),
+            disable_web_page_preview=True,
+            **kwargs,
+        )

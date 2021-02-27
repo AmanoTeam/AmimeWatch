@@ -42,6 +42,12 @@ class Favorites(Model):
     type = fields.CharField(max_length=7)
 
 
+class Collaborators(Model):
+    id = fields.IntField(pk=True)
+    user = fields.IntField()
+    language = fields.CharField(max_length=6)
+
+
 async def connect_database():
     await Tortoise.init(
         {

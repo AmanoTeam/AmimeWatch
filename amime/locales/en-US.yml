@@ -74,14 +74,14 @@ not_found:
 
 inline: |
     Touch the button below to learn how to use my <b>inline mode</b>.
-
+    
     You will be redirected to <b>my private one</b> and learn how to use it there.
     
 start: |
     Hello {mention}, my name is <b>{bot_name}</b>!
-
+    
     I am a <b>bot</b> created to provide you with the <i>best anime experience</i>, like detailed information directly from {anilist} and even get the latest episodes of your favorite anime.
-
+    
     Explore my functions in the buttons below:
     
 help:
@@ -89,7 +89,7 @@ help:
     
 about: |
     <b>{bot_name}</b> is a bot developed in <i>Python</i> with the <b>MTProto Pyrogram</b> library, made to be fast, stable and complete when it comes to animes.
-
+    
     Links: {github} | {channel} | {group}
 
 help_in_pm:
@@ -112,6 +112,11 @@ added_to_favorites:
 
 removed_from_favorites:
     This {type} has been removed from your favorites list.
+
+collaborators: |
+    Below is the list of <b>{bot_name}</b> collaborators
+    
+    They are in the following format: <b>name</b> (<i>languages</i>)
 
 
 # Buttons
@@ -155,7 +160,7 @@ favorites_button:
 # Helps
 anime_help: |
     <b>Help on</b>: anime
-
+    
     My <b>anime module</b> allows users to see a basic list of information about the specific anime based on {anilist}, but also allows users to watch episodes, for that, use the <b>{request_episodes_button}</b> button at the bottom of all anime, with it, a message requesting episodes of such anime will be sent to <i>our collaborators</i> in your language, they will check the episodes of that anime in their language, and <b>if they exist</b>, they will add the list of episodes in their language, however, if there are no episodes of the anime in question in your language or subtitled, they will not be able to do anything, but you can watch them subtitled in the language <b>you prefer</b>.
     
     <b>How to use</b>?
@@ -163,7 +168,7 @@ anime_help: |
 
 manga_help: |
     <b>Help on</b>: manga
-
+    
     My <b>manga module</b> allows users to see a basic list of information about the specific manga based on {anilist}.
     
     <b>How to use</b>?
@@ -171,7 +176,7 @@ manga_help: |
 
 inline_help: |
     <b>Help on</b>: inline
-
+    
     My <b>inline module</b> allows users to search for anime or manga, and can also only see the photo if <b>you prefer</b>.
     
     <b>How to use</b>?

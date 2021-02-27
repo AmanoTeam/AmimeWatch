@@ -23,37 +23,42 @@
 from pyrogram import filters
 from pyrogram.types import CallbackQuery, Message
 from pyromod.helpers import ikb
-from typing import Union
+from typing import Dict, List, Union
 
 from ..amime import Amime
+from ..database import Collaborators, Users
 
 
-@Amime.on_message(filters.cmd(r"about") & filters.private)
-async def about_message(bot: Amime, message: Message):
-    await about_union(bot, message)
+@Amime.on_message(filters.cmd(r"(collabs|collaborators)$") & filters.private)
+async def collaborators_message(bot: Amime, message: Message):
+    await collaborators_union(bot, message)
 
 
-@Amime.on_callback_query(filters.regex(r"^about"))
-async def about_callback(bot: Amime, callback: CallbackQuery):
-    await about_union(bot, callback)
+@Amime.on_callback_query(filters.regex(r"collaborators"))
+async def collaborators_callback(bot: Amime, callback: CallbackQuery):
+    await collaborators_union(bot, callback)
 
 
-async def about_union(bot: Amime, union: Union[CallbackQuery, Message]):
-    is_callback = isinstance(union, CallbackQuery)
+async def collaborators_union(bot: Amime, union: Union[CallbackQuery, Message]):
     lang = union._lang
+    is_callback = isinstance(union, CallbackQuery)
 
-    keyboard = [[(lang.collaborators_button, "collaborators")]]
+    text = lang.collaborators(bot_name=bot.me.first_name)
 
+    users = await Users.filter(is_collaborator=True)
+
+    for user in users:
+        languages: List[str] = []
+        collaborator = await Collaborators.filter(user=user.id)
+        for item in collaborator:
+            languages.append(item.language)
+        username = (
+            f"@{user.username}" if len(user.username) > 0 else f"<b>{user.name}</b>"
+        )
+        text += f"\n    {username} (<i>{', '.join(languages)}</i>)"
+
+    kwargs: Dict = {}
     if is_callback:
-        keyboard.append([(lang.back_button, "start")])
+        kwargs["reply_markup"] = ikb([[(lang.back_button, "about")]])
 
-    await (union.edit_message_text if is_callback else union.reply_text)(
-        lang.about.format(
-            bot_name=bot.me.first_name,
-            github="<a href='https://github.com/AmanoTeam/AmimeWatch'>GitHub</a>",
-            channel=f"<a href='https://t.me/AmimeWatchChannel'>{lang.channel}</a>",
-            group=f"<a href='https://t.me/AmimeWatchGroup'>{lang.group}</a>",
-        ),
-        reply_markup=ikb(keyboard),
-        disable_web_page_preview=True,
-    )
+    await (union.edit_message_text if is_callback else union.reply_text)(text, **kwargs)

@@ -26,13 +26,17 @@ from tortoise import fields, Tortoise
 from tortoise.models import Model
 
 
-class Users(Model):
+class Chats(Model):
     id = fields.IntField(pk=True)
-    name = fields.TextField()
+    title = fields.TextField()
     username = fields.CharField(max_length=32)
-    language_bot = fields.CharField(max_length=6)
-    language_anime = fields.CharField(max_length=6)
-    is_collaborator = fields.BooleanField()
+    language = fields.CharField(max_length=6)
+
+
+class Collaborators(Model):
+    id = fields.IntField(pk=True)
+    user = fields.IntField()
+    language = fields.CharField(max_length=6)
 
 
 class Favorites(Model):
@@ -42,10 +46,13 @@ class Favorites(Model):
     type = fields.CharField(max_length=7)
 
 
-class Collaborators(Model):
+class Users(Model):
     id = fields.IntField(pk=True)
-    user = fields.IntField()
-    language = fields.CharField(max_length=6)
+    name = fields.TextField()
+    username = fields.CharField(max_length=32)
+    language_bot = fields.CharField(max_length=6)
+    language_anime = fields.CharField(max_length=6)
+    is_collaborator = fields.BooleanField()
 
 
 async def connect_database():

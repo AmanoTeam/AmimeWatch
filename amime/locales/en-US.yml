@@ -145,6 +145,16 @@ is_not_a_collaborator_in_some_languages: |
 languages_not_exists: |
     The following language(s) ​​have not been found or do not yet exist: <code>{languages}</code>.
 
+settings_private: |
+    You are in my settings, here you can change my language and some other little things, everything is down there.
+    
+    If you want to change my settings in any group, use the /settings command in it.
+    
+    Any changes you make will only affect the chat in which you used the command.
+
+settings_group: |
+    You are in my settings, here you can change my language and some other little things, everything is down there.
+    
 
 # Buttons
 read_more_button:
@@ -183,8 +193,14 @@ start_button:
 favorites_button:
     🌟 Favorites
 
+settings_button:
+    ⚙️ Settings
 
-# Helps
+language_button:
+    🌐 Language
+
+
+# Help texts
 anime_help: |
     <b>Help on</b>: anime
     

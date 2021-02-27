@@ -30,7 +30,7 @@ from typing import Union
 from ...amime import Amime
 
 
-@Amime.on_message(filters.cmd(r"manga (?P<id>\d+)"))
+@Amime.on_message(filters.cmd(r"manga (?P<id>\d+)") & filters.private)
 async def manga_message(bot: Amime, message: Message):
     await view_manga(bot, message)
 

@@ -28,7 +28,7 @@ from typing import Dict, Union
 from ..amime import Amime
 
 
-@Amime.on_message(filters.cmd(r"help$"))
+@Amime.on_message(filters.cmd(r"help$") & filters.private)
 async def help_message(bot: Amime, message: Message):
     await help_union(bot, message)
 
@@ -57,7 +57,7 @@ async def help_union(bot: Amime, union: Union[CallbackQuery, Message]):
     )
 
 
-@Amime.on_message(filters.cmd(r"help (?P<module>.+)"))
+@Amime.on_message(filters.cmd(r"help (?P<module>.+)") & filters.private)
 async def help_module_message(bot: Amime, message: Message):
     await help_module_union(bot, message)
 

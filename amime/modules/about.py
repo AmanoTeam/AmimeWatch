@@ -28,7 +28,7 @@ from typing import Union
 from ..amime import Amime
 
 
-@Amime.on_message(filters.cmd(r"about"))
+@Amime.on_message(filters.cmd(r"about") & filters.private)
 async def about_message(bot: Amime, message: Message):
     await about_union(bot, message)
 

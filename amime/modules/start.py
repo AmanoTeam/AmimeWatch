@@ -30,7 +30,7 @@ from ..database import Users
 from .help import help_module_union
 
 
-@Amime.on_message(filters.cmd(r"start$"))
+@Amime.on_message(filters.cmd(r"start$") & filters.private)
 async def start_message(bot: Amime, message: Message):
     await start_union(bot, message)
 
@@ -68,6 +68,6 @@ async def start_union(bot: Amime, union: Union[CallbackQuery, Message]):
         )
 
 
-@Amime.on_message(filters.cmd(r"start help_(?P<module>.+)"))
+@Amime.on_message(filters.cmd(r"start help_(?P<module>.+)") & filters.private)
 async def start_help_message(bot: Amime, message: Message):
     await help_module_union(bot, message)

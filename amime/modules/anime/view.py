@@ -30,7 +30,7 @@ from typing import Union
 from ...amime import Amime
 
 
-@Amime.on_message(filters.cmd(r"anime (?P<id>\d+)"))
+@Amime.on_message(filters.cmd(r"anime (?P<id>\d+)") & filters.private)
 async def anime_message(bot: Amime, message: Message):
     await view_anime(bot, message)
 

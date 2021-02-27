@@ -30,9 +30,27 @@ from ..database import Users
 from .help import help_union, help_module_union
 
 
-@Amime.on_message(filters.cmd(r"start$") & filters.private)
+@Amime.on_message(filters.cmd(r"start$"))
 async def start_message(bot: Amime, message: Message):
-    await start_union(bot, message)
+    lang = message._lang
+
+    if await filters.private(bot, message):
+        await start_union(bot, message)
+    else:
+        await message.reply_text(
+            lang.start_in_pm,
+            reply_markup=ikb(
+                [
+                    [
+                        (
+                            lang.start_button,
+                            f"https://t.me/{bot.me.username}?start=",
+                            "url",
+                        )
+                    ]
+                ]
+            ),
+        )
 
 
 @Amime.on_callback_query(filters.regex(r"^start$"))

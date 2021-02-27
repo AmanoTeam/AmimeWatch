@@ -89,6 +89,9 @@ name:
 help_in_pm:
     Contact me privately for help.
 
+start_in_pm:
+    Contact me in private so you can see everything I can do.
+
 
 # Buttons
 read_more_button:
@@ -120,6 +123,9 @@ collaborators_button:
 
 request_episodes_button:
     🙋‍♀️ Request episodes
+
+start_button:
+    〰️ Start
 
 
 # Helps

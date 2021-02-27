@@ -28,6 +28,7 @@ from pyromod.helpers import ikb
 from typing import Union
 
 from ...amime import Amime
+from ..favorites import get_favorite_button
 
 
 @Amime.on_message(filters.cmd(r"manga (?P<id>\d+)") & filters.private)
@@ -74,22 +75,34 @@ async def view_manga(bot: Amime, union: Union[CallbackQuery, Message]):
 
             keyboard = [[(lang.read_more_button, manga.url, "url")]]
 
-            if not is_callback:
-                photo = (
-                    manga.banner
-                    or manga.cover.extra_large
-                    or manga.cover.large
-                    or manga.cover.medium
-                    or False
+            keyboard.append(
+                [await get_favorite_button(lang, union.from_user, "manga", manga.id)]
+            )
+
+            photo = (
+                manga.banner
+                or manga.cover.extra_large
+                or manga.cover.large
+                or manga.cover.medium
+                or False
+            )
+
+            message = union.message if is_callback else union
+
+            if is_callback and message.photo:
+                await union.edit_message_text(
+                    text,
+                    reply_markup=ikb(keyboard),
                 )
+            else:
                 if photo:
-                    await union.reply_photo(
+                    await message.reply_photo(
                         photo=photo,
                         caption=text,
                         reply_markup=ikb(keyboard),
                     )
                 else:
-                    await union.reply_text(
+                    await message.reply_text(
                         text=text,
                         reply_markup=ikb(keyboard),
                     )

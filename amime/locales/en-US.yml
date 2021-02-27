@@ -3,9 +3,6 @@ LANGUAGE_CODE: en-US
 
 
 # Texts
-not_found:
-    No <b>{type}</b> with {key} <code>{value}</code> was found.
-
 id:
     ID
 
@@ -54,6 +51,27 @@ description:
 short_description:
     Short description
 
+favorite:
+    Favorite
+
+channel:
+    Channel
+
+group:
+    Group
+        
+module:
+    Module
+    
+name:
+    Name
+
+type:
+    Type
+
+not_found:
+    No <b>{type}</b> with {key} <code>{value}</code> was found.
+
 inline: |
     Touch the button below to learn how to use my <b>inline mode</b>.
 
@@ -74,23 +92,26 @@ about: |
 
     Links: {github} | {channel} | {group}
 
-channel:
-    Channel
-
-group:
-    Group
-        
-module:
-    Module
-    
-name:
-    Name
-
 help_in_pm:
     Contact me privately for help.
 
 start_in_pm:
     Contact me in private so you can see everything I can do.
+
+favorites:
+    School which list of favorites you want to see.
+
+favorites_empty:
+    Your list of <b>{type}</b> favorites is empty.
+
+favorites_list:
+    Below is your list of favorite <b>{type}</b>.
+
+added_to_favorites:
+    This {type} has been added to your favorites list.
+
+removed_from_favorites:
+    This {type} has been removed from your favorites list.
 
 
 # Buttons
@@ -126,6 +147,9 @@ request_episodes_button:
 
 start_button:
     〰️ Start
+
+favorites_button:
+    🌟 Favorites
 
 
 # Helps

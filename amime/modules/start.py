@@ -62,7 +62,10 @@ async def start_union(bot: Amime, union: Union[CallbackQuery, Message]):
     is_callback = isinstance(union, CallbackQuery)
     lang = union._lang
 
-    keyboard = [[(lang.help_button, "help"), (lang.about_button, "about")]]
+    keyboard = [
+        [(lang.help_button, "help"), (lang.favorites_button, "favorites")],
+        [(lang.about_button, "about")],
+    ]
     user = union.from_user
 
     await (union.edit_message_text if is_callback else union.reply_text)(

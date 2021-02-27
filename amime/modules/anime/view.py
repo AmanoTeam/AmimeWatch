@@ -28,6 +28,7 @@ from pyromod.helpers import ikb
 from typing import Union
 
 from ...amime import Amime
+from ..favorites import get_favorite_button
 
 
 @Amime.on_message(filters.cmd(r"anime (?P<id>\d+)") & filters.private)
@@ -81,12 +82,30 @@ async def view_anime(bot: Amime, union: Union[CallbackQuery, Message]):
             if hasattr(anime.trailer, "url"):
                 keyboard[0].append((lang.trailer_button, anime.trailer.url, "url"))
 
+            keyboard.append(
+                [await get_favorite_button(lang, union.from_user, "anime", anime.id)]
+            )
+
+            photo = f"https://img.anili.st/media/{anime.id}"
+
             if not is_callback:
                 await union.reply_photo(
-                    photo=f"https://img.anili.st/media/{anime.id}",
+                    photo=photo,
                     caption=text,
                     reply_markup=ikb(keyboard),
                 )
+            else:
+                if union.message.photo:
+                    await union.edit_message_text(
+                        text,
+                        reply_markup=ikb(keyboard),
+                    )
+                else:
+                    await union.message.reply_photo(
+                        photo=photo,
+                        caption=text,
+                        reply_markup=ikb(keyboard),
+                    )
         else:
             await union.reply_text(
                 lang.not_found(type="anime", key="id", value=anime_id)

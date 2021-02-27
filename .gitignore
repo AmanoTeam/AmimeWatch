@@ -1,5 +1,5 @@
 # Personal files
-*.session
+*.session*
 *.ini
 *.sqlite
 

@@ -33,13 +33,9 @@ async def settings_private_message(bot: Amime, message: Message):
     await settings_union(bot, message)
 
 
-@Amime.on_message(filters.cmd(r"settings") & filters.group)
+@Amime.on_message(filters.cmd(r"settings") & filters.group & filters.administrator)
 async def settings_group_message(bot: Amime, message: Message):
-    chat = message.chat
-    user = message.from_user
-    member = await bot.get_chat_member(chat.id, user.id)
-    if member.status in ["administrator", "creator"]:
-        await settings_union(bot, message)
+    await settings_union(bot, message)
 
 
 @Amime.on_callback_query(filters.regex(r"^settings"))

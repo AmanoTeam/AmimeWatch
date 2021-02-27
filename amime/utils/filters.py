@@ -42,5 +42,11 @@ async def filter_sudo(_, bot: Amime, message: Message) -> Callable:
     return user.id in bot.sudos
 
 
+async def filter_administrator(_, bot: Amime, message: Message) -> bool:
+    member = await bot.get_chat_member(message.chat.id, message.from_user.id)
+    return member.status in ["administrator", "creator"]
+
+
 filters.cmd = filter_cmd
 filters.sudo = filters.create(filter_sudo, "FilterSudo")
+filters.administrator = filters.create(filter_administrator, "FilterAdministrator")

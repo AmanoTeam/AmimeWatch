@@ -33,6 +33,8 @@ from .utils import langs, modules
 
 
 class Amime(Client):
+    SUDO_USERS = [1155717290, 918317361]  # @AndrielFR and @Hitalo
+
     def __init__(self):
         name = self.__class__.__name__.lower()
 
@@ -42,6 +44,8 @@ class Amime(Client):
             workers=16,
             workdir=".",
         )
+
+        self.sudos = Amime.SUDO_USERS
 
         self.start_datetime = datetime.utcnow()
 

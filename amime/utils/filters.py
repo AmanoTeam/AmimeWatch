@@ -23,7 +23,10 @@
 import re
 
 from pyrogram import filters
+from pyrogram.types import Message
 from typing import Callable
+
+from ..amime import Amime
 
 
 def filter_cmd(pattern: str, *args, **kwargs) -> Callable:
@@ -32,4 +35,12 @@ def filter_cmd(pattern: str, *args, **kwargs) -> Callable:
     return filters.regex(r"^" + prefix + pattern, *args, **kwargs)
 
 
+async def filter_sudo(_, bot: Amime, message: Message) -> Callable:
+    user = message.from_user
+    if not user:
+        return False
+    return user.id in bot.sudos
+
+
 filters.cmd = filter_cmd
+filters.sudo = filters.create(filter_sudo, "FilterSudo")

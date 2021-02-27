@@ -31,7 +31,7 @@ from ...amime import Amime
 from ..favorites import get_favorite_button
 
 
-@Amime.on_message(filters.cmd(r"manga (?P<id>\d+)") & filters.private)
+@Amime.on_message(filters.cmd(r"manga (?P<id>\d+)"))
 async def manga_message(bot: Amime, message: Message):
     await view_manga(bot, message)
 
@@ -45,6 +45,7 @@ async def view_manga(bot: Amime, union: Union[CallbackQuery, Message]):
     lang = union._lang
     manga_id = int(union.matches[0]["id"])
     is_callback = isinstance(union, CallbackQuery)
+    is_private = await filters.private(bot, union.message if is_callback else union)
 
     async with aioanilist.Client() as client:
         manga = await client.get("manga", manga_id)
@@ -75,9 +76,14 @@ async def view_manga(bot: Amime, union: Union[CallbackQuery, Message]):
 
             keyboard = [[(lang.read_more_button, manga.url, "url")]]
 
-            keyboard.append(
-                [await get_favorite_button(lang, union.from_user, "manga", manga.id)]
-            )
+            if is_private:
+                keyboard.append(
+                    [
+                        await get_favorite_button(
+                            lang, union.from_user, "manga", manga.id
+                        )
+                    ]
+                )
 
             photo = (
                 manga.banner

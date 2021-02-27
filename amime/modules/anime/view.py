@@ -31,7 +31,7 @@ from ...amime import Amime
 from ..favorites import get_favorite_button
 
 
-@Amime.on_message(filters.cmd(r"anime (?P<id>\d+)") & filters.private)
+@Amime.on_message(filters.cmd(r"anime (?P<id>\d+)"))
 async def anime_message(bot: Amime, message: Message):
     await view_anime(bot, message)
 
@@ -45,6 +45,7 @@ async def view_anime(bot: Amime, union: Union[CallbackQuery, Message]):
     lang = union._lang
     anime_id = int(union.matches[0]["id"])
     is_callback = isinstance(union, CallbackQuery)
+    is_private = await filters.private(bot, union.message if is_callback else union)
 
     async with aioanilist.Client() as client:
         anime = await client.get("anime", anime_id)
@@ -82,9 +83,14 @@ async def view_anime(bot: Amime, union: Union[CallbackQuery, Message]):
             if hasattr(anime.trailer, "url"):
                 keyboard[0].append((lang.trailer_button, anime.trailer.url, "url"))
 
-            keyboard.append(
-                [await get_favorite_button(lang, union.from_user, "anime", anime.id)]
-            )
+            if is_private:
+                keyboard.append(
+                    [
+                        await get_favorite_button(
+                            lang, union.from_user, "anime", anime.id
+                        )
+                    ]
+                )
 
             photo = f"https://img.anili.st/media/{anime.id}"
 

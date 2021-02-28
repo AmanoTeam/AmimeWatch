@@ -27,7 +27,7 @@ from pyrogram.types import CallbackQuery, InputMediaVideo
 from pyromod.helpers import ikb
 
 from ...amime import Amime
-from ...database import Episodes, Users, Viewed
+from ...database import Episodes, Users, Viewed, Watched
 
 
 @Amime.on_callback_query(
@@ -63,9 +63,20 @@ async def watch_callback(bot: Amime, callback: CallbackQuery):
     text += f"\n<b>{lang.duration}</b>: <code>{episode.duration}m</code>"
     text += f"\n<b>{lang.language}</b>: <code>{lang.strings[episode.language]['NAME']}</code>"
 
-    keyboard = []
-    media_buttons = []
+    keyboard = [
+        [
+            (
+                (
+                    lang.mark_as_unwatched_button
+                    if len(await Watched.filter(user=user.id, episode=episode.id)) > 0
+                    else lang.mark_as_watched_button
+                ),
+                f"watched {anime_id} {number} {language}",
+            )
+        ]
+    ]
 
+    media_buttons = []
     previous_number = 0
     for episode in episodes:
         if episode.number < number:
@@ -101,3 +112,25 @@ async def watch_callback(bot: Amime, callback: CallbackQuery):
         ),
         reply_markup=ikb(keyboard),
     )
+
+
+@Amime.on_callback_query(
+    filters.regex(r"^watched (?P<id>\d+) (?P<number>\d+) (?P<language>\w+)")
+)
+async def watched_callback(bot: Amime, callback: CallbackQuery):
+    anime_id = int(callback.matches[0]["id"])
+    number = int(callback.matches[0]["number"])
+    language = callback.matches[0]["language"]
+    user = callback.from_user
+    lang = callback._lang
+
+    episode = await Episodes.get(anime=anime_id, number=number, language=language)
+
+    watched = await Watched.filter(user=user.id, episode=episode.id)
+    if len(watched) > 0:
+        watched = watched[0]
+        await watched.delete()
+    else:
+        await Watched.create(user=user.id, episode=episode.id)
+
+    await watch_callback(bot, callback)

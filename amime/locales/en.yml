@@ -261,7 +261,10 @@ dot_button:
     ⏺️
 
 mark_as_watched_button:
-    ✅ Mark as watched.
+    ✅ Mark as watched
+
+mark_as_unwatched_button:
+    👁️ Mark as unwatched
 
 
 # Help texts

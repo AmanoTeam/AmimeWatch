@@ -46,6 +46,7 @@ async def episodes_callback(bot: Amime, callback: CallbackQuery):
     user_db = await Users.get(id=user.id)
 
     episodes = await Episodes.filter(anime=anime_id, language=user_db.language_anime)
+    episodes = sorted(episodes, key=lambda episode: episode.number)
 
     episodes_dict: Dict = {}
     for episode in episodes:

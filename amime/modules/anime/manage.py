@@ -74,6 +74,7 @@ async def manage_episodes_callback(bot: Amime, callback: CallbackQuery):
     episodes = await Episodes.filter(
         anime=anime_id, language=LANGUAGE[str(user.id)][str(anime_id)]
     )
+    episodes = sorted(episodes, key=lambda episode: episode.number)
 
     episodes_dict: Dict = {}
     for episode in episodes:
@@ -188,9 +189,9 @@ async def manage_add_episode_callback(bot: Amime, callback: CallbackQuery):
     await Episodes.create(
         anime=anime_id,
         file_id=video.file_id,
-        name=f"Test #{number}",
-        added_by=user.first_name,
-        notes="Só testando...",
+        name="",
+        added_by="",
+        notes="",
         number=number,
         duration=duration,
         language=language,

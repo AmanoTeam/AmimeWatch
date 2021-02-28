@@ -48,12 +48,16 @@ async def watch_callback(bot: Amime, callback: CallbackQuery):
 
     episode = await Episodes.get(anime=anime_id, number=number, language=language)
     episodes = await Episodes.filter(anime=anime_id, language=language)
+    episodes = sorted(episodes, key=lambda ep: ep.number)
 
     if len(await Viewed.filter(user=user.id, item=episode.id, type="anime")) < 1:
         await Viewed.create(user=user.id, item=episode.id, type="anime")
 
-    for index, episode in enumerate(episodes):
-        if episode.number == number:
+    if len(episode.name) > 0:
+        text += f"\n<b>{lang.name}</b>: <code>{episode.name}</code>"
+
+    for index, ep in enumerate(episodes):
+        if ep.number == number:
             text += f"\n<b>{lang.episode}</b>: <code>{index + 1}/{len(episodes)}</code>"
             if index == 0:
                 text += f" (<b>{lang.first}</b>)"
@@ -62,6 +66,12 @@ async def watch_callback(bot: Amime, callback: CallbackQuery):
             break
     text += f"\n<b>{lang.duration}</b>: <code>{episode.duration}m</code>"
     text += f"\n<b>{lang.language}</b>: <code>{lang.strings[episode.language]['NAME']}</code>"
+
+    if len(episode.added_by) > 0:
+        text += f"\n<b>{lang.added_by}</b>: <b>{episode.added_by}</b>"
+
+    if len(episode.notes) > 0:
+        text += f"\n\n<b>{lang.notes}</b>: <i>{episode.notes}</i>"
 
     keyboard = [
         [
@@ -78,9 +88,9 @@ async def watch_callback(bot: Amime, callback: CallbackQuery):
 
     media_buttons = []
     previous_number = 0
-    for episode in episodes:
-        if episode.number < number:
-            previous_number = episode.number
+    for ep in episodes:
+        if ep.number < number:
+            previous_number = ep.number
     if previous_number != 0:
         media_buttons.append(
             (lang.previous_button, f"watch {anime_id} {previous_number} {language}")
@@ -89,9 +99,9 @@ async def watch_callback(bot: Amime, callback: CallbackQuery):
         media_buttons.append((lang.dot_button, "noop"))
 
     next_number = 0
-    for episode in episodes:
-        if episode.number > number:
-            next_number = episode.number
+    for ep in episodes:
+        if ep.number > number:
+            next_number = ep.number
             break
     if next_number != 0:
         media_buttons.append(
@@ -101,7 +111,11 @@ async def watch_callback(bot: Amime, callback: CallbackQuery):
         media_buttons.append((lang.dot_button, "noop"))
 
     if len(media_buttons) > 0:
-        keyboard.append(media_buttons)
+        if not (
+            media_buttons[0][0] == lang.dot_button
+            and media_buttons[1][0] == lang.dot_button
+        ):
+            keyboard.append(media_buttons)
 
     keyboard.append([(lang.back_button, f"episodes {anime_id} {number // 12 }")])
 

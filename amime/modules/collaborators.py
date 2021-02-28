@@ -92,8 +92,8 @@ async def collab_add(bot: Amime, message: Message):
                 id=user.id,
                 name=user.first_name,
                 username=user.username or "",
-                language_bot=user.language_code or "en-US",
-                language_anime=user.language_code or "en-US",
+                language_bot="en",
+                language_anime="en",
                 is_collaborator=True,
             )
 
@@ -163,8 +163,8 @@ async def collab_del(bot: Amime, message: Message):
                 id=user.id,
                 name=user.first_name,
                 username=user.username or "",
-                language_bot=user.language_code or "en-US",
-                language_anime=user.language_code or "en-US",
+                language_bot="en",
+                language_anime="en",
                 is_collaborator=False,
             )
             await message.reply_text(

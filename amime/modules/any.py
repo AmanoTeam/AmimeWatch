@@ -20,40 +20,33 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import re
-
 from pyrogram import filters
 from pyrogram.types import CallbackQuery, Message
-from typing import Callable, Union
 
 from ..amime import Amime
+from ..database import Chats, Users
 
 
-def filter_cmd(pattern: str, *args, **kwargs) -> Callable:
-    prefixes = ["!", "/"]
-    prefix = f"[{re.escape(''.join(prefixes))}]"
-    return filters.regex(r"^" + prefix + pattern, *args, **kwargs)
+@Amime.on_message(group=-1)
+async def set_language_message(bot: Amime, message: Message):
+    lang = message._lang
+    code: str = ""
+
+    if await filters.private(bot, message):
+        code = (await Users.get(id=message.from_user.id)).language_bot
+    else:
+        code = (await Chats.get(id=message.chat.id)).language
+    message._lang = lang.get_language(code)
 
 
-async def filter_sudo(_, bot: Amime, message: Message) -> Callable:
-    user = message.from_user
-    if not user:
-        return False
-    return user.id in bot.sudos
+@Amime.on_callback_query(group=-1)
+async def set_language_callback(bot: Amime, callback: CallbackQuery):
+    message = callback.message
+    lang = callback._lang
+    code: str = ""
 
-
-async def filter_administrator(
-    _, bot: Amime, union: Union[CallbackQuery, Message]
-) -> bool:
-    is_callback = isinstance(union, CallbackQuery)
-    message = union.message if is_callback else union
-    chat = message.chat
-    user = union.from_user
-
-    member = await bot.get_chat_member(chat.id, user.id)
-    return member.status in ["administrator", "creator"]
-
-
-filters.cmd = filter_cmd
-filters.sudo = filters.create(filter_sudo, "FilterSudo")
-filters.administrator = filters.create(filter_administrator, "FilterAdministrator")
+    if await filters.private(bot, message):
+        code = (await Users.get(id=callback.from_user.id)).language_bot
+    else:
+        code = (await Chats.get(id=message.chat.id)).language
+    callback._lang = lang.get_language(code)

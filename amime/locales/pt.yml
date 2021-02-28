@@ -1,0 +1,242 @@
+NAME: Português
+LANGUAGE_CODE: pt
+
+
+# Words
+id:
+    ID
+
+score:
+    Pontuação
+
+mean:
+    Média
+
+average:
+    Média
+
+format:
+    Formato
+
+status:
+    Status
+
+genres:
+    Gêneros
+
+studios:
+    Estúdios
+
+volume:
+    Volume
+
+chapter:
+    Capítulo
+
+episode:
+    Episódio
+
+duration:
+    Duração
+
+start_date:
+    Data de início
+
+end_date:
+    Data final
+
+description:
+    Descrição
+
+short_description:
+    Pequena descrição
+
+favorite:
+    Favorito
+
+channel:
+    Canal
+
+group:
+    Grupo
+        
+module:
+    Módulo
+    
+name:
+    Nome
+
+type:
+    Tipo
+
+
+
+# Texts
+not_found:
+    Nenhum <b>{type}</b> com o(a) {key} <code>{value}</code> foi encontrado.
+
+inline: |
+    Toque no botão abaixo para aprender a usar o <b>modo inline</b>.
+    
+    Você será enviado para o <b>meu privado</b> e aprenderá como usar-me.
+    
+start: |
+    Olá {mention}, meu nome é <b>{bot_name}</b>!
+    
+    Eu sou um <b>bot</b> criado para fornecer a você a <i>melhor experiência anime</i>, como informações detalhadas diretamente de {anilist} e até mesmo obter os episódios mais recentes do seu anime favorito.
+    
+    Explore minhas funções nos botões abaixo:
+    
+help:
+    Vamos explorar? Clique nos botões abaixo e descubra todo o meu potencial, espero que gostem!
+    
+about: |
+    <b>{bot_name}</b> é um bot feito em <i>Python</i> com a livraria <b>MTProto Pyrogram</b>, feito para ser rápido, estável e completo quando se trata de animes.
+    
+    Links: {github} | {channel} | {group}
+
+help_in_pm:
+    Contate-me em particular para obter ajuda.
+
+start_in_pm:
+    Contacte-me em particular para que possa ver tudo o que posso fazer.
+
+favorites:
+    Escola qual lista de favoritos você deseja ver.
+
+favorites_empty:
+    Sua lista de <b>{type}</b> favoritos está vazia.
+
+favorites_list:
+    Abaixo está sua lista de <b>{type}</b> favoritos.
+
+added_to_favorites:
+    Este {type} foi adicionado à sua lista de favoritos.
+
+removed_from_favorites:
+    Este {type} foi removido de sua lista de favoritos.
+
+collaborators: |
+    Abaixo está a lista de colaboradores de <b>{bot_name}</b>.
+    
+    Eles estão no seguinte formato:
+        <b>Nome</b> (<i>idiomas</i>)
+
+user_is_sudo:
+    O usuário {mention} é um <b>usuário sudo</b>, você não pode fazer nada com ele.
+
+is_already_a_collaborator_in_all_these_languages:
+    O usuário {mention} já é colaborador em todos os idiomas que você especificou.
+
+is_not_a_collaborator_in_all_of_these_languages:
+    O usuário {mention} não é um colaborador em nenhum idioma que você especificou.
+
+promoted_to_collaborator: |
+    {mention_sudo} promoveu {mention_user} a <b>collaborador</b> no(s) seguinte(s) idioma(s): <code>{languages}</code>.
+
+demoted_collaborator: |
+    {mention_sudo} rebaixou {mention_user} a usuário normal no(s) seguinte(s) idioma(s): <code>{languages}</code>.
+
+is_already_a_collaborator_in_some_languages: |
+    Este usuário já é um <b>colaborador</b> no(s) seguinte(s) idioma(s): <code> {languages} </code>.
+
+is_not_a_collaborator_in_some_languages: |
+    Este usuário não é um <b>colaborador</b> no(s) seguinte(s) idioma(s): <code> {languages} </code>.
+
+languages_not_exists: |
+    Os seguintes idiomas não foram encontrados ou ainda não existem: <code>{languages}</code>.
+
+settings_private: |
+    Você está nas minhas configurações, aqui você pode mudar meu idioma e algumas outras coisinhas, está tudo ai embaixo.
+    
+    Se você quiser alterar minhas configurações em qualquer grupo, use o comando /settings nele.
+    
+    Quaisquer alterações feitas afetarão apenas o chat no qual você usou o comando.
+
+settings_group: |
+    Você está nas minhas configurações, aqui você pode mudar meu idioma e algumas outras coisinhas, está tudo ai embaixo.
+    
+settings_language:
+    Escolha o idioma que deseja usar abaixo.
+    
+
+# Buttons
+read_more_button:
+    🤓 Ler mais...
+
+trailer_button:
+    🎬 Trailer
+
+help_button:
+    ❓ Ajuda
+
+about_button:
+    👤 Sobre
+
+back_button:
+    🔙 Voltar
+
+anime_button:
+    🧕 Anime
+
+manga_button:
+    📜 Manga
+
+inline_button:
+    ✍️ Inline
+
+collaborators_button:
+    👷‍♀️ Colaboradores
+
+request_episodes_button:
+    🙋‍♀️ Solicitar episódios
+
+start_button:
+    〰️ Iniciar
+
+favorites_button:
+    🌟 Favoritos
+
+settings_button:
+    ⚙️ Configurações
+
+language_button:
+    🌐 Idioma
+
+
+# Help texts
+anime_help: |
+    <b>Help on</b>: anime
+    
+    My <b>anime module</b> allows users to see a basic list of information about the specific anime based on {anilist}, but also allows users to watch episodes, for that, use the <b>{request_episodes_button}</b> button at the bottom of all anime, with it, a message requesting episodes of such anime will be sent to <i>our collaborators</i> in your language, they will check the episodes of that anime in their language, and <b>if they exist</b>, they will add the list of episodes in their language, however, if there are no episodes of the anime in question in your language or subtitled, they will not be able to do anything, but you can watch them subtitled in the language <b>you prefer</b>.
+    
+    <b>How to use</b>?
+        Send me the anime using the <b>inline module</b> or use the command <code>/anime &lt;id&gt;</code>.
+
+manga_help: |
+    <b>Help on</b>: manga
+    
+    My <b>manga module</b> allows users to see a basic list of information about the specific manga based on {anilist}.
+    
+    <b>How to use</b>?
+        Send me the manga using the <b>inline module</b> or use the command <code>/manga &lt;id&gt;</code>.
+
+inline_help: |
+    <b>Help on</b>: inline
+    
+    My <b>inline module</b> allows users to search for anime or manga, and can also only see the photo if <b>you prefer</b>.
+    
+    <b>How to use</b>?
+        Type my username and proceed: @{bot_username}
+        
+        <b>Flags</b>:
+            <code>!a</code> - search anime.
+            <code>!m</code> - search manga.
+            <code>!g</code> - use gallery mode (photos only).
+            
+        <b>Examples</b>:
+            <code>@{bot_username} !a !g Naruto Shippuden</code>
+            <code>@{bot_username} !m Jujutsu Kaizen</code>
+            <code>@{bot_username} !a Shingeki no Kyojin</code>
+        
+        Test it yourself. 😅

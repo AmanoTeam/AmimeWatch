@@ -1,5 +1,5 @@
-NAME: 🇺🇸 English
-LANGUAGE_CODE: en-US
+NAME: English
+LANGUAGE_CODE: en
 
 
 # Words
@@ -154,6 +154,9 @@ settings_private: |
 
 settings_group: |
     You are in my settings, here you can change my language and some other little things, everything is down there.
+    
+settings_language:
+    Choose which language you want to use below.
     
 
 # Buttons

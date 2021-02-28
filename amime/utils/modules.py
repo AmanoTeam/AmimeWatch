@@ -33,6 +33,7 @@ async def load(bot):
     modules: List[Module] = []
 
     files = glob.glob(f"amime/modules/*.py") + glob.glob(f"amime/modules/*/*.py")
+    files = sorted(files, key=lambda file: file.split("/")[2])
     for file_name in files:
         try:
             module = importlib.import_module(

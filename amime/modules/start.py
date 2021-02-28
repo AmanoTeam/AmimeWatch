@@ -83,8 +83,8 @@ async def start_union(bot: Amime, union: Union[CallbackQuery, Message]):
             id=user.id,
             name=user.first_name,
             username=user.username or "",
-            language_bot=user.language_code or "en-US",
-            language_anime=user.language_code or "en-US",
+            language_bot="en",
+            language_anime="en",
             is_collaborator=False,
         )
 
@@ -110,5 +110,5 @@ async def new_members_message(bot: Amime, message: Message):
                     id=chat.id,
                     title=chat.title,
                     username=chat.username or "",
-                    language="en-US",
+                    language="en",
                 )

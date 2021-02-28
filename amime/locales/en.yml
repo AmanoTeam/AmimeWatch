@@ -69,6 +69,12 @@ name:
 type:
     Type
 
+video:
+    Video
+
+episode_number:
+    Episode number
+
 
 # Texts
 not_found:
@@ -157,7 +163,24 @@ settings_group: |
     
 settings_language:
     Choose which language you want to use below.
-    
+
+manage_anime:
+    Choose what you want to do with this anime.
+
+manage_episodes:
+    Here you manage the episodes, you can edit them, delete them or add new episodes.
+
+list_of_questions:
+    A list of questions will be asked, answer them.
+
+send_me_the:
+    Send me the <b>{item}</b>.
+
+duplicate_episode_number:
+    This anime already has an episode with that number in that same language, you cannot put two episodes with the same number, choose another one or delete the other episode.
+
+episode_added:
+    The episode was successfully added!
 
 # Buttons
 read_more_button:
@@ -204,6 +227,12 @@ language_button:
 
 episodes_button:
     🎬 Episodes
+
+manage_button:
+    💼 Manage
+
+add_button:
+    ➕ Add
 
 
 # Help texts

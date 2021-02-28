@@ -42,6 +42,9 @@ class Collaborators(Model):
 class Episodes(Model):
     id = fields.IntField(pk=True)
     anime = fields.IntField()
+    file_id = fields.TextField()
+    number = fields.IntField()
+    duration = fields.IntField()
     language = fields.CharField(max_length=6)
 
 

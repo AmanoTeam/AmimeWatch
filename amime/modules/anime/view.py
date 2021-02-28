@@ -97,6 +97,11 @@ async def view_anime(bot: Amime, union: Union[CallbackQuery, Message]):
                 keyboard[-1].append((lang.episodes_button, f"episodes {anime.id}"))
                 keyboard[-1].sort(reverse=True)
 
+            if is_private and (
+                await filters.collaborator(bot, union) or await filters.sudo(bot, union)
+            ):
+                keyboard[-1].append((lang.manage_button, f"manage anime {anime.id}"))
+
             photo = f"https://img.anili.st/media/{anime.id}"
 
             if not is_callback:

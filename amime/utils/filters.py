@@ -27,7 +27,7 @@ from pyrogram.types import CallbackQuery, Message
 from typing import Callable, Union
 
 from ..amime import Amime
-from ..databae import Users
+from ..database import Users
 
 
 def filter_cmd(pattern: str, *args, **kwargs) -> Callable:
@@ -43,7 +43,7 @@ async def filter_sudo(_, bot: Amime, message: Message) -> Callable:
     return user.id in bot.sudos
 
 
-async def filter_collaborator(_, bot: Amime, message: Message) -> ool:
+async def filter_collaborator(_, bot: Amime, message: Message) -> bool:
     user = message.from_user
     if not user:
         return False

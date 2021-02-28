@@ -182,6 +182,11 @@ duplicate_episode_number:
 episode_added:
     The episode was successfully added!
 
+episodes:
+    You are on my list of episodes, I hope you like them. 🙈
+    
+    I currently have <code>{count}</code> episodes in the language <b>{language}</b>. 😅
+
 # Buttons
 read_more_button:
     🤓 Read more...

@@ -94,7 +94,7 @@ async def view_anime(bot: Amime, union: Union[CallbackQuery, Message]):
                 )
 
             if len(await Episodes.filter(anime=anime.id)) > 0:
-                keyboard[-1].append((lang.episodes_button, f"episodes {anime.id}"))
+                keyboard[-1].append((lang.episodes_button, f"episodes {anime.id} 1"))
                 keyboard[-1].sort(reverse=True)
 
             if is_private and (

@@ -35,6 +35,7 @@ from .utils import langs, modules
 
 class Amime(Client):
     SUDO_USERS = [1155717290, 918317361]  # @AndrielFR and @Hitalo
+    STAFF_ID = -543289351
 
     def __init__(self):
         name = self.__class__.__name__.lower()
@@ -60,6 +61,8 @@ class Amime(Client):
 
         langs.load()
         await modules.load(self)
+
+        self.staff = await self.get_chat(Amime.STAFF_ID)
 
     async def stop(self, *args):
         await super().stop()

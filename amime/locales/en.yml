@@ -75,6 +75,18 @@ video:
 episode_number:
     Episode number
 
+language:
+    Language
+
+first:
+    First
+
+last:
+    Last
+
+added_by:
+    Added by
+
 
 # Texts
 not_found:
@@ -238,6 +250,15 @@ manage_button:
 
 add_button:
     ➕ Add
+
+previous_button:
+    ⏪ Previous
+
+next_button:
+    ⏩ Next
+
+dot_button:
+    ⏺️
 
 
 # Help texts

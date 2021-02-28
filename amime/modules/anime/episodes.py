@@ -21,7 +21,7 @@
 # SOFTWARE.
 
 from pyrogram import filters
-from pyrogram.types import CallbackQuery
+from pyrogram.types import CallbackQuery, InputMediaPhoto
 from pyromod.helpers import array_chunk, ikb
 from pyromod.nav import Pagination
 from typing import Dict
@@ -77,12 +77,25 @@ async def episodes_callback(bot: Amime, callback: CallbackQuery):
 
     keyboard.append([(lang.back_button, f"anime {anime_id}")])
 
-    await callback.edit_message_text(
-        lang.episodes(
-            count=len(episodes), language=lang.strings[user_db.language_anime]["NAME"]
-        ),
-        reply_markup=ikb(keyboard),
-    )
+    if not callback.message.photo:
+        await callback.edit_message_media(
+            InputMediaPhoto(
+                f"https://img.anili.st/media/{anime_id}",
+                caption=lang.episodes(
+                    count=len(episodes),
+                    language=lang.strings[user_db.language_anime]["NAME"],
+                ),
+            ),
+            reply_markup=ikb(keyboard),
+        )
+    else:
+        await callback.edit_message_text(
+            lang.episodes(
+                count=len(episodes),
+                language=lang.strings[user_db.language_anime]["NAME"],
+            ),
+            reply_markup=ikb(keyboard),
+        )
 
 
 @Amime.on_callback_query(filters.regex(r"^episodes lang (?P<id>\d+) (?P<page>\d+)"))

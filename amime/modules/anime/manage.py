@@ -188,6 +188,9 @@ async def manage_add_episode_callback(bot: Amime, callback: CallbackQuery):
     await Episodes.create(
         anime=anime_id,
         file_id=video.file_id,
+        name=f"Test #{number}",
+        added_by=user.first_name,
+        notes="Só testando...",
         number=number,
         duration=duration,
         language=language,

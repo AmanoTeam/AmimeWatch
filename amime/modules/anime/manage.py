@@ -209,17 +209,14 @@ async def manage_add_episode_callback(bot: Amime, callback: CallbackQuery):
     )
 
 
-@Amime.on_callback_query(
-    filters.regex(r"^manage del (?P<id>\d+) (?P<number>\d+) (?P<page>\d+)")
-)
+@Amime.on_callback_query(filters.regex(r"^manage del (?P<id>\d+) (?P<number>\d+) (?P<page>\d+)"))
 async def manage_del_callback(bot: Amime, callback: CallbackQuery):
     anime_id = int(callback.matches[0]["id"])
     number = int(callback.matches[0]["number"])
-    page = int(callback.matches[0]["page"])
-
+    
     try:
         await (await Episodes.get(anime=anime_id, number=number)).delete()
     except:
         pass
-
+    
     await manage_episodes_callback(bot, callback)

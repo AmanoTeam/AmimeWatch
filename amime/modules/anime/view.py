@@ -28,6 +28,7 @@ from pyromod.helpers import ikb
 from typing import Union
 
 from ...amime import Amime
+from ...database import Episodes
 from ..favorites import get_favorite_button
 
 
@@ -91,6 +92,10 @@ async def view_anime(bot: Amime, union: Union[CallbackQuery, Message]):
                         )
                     ]
                 )
+
+            if len(await Episodes.filter(anime=anime.id)) > 0:
+                keyboard[-1].append((lang.episodes_button, f"episodes {anime.id}"))
+                keyboard[-1].sort(reverse=True)
 
             photo = f"https://img.anili.st/media/{anime.id}"
 

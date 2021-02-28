@@ -39,6 +39,12 @@ class Collaborators(Model):
     language = fields.CharField(max_length=6)
 
 
+class Episodes(Model):
+    id = fields.IntField(pk=True)
+    anime = fields.IntField()
+    language = fields.CharField(max_length=6)
+
+
 class Favorites(Model):
     id = fields.IntField(pk=True)
     user = fields.IntField()

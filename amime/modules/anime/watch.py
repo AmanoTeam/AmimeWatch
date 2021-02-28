@@ -27,7 +27,7 @@ from pyrogram.types import CallbackQuery, InputMediaVideo
 from pyromod.helpers import ikb
 
 from ...amime import Amime
-from ...database import Episodes, Users
+from ...database import Episodes, Users, Viewed
 
 
 @Amime.on_callback_query(
@@ -48,6 +48,9 @@ async def watch_callback(bot: Amime, callback: CallbackQuery):
 
     episode = await Episodes.get(anime=anime_id, number=number, language=language)
     episodes = await Episodes.filter(anime=anime_id, language=language)
+
+    if len(await Viewed.filter(user=user.id, item=episode.id, type="anime")) < 1:
+        await Viewed.create(user=user.id, item=episode.id, type="anime")
 
     for index, episode in enumerate(episodes):
         if episode.number == number:

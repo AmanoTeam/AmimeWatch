@@ -260,6 +260,9 @@ next_button:
 dot_button:
     ⏺️
 
+mark_as_watched_button:
+    ✅ Mark as watched.
+
 
 # Help texts
 anime_help: |

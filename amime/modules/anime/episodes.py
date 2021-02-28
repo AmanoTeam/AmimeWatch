@@ -61,12 +61,12 @@ async def episodes_callback(bot: Amime, callback: CallbackQuery):
 
     layout = Pagination(
         [*episodes_dict.items()],
-        item_data=lambda i, pg: f"watch {i[1][0].anime} {i[1][0].number}",
+        item_data=lambda i, pg: f"watch {i[1][0].anime} {i[1][0].number} {i[1][0].language}",
         item_title=item_title,
         page_data=lambda pg: f"episodes {anime_id} {pg}",
     )
 
-    lines = layout.create(page, lines=8, columns=2)
+    lines = layout.create(page, lines=12, columns=2)
 
     if len(lines) > 0:
         keyboard += lines

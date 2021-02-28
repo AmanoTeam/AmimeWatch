@@ -20,6 +20,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+import asyncio
+import aioschedule as schedule
 import pyromod.listen
 
 from datetime import datetime
@@ -30,11 +32,12 @@ from pyrogram.raw.all import layer
 from pyrogram.types import User
 
 from . import log
-from .utils import langs, modules
+from .utils import backup, langs, modules
 
 
 class Amime(Client):
     SUDO_USERS = [1155717290, 918317361]  # @AndrielFR and @Hitalo
+    BACKUP_ID = -1001339690483
     STAFF_ID = -543289351
 
     def __init__(self):
@@ -62,7 +65,14 @@ class Amime(Client):
         langs.load()
         await modules.load(self)
 
-        self.staff = await self.get_chat(Amime.STAFF_ID)
+        self.backup_chat = await self.get_chat(Amime.BACKUP_ID)
+        self.staff_chat = await self.get_chat(Amime.STAFF_ID)
+
+        schedule.every(1).hour.do(backup.save_in_telegram, bot=self)
+
+        while True:
+            await schedule.run_pending()
+            await asyncio.sleep(0.1)
 
     async def stop(self, *args):
         await super().stop()

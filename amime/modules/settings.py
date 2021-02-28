@@ -26,6 +26,7 @@ from pyromod.helpers import ikb
 from typing import Union
 
 from ..amime import Amime
+from ..database import Chats
 
 
 @Amime.on_message(filters.cmd(r"settings") & filters.private)
@@ -46,7 +47,18 @@ async def settings_callback(bot: Amime, callback: CallbackQuery):
 async def settings_union(bot: Amime, union: Union[CallbackQuery, Message]):
     is_callback = isinstance(union, CallbackQuery)
     is_private = await filters.private(bot, union.message if is_callback else union)
+    message = union.message if is_callback else union
+    chat = message.chat
     lang = union._lang
+
+    if await filters.group(bot, message):
+        if len(await Chats.filter(id=chat.id)) == 0:
+            await Chats.create(
+                id=chat.id,
+                title=chat.title,
+                username=chat.username or "",
+                language="en",
+            )
 
     keyboard = [
         [(lang.language_button, f"language {'bot' if is_private else 'group'}")]

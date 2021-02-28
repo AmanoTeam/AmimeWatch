@@ -197,10 +197,15 @@ duplicate_episode_number:
 episode_added:
     The episode was successfully added!
 
-episodes:
-    You are on my list of episodes, I hope you like them. 🙈
+episodes: |
+    Here are the episodes available for the anime <b>{name}</b> (<b>ID</b>: <code>{id}</code>), have fun!
+    I currently have <code>{count}</code> episodes in <b>{language}</b>.
     
-    I currently have <code>{count}</code> episodes in the language <b>{language}</b>. 😅
+    <b>About emojis</b>:
+        ✅ - Watched
+        👁️ - Only viewed
+        🙈 - Never open
+
 
 # Buttons
 read_more_button:

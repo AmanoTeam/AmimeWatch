@@ -64,10 +64,15 @@ async def manage_episodes_callback(bot: Amime, callback: CallbackQuery):
     user = callback.from_user
     lang = callback._lang
 
+    language = LANGUAGE[str(user.id)][str(anime_id)]
+
     keyboard = [
         [
             (lang.add_button, f"manage add episode {anime_id} {page}"),
-            (lang.language_button, f"manage lang {anime_id} {page}"),
+            (
+                f"{lang.language_button}: {lang.strings[language]['NAME']}",
+                f"manage lang {anime_id} {page}",
+            ),
         ]
     ]
 

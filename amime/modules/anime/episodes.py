@@ -20,6 +20,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+import aioanilist
+
 from pyrogram import filters
 from pyrogram.types import CallbackQuery, InputMediaPhoto
 from pyromod.helpers import array_chunk, ikb
@@ -37,13 +39,18 @@ async def episodes_callback(bot: Amime, callback: CallbackQuery):
     user = callback.from_user
     lang = callback._lang
 
-    keyboard = [
-        [
-            (lang.language_button, f"episodes lang {anime_id} {page}"),
-        ]
-    ]
+    anime = await aioanilist.Client().get("anime", anime_id)
 
     user_db = await Users.get(id=user.id)
+
+    keyboard = [
+        [
+            (
+                f"{lang.language_button}: {lang.strings[user_db.language_anime]['NAME']}",
+                f"episodes lang {anime_id} {page}",
+            ),
+        ]
+    ]
 
     episodes = await Episodes.filter(anime=anime_id, language=user_db.language_anime)
     episodes = sorted(episodes, key=lambda episode: episode.number)
@@ -83,6 +90,8 @@ async def episodes_callback(bot: Amime, callback: CallbackQuery):
             InputMediaPhoto(
                 f"https://img.anili.st/media/{anime_id}",
                 caption=lang.episodes(
+                    name=anime.title.romaji,
+                    id=anime.id,
                     count=len(episodes),
                     language=lang.strings[user_db.language_anime]["NAME"],
                 ),
@@ -92,6 +101,8 @@ async def episodes_callback(bot: Amime, callback: CallbackQuery):
     else:
         await callback.edit_message_text(
             lang.episodes(
+                name=anime.title.romaji,
+                id=anime.id,
                 count=len(episodes),
                 language=lang.strings[user_db.language_anime]["NAME"],
             ),

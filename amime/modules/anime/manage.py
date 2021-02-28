@@ -80,11 +80,11 @@ async def manage_episodes_callback(bot: Amime, callback: CallbackQuery):
         episodes_dict[episode.id] = episode
 
     def item_title(i, pg) -> str:
-        return i[1].number
+        return f"🗑️ {i[1].number}"
 
     layout = Pagination(
         [*episodes_dict.items()],
-        item_data=lambda i, pg: f"manage episode {i[1].id}",
+        item_data=lambda i, pg: f"manage del {i[1].anime} {i[1].number} {pg}",
         item_title=item_title,
         page_data=lambda pg: f"manage episodes {anime_id} {pg}",
     )
@@ -207,3 +207,19 @@ async def manage_add_episode_callback(bot: Amime, callback: CallbackQuery):
         lang.episode_added,
         reply_markup=ikb([[(lang.back_button, f"manage episodes {anime_id} {page}")]]),
     )
+
+
+@Amime.on_callback_query(
+    filters.regex(r"^manage del (?P<id>\d+) (?P<number>\d+) (?P<page>\d+)")
+)
+async def manage_del_callback(bot: Amime, callback: CallbackQuery):
+    anime_id = int(callback.matches[0]["id"])
+    number = int(callback.matches[0]["number"])
+    page = int(callback.matches[0]["page"])
+
+    try:
+        await (await Episodes.get(anime=anime_id, number=number)).delete()
+    except:
+        pass
+
+    await manage_episodes_callback(bot, callback)

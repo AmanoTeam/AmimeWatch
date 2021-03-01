@@ -95,7 +95,7 @@ async def manage_episodes_callback(bot: Amime, callback: CallbackQuery):
         page_data=lambda pg: f"manage episodes {anime_id} {pg}",
     )
 
-    lines = layout.create(page, lines=8, columns=2)
+    lines = layout.create(page, lines=5, columns=2)
 
     if len(lines) > 0:
         keyboard += lines

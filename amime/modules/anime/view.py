@@ -106,14 +106,18 @@ async def view_anime(bot: Amime, union: Union[CallbackQuery, Message]):
                         (lang.manage_button, f"manage anime {anime.id}")
                     )
 
-                keyboard.append(
-                    [
-                        (
-                            lang.request_episodes_button,
-                            f"request episodes question {anime_id}",
-                        )
-                    ]
-                )
+                if not (
+                    await filters.collaborator(bot, union)
+                    or await filters.sudo(bot, union)
+                ):
+                    keyboard.append(
+                        [
+                            (
+                                lang.request_episodes_button,
+                                f"request episodes question {anime_id}",
+                            )
+                        ]
+                    )
 
             photo = f"https://img.anili.st/media/{anime.id}"
 

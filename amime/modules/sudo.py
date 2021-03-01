@@ -30,6 +30,16 @@ from pyromod.helpers import ikb
 from typing import Dict
 
 from ..amime import Amime
+from ..database import (
+    Chats,
+    Collaborators,
+    Episodes,
+    Favorites,
+    Requests,
+    Users,
+    Viewed,
+    Watched,
+)
 
 
 @Amime.on_message(filters.cmd(r"up(gr|d)a(d|t)e") & filters.sudo)
@@ -124,3 +134,43 @@ async def reboot_message(bot: Amime, message: Message):
 async def shutdown_message(bot: Amime, message: Message):
     await message.reply_text("Turning off...")
     sys.exit(0)
+
+
+@Amime.on_message(filters.cmd(r"stats") & filters.sudo)
+async def stats_message(bot: Amime, message: Message):
+    lang = message._lang
+
+    text = "<b>General statistics</b>"
+    text += f"\n    <b>Registered</b>:"
+
+    text += f"\n        <b>Chats</b>:"
+    for code in lang.strings.keys():
+        chats = await Chats.filter(language=code)
+        text += f"\n            <b>{code}</b>: <code>{len(chats)}</code>"
+
+    text += f"\n        <b>Users</b>:"
+    for code in lang.strings.keys():
+        users = await Users.filter(language_bot=code)
+        text += f"\n            <b>{code}</b>: <code>{len(users)}</code>"
+
+    vieweds = await Viewed.all()
+    text += f"\n        <b>Vieweds</b>: <code>{len(vieweds)}</code>"
+
+    episodes = await Episodes.all()
+    text += f"\n        <b>Episodes</b>: <code>{len(episodes)}</code>"
+
+    favorites = await Favorites.all()
+    text += f"\n        <b>Favorites</b>: <code>{len(favorites)}</code>"
+
+    requests = await Requests.all()
+    text += f"\n        <b>Requests</b>: <code>{len(requests)}</code>"
+
+    watcheds = await Watched.all()
+    text += f"\n        <b>Watcheds</b>: <code>{len(watcheds)}</code>"
+
+    collaborators = await Collaborators.all()
+    text += f"\n    <b>Collaborators</b>: <code>{len(collaborators)}</code>"
+
+    text += f"\n    <b>Loaded languages</b>: <code>{len(lang.strings.keys())}</code>"
+
+    await message.reply_text(text)

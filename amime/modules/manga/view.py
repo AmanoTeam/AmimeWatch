@@ -57,7 +57,7 @@ async def view_manga(bot: Amime, union: Union[CallbackQuery, Message]):
             text = f"<b>{manga.title.romaji}</b> (<code>{manga.title.native}</code>)\n"
 
             text += f"\n<b>{lang.id}</b>: <code>{manga.id}</code>"
-            text += f"\n<b>{lang.score}</b>: (<b>{lang.mean} = <code>{manga.score.mean or 0}</code>, {lang.average} = <code>{manga.score.average or 0}</code></b>)"
+            text += f"\n<b>{lang.score}</b>: (<b>{lang.average} = <code>{manga.score.average or 0}</code></b>)"
             text += f"\n<b>{lang.status}</b>: <code>{manga.status}</code>"
             text += f"\n<b>{lang.genres}</b>: <code>{', '.join(manga.genres)}</code>"
             text += f"\n<b>{lang.volume}s</b>: <code>{manga.volumes or 0}</code>"

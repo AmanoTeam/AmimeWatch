@@ -58,7 +58,7 @@ async def view_anime(bot: Amime, union: Union[CallbackQuery, Message]):
             text = f"<b>{anime.title.romaji}</b> (<code>{anime.title.native}</code>)\n"
 
             text += f"\n<b>{lang.id}</b>: <code>{anime.id}</code>"
-            text += f"\n<b>{lang.score}</b>: (<b>{lang.mean} = <code>{anime.score.mean or 0}</code>, {lang.average} = <code>{anime.score.average or 0}</code></b>)"
+            text += f"\n<b>{lang.score}</b>: (<b>{lang.average} = <code>{anime.score.average or 0}</code></b>)"
             text += f"\n<b>{lang.status}</b>: <code>{anime.status}</code>"
             text += f"\n<b>{lang.genres}</b>: <code>{', '.join(anime.genres)}</code>"
             if anime.studios.nodes:

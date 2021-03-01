@@ -88,7 +88,8 @@ def parse_commits(log: str) -> Dict:
 
 @Amime.on_callback_query(filters.regex(r"^upgrade") & filters.sudo)
 async def upgrade_callback(bot: Amime, callback: CallbackQuery):
-    await callback.message.edit_text("Upgrading...")
+    await callback.edit_message_reply_markup({})
+    sent = await callback.message.reply_text("Upgrading...")
 
     proc = await asyncio.create_subprocess_shell(
         "git pull --no-edit",
@@ -98,7 +99,7 @@ async def upgrade_callback(bot: Amime, callback: CallbackQuery):
     stdout = (await proc.communicate())[0].decode()
 
     if proc.returncode == 0:
-        await callback.message.edit_text("Restarting...")
+        await sent.edit_text("Restarting...")
         args = [sys.executable, "-m", "amime"]
         os.execv(sys.executable, args)
     else:
@@ -106,6 +107,6 @@ async def upgrade_callback(bot: Amime, callback: CallbackQuery):
         lines = stdout.split("\n")
         for line in lines:
             error += f"<code>{line}</code>\n"
-        await callback.message.edit_text(
+        await sent.edit_text(
             f"Update failed (process exited with {proc.returncode}):\n{error}"
         )

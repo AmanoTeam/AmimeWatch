@@ -93,18 +93,22 @@ async def view_anime(bot: Amime, union: Union[CallbackQuery, Message]):
                     ]
                 )
 
-            if len(await Episodes.filter(anime=anime.id)) > 0:
-                keyboard[-1].append((lang.episodes_button, f"episodes {anime.id} 1"))
-                keyboard[-1].sort(reverse=True)
+                if len(await Episodes.filter(anime=anime.id)) > 0:
+                    keyboard[-1].append(
+                        (lang.episodes_button, f"episodes {anime.id} 1")
+                    )
+                    keyboard[-1].sort(reverse=True)
 
-            if is_private and (
-                await filters.collaborator(bot, union) or await filters.sudo(bot, union)
-            ):
-                keyboard[-1].append((lang.manage_button, f"manage anime {anime.id}"))
+                if await filters.collaborator(bot, union) or await filters.sudo(
+                    bot, union
+                ):
+                    keyboard[-1].append(
+                        (lang.manage_button, f"manage anime {anime.id}")
+                    )
 
-            keyboard.append(
-                [(lang.request_episodes_button, f"request episodes {anime_id}")]
-            )
+                keyboard.append(
+                    [(lang.request_episodes_button, f"request episodes {anime_id}")]
+                )
 
             photo = f"https://img.anili.st/media/{anime.id}"
 

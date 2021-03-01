@@ -22,6 +22,7 @@
 
 import asyncio
 import os
+import sys
 
 from pyrogram import filters
 from pyrogram.types import CallbackQuery, Message

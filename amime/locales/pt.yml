@@ -43,13 +43,13 @@ start_date:
     Data de início
 
 end_date:
-    Data final
+    Data de finalização
 
 description:
     Descrição
 
 short_description:
-    Pequena descrição
+    Descrição curta
 
 favorite:
     Favorito
@@ -69,40 +69,60 @@ name:
 type:
     Tipo
 
+video:
+    Vídeo
+
+episode_number:
+    Número do episódio
+
+language:
+    Idioma
+
+first:
+    Primeiro
+
+last:
+    Última
+
+added_by:
+    Adicionado por
+
+notes:
+    Notas
 
 
 # Texts
 not_found:
-    Nenhum <b>{type}</b> com o(a) {key} <code>{value}</code> foi encontrado.
+    Nenhum <b>{type}</b> com {key} <code>{value}</code> foi encontrado.
 
 inline: |
-    Toque no botão abaixo para aprender a usar o <b>modo inline</b>.
+    Toque no botão abaixo para saber como usar meu <b>modo inline</b>.
     
-    Você será enviado para o <b>meu privado</b> e aprenderá como usar-me.
+    Você será redirecionado para <b>meu privado</b> e aprenderá a usá-lo lá.
     
 start: |
     Olá {mention}, meu nome é <b>{bot_name}</b>!
     
-    Eu sou um <b>bot</b> criado para fornecer a você a <i>melhor experiência anime</i>, como informações detalhadas diretamente de {anilist} e até mesmo obter os episódios mais recentes do seu anime favorito.
+    Eu sou um <b>bot</b> criado para fornecer-lhe a <i>melhor</i> experiência de animes, como informações detalhadas diretamente do {anilist} e até mesmo obter os últimos episódios de seu anime favorito.
     
     Explore minhas funções nos botões abaixo:
     
 help:
-    Vamos explorar? Clique nos botões abaixo e descubra todo o meu potencial, espero que gostem!
+    Vamos explorar? Clique nos botões abaixo e descubra todo o meu potencial, espero que você goste!
     
 about: |
-    <b>{bot_name}</b> é um bot feito em <i>Python</i> com a livraria <b>MTProto Pyrogram</b>, feito para ser rápido, estável e completo quando se trata de animes.
+    <b>{bot_name}</b> é um bot desenvolvido em <i>Python</i> com a biblioteca <b>MTProto Pyrogram</b>, feito para ser rápido, estável e completo quando se trata de animes.
     
     Links: {github} | {channel} | {group}
 
 help_in_pm:
-    Contate-me em particular para obter ajuda.
+    Entre em contato comigo no privado para obter ajuda.
 
 start_in_pm:
-    Contacte-me em particular para que possa ver tudo o que posso fazer.
+    Entre em contato comigo no privado para que você possa ver tudo o que eu posso fazer.
 
 favorites:
-    Escola qual lista de favoritos você deseja ver.
+    Escolha qual lista de favoritos você quer ver.
 
 favorites_empty:
     Sua lista de <b>{type}</b> favoritos está vazia.
@@ -114,51 +134,78 @@ added_to_favorites:
     Este {type} foi adicionado à sua lista de favoritos.
 
 removed_from_favorites:
-    Este {type} foi removido de sua lista de favoritos.
+    Este {type} foi removido da sua lista de favoritos.
 
 collaborators: |
-    Abaixo está a lista de colaboradores de <b>{bot_name}</b>.
+    Abaixo está a lista de colaboradores do <b>{bot_name}</b>
     
     Eles estão no seguinte formato:
-        <b>Nome</b> (<i>idiomas</i>)
+        <b>Nome</b> (<i>idioma</i>)
 
 user_is_sudo:
-    O usuário {mention} é um <b>usuário sudo</b>, você não pode fazer nada com ele.
+    O usuário {mention} é um usuário <b>sudo</b>, pode fazer nada com ele.
 
 is_already_a_collaborator_in_all_these_languages:
-    O usuário {mention} já é colaborador em todos os idiomas que você especificou.
+    O usuário {mention} já é um contribuinte para todos os idiomas especificados.
 
 is_not_a_collaborator_in_all_of_these_languages:
-    O usuário {mention} não é um colaborador em nenhum idioma que você especificou.
+    O usuário {mention} não é um contribuinte em qualquer idioma que você especificou.
 
 promoted_to_collaborator: |
-    {mention_sudo} promoveu {mention_user} a <b>collaborador</b> no(s) seguinte(s) idioma(s): <code>{languages}</code>.
+    {mention_sudo} promoveu {mention_user} a um <b>colaborador</b> do seguinte idioma: <code>{languages}</code>.
 
 demoted_collaborator: |
-    {mention_sudo} rebaixou {mention_user} a usuário normal no(s) seguinte(s) idioma(s): <code>{languages}</code>.
+    {mention_sudo} rebaixado {mention_user} para um usuário normal no seguinte idioma: <code>{languages}</code>.
 
 is_already_a_collaborator_in_some_languages: |
-    Este usuário já é um <b>colaborador</b> no(s) seguinte(s) idioma(s): <code> {languages} </code>.
+    Este usuário já é um <b>colaborador</b> no seguinte idioma: <code>{languages}</code>.
 
 is_not_a_collaborator_in_some_languages: |
-    Este usuário não é um <b>colaborador</b> no(s) seguinte(s) idioma(s): <code> {languages} </code>.
+    Este usuário não é um <b>colaborador</b> nos seguintes idiomas: <code>{languages}</code>.
 
 languages_not_exists: |
-    Os seguintes idiomas não foram encontrados ou ainda não existem: <code>{languages}</code>.
+    Os seguinte idiomas não foram encontrados ou ainda não existem: <code>{languages}</code>.
 
 settings_private: |
-    Você está nas minhas configurações, aqui você pode mudar meu idioma e algumas outras coisinhas, está tudo ai embaixo.
+    Você está nas minhas configurações, aqui você pode mudar o seu idioma e algumas outras pequenas coisas, tudo está lá embaixo.
     
-    Se você quiser alterar minhas configurações em qualquer grupo, use o comando /settings nele.
+    Se você quiser alterar minhas configurações em algum grupo, use o comando /settings nele.
     
-    Quaisquer alterações feitas afetarão apenas o chat no qual você usou o comando.
+    Quaisquer alterações que você fizer só afetarão o chat em que você usou o comando.
 
 settings_group: |
-    Você está nas minhas configurações, aqui você pode mudar meu idioma e algumas outras coisinhas, está tudo ai embaixo.
+    Você está nas minhas configurações, aqui você pode mudar minha linguagem e algumas outras pequenas coisas, tudo está lá embaixo.
     
 settings_language:
-    Escolha o idioma que deseja usar abaixo.
+    Escolha qual idioma você deseja usar abaixo.
+
+manage_anime:
+    Escolha o que você quer fazer com este anime.
+
+manage_episodes:
+    Aqui você gerencia os episódios, você pode editá-los, excluí-los ou adicionar novos episódios.
+
+list_of_questions:
+    Uma lista de perguntas será feita, responda-as.
+
+send_me_the:
+    Envie-me o item <b>{item}</b>.
+
+duplicate_episode_number:
+    Este anime já tem um episódio com esse número neste mesmo idioma, você não pode colocar dois episódios com o mesmo número, escolher outro ou excluir o outro episódio.
+
+episode_added:
+    O episódio foi adicionado com sucesso!
+
+episodes: |
+    Aqui estão os episódios disponíveis para o anime <b>{name}</b> (<b>ID</b>: <code>{id}</code>), divirta-se!
+    Atualmente tenho <code>{count}</code> episódio(s) em <b>{language}</b>.
     
+    <b>Sobre os emojis</b>:
+        ✅ - Assistido
+        👁️ - Apenas visualizado
+        🙈 - Nunca aberto
+
 
 # Buttons
 read_more_button:
@@ -180,7 +227,7 @@ anime_button:
     🧕 Anime
 
 manga_button:
-    📜 Manga
+    📜 mangá
 
 inline_button:
     ✍️ Inline
@@ -189,7 +236,7 @@ collaborators_button:
     👷‍♀️ Colaboradores
 
 request_episodes_button:
-    🙋‍♀️ Solicitar episódios
+    🙋‍♀️ Pedir episódios
 
 start_button:
     〰️ Iniciar
@@ -203,40 +250,64 @@ settings_button:
 language_button:
     🌐 Idioma
 
+episodes_button:
+    🎬 Episódios
+
+manage_button:
+    💼 Gerenciar
+
+add_button:
+    ➕ Adicionar
+
+previous_button:
+    ⏪ Anterior
+
+next_button:
+    ⏩ Próximo
+
+dot_button:
+    ⏺️
+
+mark_as_watched_button:
+    ✅ Marcar como assistido
+
+mark_as_unwatched_button:
+    👁️ Marca como não assistido
+
 
 # Help texts
 anime_help: |
-    <b>Help on</b>: anime
+    <b>Ajuda sobre</b>: anime
     
-    My <b>anime module</b> allows users to see a basic list of information about the specific anime based on {anilist}, but also allows users to watch episodes, for that, use the <b>{request_episodes_button}</b> button at the bottom of all anime, with it, a message requesting episodes of such anime will be sent to <i>our collaborators</i> in your language, they will check the episodes of that anime in their language, and <b>if they exist</b>, they will add the list of episodes in their language, however, if there are no episodes of the anime in question in your language or subtitled, they will not be able to do anything, but you can watch them subtitled in the language <b>you prefer</b>.
+    Meu <b>módulo de animes</b> permite que os usuários vejam uma lista básica de informações sobre o anime específico com base no {anilist}, mas também permite que os usuários assistam aos episódios, para isso, use o <b>{request_episodes_button}</b> botão na parte inferior de todo anime, com ele, uma mensagem solicitando episódios desse anime será enviada para <i>nossos colaboradores</i> em seu idioma, eles verificarão os episódios desse anime em seu idioma, e <b>se existirem</b>, eles irão adicionar a lista de episódios no seu idioma, porém, se não houver episódios do anime em questão no seu idioma ou legendados, eles não poderão fazer nada, mas você pode assisti-los legendados no idioma <b>de sua preferência</b>.
     
-    <b>How to use</b>?
-        Send me the anime using the <b>inline module</b> or use the command <code>/anime &lt;id&gt;</code>.
+    <b>Como usar</b>?
+        Envie-me o anime usando o módulo <b>inline</b> ou use o comando <code>/anime &lt;id&gt;</code>.
 
 manga_help: |
-    <b>Help on</b>: manga
+    <b>Ajuda sobre</b>: mangá
     
-    My <b>manga module</b> allows users to see a basic list of information about the specific manga based on {anilist}.
+    Meu módulo <b>mangá</b> permite que os usuários vejam uma lista básica de informações sobre o mangá específico com base em {anilist}.
     
     <b>How to use</b>?
-        Send me the manga using the <b>inline module</b> or use the command <code>/manga &lt;id&gt;</code>.
+        Envie-me o mangá usando o módulo <b>inline</b> ou use o comando <code>/mangá &lt;id&gt;</code>.
 
 inline_help: |
-    <b>Help on</b>: inline
+    <b>Ajuda sobre</b>: inline
     
-    My <b>inline module</b> allows users to search for anime or manga, and can also only see the photo if <b>you prefer</b>.
+    Meu módulo <b>inline</b> permite que os usuários procurem animes ou mangás, e também pode procurar apenas imagens se <b>você preferir</b>.
     
-    <b>How to use</b>?
-        Type my username and proceed: @{bot_username}
+    <b>Como usar</b>?
+        Digite meu nome de usuário e proceda: @{bot_username}
         
-        <b>Flags</b>:
-            <code>!a</code> - search anime.
-            <code>!m</code> - search manga.
-            <code>!g</code> - use gallery mode (photos only).
+        <b>Sinalizadores</b>:
+            <code>!a</code> - procurar animes.
+            <code>!m</code> - procurar mangás.
+            <code>!g</code> - usar o modo galeria (somente fotos).
             
-        <b>Examples</b>:
+        <b>Exemplos</b>:
             <code>@{bot_username} !a !g Naruto Shippuden</code>
             <code>@{bot_username} !m Jujutsu Kaizen</code>
             <code>@{bot_username} !a Shingeki no Kyojin</code>
         
-        Test it yourself. 😅
+        Teste você mesmo. 😅

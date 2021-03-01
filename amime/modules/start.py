@@ -28,6 +28,8 @@ from typing import Union
 from ..amime import Amime
 from ..database import Chats, Users
 from .help import help_union, help_module_union
+from .anime.view import view_anime
+from .manga.view import view_manga
 
 
 @Amime.on_message(filters.cmd(r"start$"))
@@ -112,3 +114,16 @@ async def new_members_message(bot: Amime, message: Message):
                     username=chat.username or "",
                     language="en",
                 )
+
+
+@Amime.on_message(filters.cmd(r"start (?P<type>anime|manga)_(?P<id>\d+)"))
+async def view_content(bot: Amime, message: Message):
+    content_type = message.matches[0]["type"]
+    content_id = int(message.matches[0]["id"])
+
+    message.matches = [{"id": content_id}]
+
+    if content_type == "anime":
+        await view_anime(bot, message)
+    else:
+        await view_manga(bot, message)

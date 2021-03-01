@@ -111,3 +111,16 @@ async def upgrade_callback(bot: Amime, callback: CallbackQuery):
         await sent.edit_text(
             f"Update failed (process exited with {proc.returncode}):\n{error}"
         )
+
+
+@Amime.on_message(filters.cmd(r"re(boot|start)") & filters.sudo)
+async def reboot_message(bot: Amime, message: Message):
+    await message.reply_text("Restarting...")
+    args = [sys.executable, "-m", "amime"]
+    os.execv(sys.executable, args)
+
+
+@Amime.on_message(filters.cmd(r"shutdown") & filters.sudo)
+async def shutdown_message(bot: Amime, message: Message):
+    await message.reply_text("Turning off...")
+    sys.exit(0)

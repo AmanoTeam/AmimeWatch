@@ -58,6 +58,14 @@ class Favorites(Model):
     type = fields.CharField(max_length=7)
 
 
+class Requests(Model):
+    id = fields.IntField(pk=True)
+    user = fields.IntField()
+    item = fields.IntField()
+    type = fields.CharField(max_length=7)
+    datetime = fields.DatetimeField()
+
+
 class Users(Model):
     id = fields.IntField(pk=True)
     name = fields.TextField()

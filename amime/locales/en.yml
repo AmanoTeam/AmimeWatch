@@ -206,6 +206,14 @@ episodes: |
         👁️ - Only viewed
         🙈 - Never open
 
+episodes_request_in_last_24h: |
+    An episode request has already been made for this anime in the past 24 hours, wait for the collaborators to add the episodes.
+    
+    Date: {date}
+
+episode_request_successfully_sent:
+    Your episode request has been sent successfully! Wait for collaborators to add episodes (if any).
+
 
 # Buttons
 read_more_button:

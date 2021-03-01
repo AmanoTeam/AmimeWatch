@@ -38,7 +38,7 @@ from .utils import backup, langs, modules
 class Amime(Client):
     SUDO_USERS = [1155717290, 918317361]  # @AndrielFR and @Hitalo
     BACKUP_ID = -1001339690483
-    STAFF_ID = -543289351
+    STAFF_ID = -1001382912209
 
     def __init__(self):
         name = self.__class__.__name__.lower()

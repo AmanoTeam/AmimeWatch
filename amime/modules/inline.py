@@ -93,7 +93,7 @@ async def answer(bot: Amime, inline_query: InlineQuery):
                         keyboard = [
                             [
                                 (
-                                    lang.read_more_button,
+                                    lang.view_more_button,
                                     f"https://t.me/{bot.me.username}?start={content_type}_{result.id}",
                                     "url",
                                 )

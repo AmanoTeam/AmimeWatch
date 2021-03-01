@@ -282,6 +282,9 @@ mark_as_watched_button:
 mark_as_unwatched_button:
     👁️ Mark as unwatched
 
+view_more_button:
+    👁️‍🗨️ View more
+
 
 # Help texts
 anime_help: |

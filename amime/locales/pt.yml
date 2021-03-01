@@ -93,6 +93,12 @@ notes:
 available_to_watch:
     Disponíveis para assistir
 
+yes:
+    Sim
+
+no:
+    Não
+
 
 # Texts
 not_found:
@@ -188,9 +194,6 @@ manage_anime:
 manage_episodes:
     Aqui você gerencia os episódios, você pode editá-los, excluí-los ou adicionar novos episódios.
 
-list_of_questions:
-    Uma lista de perguntas será feita, responda-as.
-
 send_me_the:
     Envie-me o item <b>{item}</b>.
 
@@ -220,6 +223,12 @@ episode_request_successfully_sent:
 confirm:
     Para continuar, confirme usando o botão abaixo.
 
+preview:
+    O que você vê abaixo é apenas uma prévia de como ficará quando estiver pronto.
+
+missing_items_episode: |
+    Você não pode adicionar um episódio sem os seguintes itens: {items}.
+
 
 # Buttons
 read_more_button:
@@ -241,7 +250,7 @@ anime_button:
     🧕 Anime
 
 manga_button:
-    📜 mangá
+    📜 Mangá
 
 inline_button:
     ✍️ Inline

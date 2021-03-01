@@ -20,8 +20,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+import aioanilist
+
 from pyrogram import filters
-from pyrogram.types import CallbackQuery, Message
+from pyrogram.types import CallbackQuery, Message, InputMediaPhoto, InputMediaVideo
 from pyromod.helpers import array_chunk, ikb
 from pyromod.nav import Pagination
 from typing import Dict, List, Tuple
@@ -30,6 +32,7 @@ from ...amime import Amime
 from ...database import Collaborators, Episodes
 
 
+ADDING: Dict = {}
 LANGUAGE: Dict = {}
 
 
@@ -102,8 +105,11 @@ async def manage_episodes_callback(bot: Amime, callback: CallbackQuery):
 
     keyboard.append([(lang.back_button, f"manage anime {anime_id}")])
 
-    await callback.edit_message_text(
-        lang.manage_episodes,
+    await callback.edit_message_media(
+        InputMediaPhoto(
+            f"https://img.anili.st/media/{anime_id}",
+            caption=lang.manage_episodes,
+        ),
         reply_markup=ikb(keyboard),
     )
 
@@ -161,48 +167,116 @@ async def manage_add_episode_callback(bot: Amime, callback: CallbackQuery):
     user = callback.from_user
     lang = callback._lang
 
-    await callback.edit_message_text(lang.list_of_questions)
+    anime = await aioanilist.Client().get("anime", anime_id)
 
-    answers: List[Message] = []
+    if not str(user.id) in ADDING.keys():
+        ADDING[str(user.id)] = {}
+    if not str(anime_id) in ADDING[str(user.id)].keys():
+        ADDING[str(user.id)][str(anime_id)] = {}
 
-    answer = await chat.ask(lang.send_me_the(item=lang.video.lower()), filters.video)
-    answers.append(answer)
-    video = answer.video
+    adding = ADDING[str(user.id)][str(anime_id)]
 
     language = LANGUAGE[str(user.id)][str(anime_id)]
-    answer = await chat.ask(
-        lang.send_me_the(item=lang.episode_number.lower()), filters.regex(r"^\d+")
-    )
-    number = int(answer.text)
-    answers.append(answer)
-    while (
-        len(await Episodes.filter(anime=anime_id, number=number, language=language)) > 0
-    ):
-        answers.append(await answer.reply_text(lang.duplicate_episode_number))
-        answer = await chat.ask(
-            lang.send_me_the(item=lang.episode_number.lower()), filters.regex(r"^\d+")
+    episodes = await Episodes.filter(anime=anime_id, language=language)
+    episodes = sorted(episodes, key=lambda ep: ep.number)
+
+    text = lang.preview + "\n"
+
+    text += f"<b>{anime.title.romaji}</b> (<code>{anime.title.native}</code>)\n"
+
+    keyboard = [[], [], []]
+
+    if "name" in adding.keys():
+        text += f"\n<b>{lang.name}</b>: <b>{adding['name']}</b>"
+        keyboard[0].append(("✏️ " + lang.name, f"manage add name {anime_id} {page}"))
+    else:
+        keyboard[0].append(("➕ " + lang.name, f"manage add name {anime_id} {page}"))
+
+    if "number" in adding.keys():
+        text += f"\n<b>{lang.episode}</b>: <code>{adding['number']}/{len(episodes) + 1}</code>"
+        keyboard[0].append(
+            ("✏️ " + lang.episode_number, f"manage add number {anime_id} {page}")
         )
-        number = int(answer.text)
-        answers.append(answer)
+    else:
+        keyboard[0].append(
+            ("➕ " + lang.episode_number, f"manage add number {anime_id} {page}")
+        )
 
-    answer = await chat.ask(
-        lang.send_me_the(item=lang.duration.lower() + " (m)"), filters.regex(r"^\d+")
+    if "duration" in adding.keys():
+        text += f"\n<b>{lang.duration}</b>: <code>{adding['duration']}</code>"
+
+    if "added_by" in adding.keys() and adding["added_by"]:
+        text += f"\n<b>{lang.added_by}</b>: {user.mention()}"
+        keyboard[2].append(
+            (f"{lang.added_by}: {lang.yes}", f"manage add added_by {anime_id} {page}")
+        )
+    else:
+        keyboard[2].append(
+            (f"{lang.added_by}: {lang.no}", f"manage add added_by {anime_id} {page}")
+        )
+
+    if "notes" in adding.keys():
+        text += f"\n\n<b>{lang.notes}</b>: <i>{adding['notes']}</i>"
+        keyboard[1].append(("✏️ " + lang.notes, f"manage add notes {anime_id} {page}"))
+    else:
+        keyboard[1].append(("➕ " + lang.notes, f"manage add notes {anime_id} {page}"))
+
+    keyboard.append(
+        [
+            (lang.confirm_button, f"manage confirm add {anime_id} {page}"),
+            (lang.cancel_button, f"manage cancel episode {anime_id} {page}"),
+        ]
     )
-    duration = int(answer.text)
-    answers.append(answer)
 
-    await Episodes.create(
-        anime=anime_id,
-        file_id=video.file_id,
-        name="",
-        added_by="",
-        notes="",
-        number=number,
-        duration=duration,
-        language=language,
-    )
+    keyboard.append([(lang.back_button, f"manage episodes {anime.id} {page}")])
 
-    for answer in answers:
+    if "video" in adding.keys():
+        keyboard[1].append(("✏️ " + lang.video, f"manage add video {anime_id} {page}"))
+        await callback.edit_message_media(
+            InputMediaVideo(
+                adding["video"],
+                caption=text,
+            ),
+            reply_markup=ikb(keyboard),
+        )
+    else:
+        keyboard[1].append(("➕ " + lang.video, f"manage add video {anime_id} {page}"))
+        await callback.edit_message_media(
+            InputMediaPhoto(
+                f"https://img.anili.st/media/{anime.id}",
+                caption=text,
+            ),
+            reply_markup=ikb(keyboard),
+        )
+
+
+@Amime.on_callback_query(
+    filters.regex(r"manage add (?P<type>\w+) (?P<id>\d+) (?P<page>\d+)")
+)
+async def add_type_callback(bot: Amime, callback: CallbackQuery):
+    add_type = callback.matches[0]["type"]
+    add_id = int(callback.matches[0]["id"])
+    message = callback.message
+    chat = message.chat
+    user = callback.from_user
+    lang = callback._lang
+
+    await callback.edit_message_reply_markup({})
+
+    adding = ADDING[str(user.id)][str(add_id)]
+
+    if add_type == "added_by":
+        if "added_by" in adding.keys():
+            ADDING[str(user.id)][str(add_id)]["added_by"] = not ADDING[str(user.id)][
+                str(add_id)
+            ]["added_by"]
+        else:
+            ADDING[str(user.id)][str(add_id)]["added_by"] = True
+    elif add_type == "video":
+        answer = await chat.ask(
+            lang.send_me_the(item=lang.video.lower()), filters.video
+        )
+
         try:
             await answer.delete()
         except:
@@ -212,10 +286,84 @@ async def manage_add_episode_callback(bot: Amime, callback: CallbackQuery):
         except:
             pass
 
-    await callback.edit_message_text(
-        lang.episode_added,
-        reply_markup=ikb([[(lang.back_button, f"manage episodes {anime_id} {page}")]]),
+        ADDING[str(user.id)][str(add_id)][add_type] = answer.video.file_id
+    else:
+        item = (
+            lang.episode_number
+            if add_type == "number"
+            else lang.strings[lang.code][add_type]
+        )
+
+        answer = await chat.ask(lang.send_me_the(item=item.lower()))
+
+        try:
+            await answer.delete()
+        except:
+            pass
+        try:
+            await answer.request.delete()
+        except:
+            pass
+
+        ADDING[str(user.id)][str(add_id)][add_type] = answer.text
+
+    await manage_add_episode_callback(bot, callback)
+
+
+@Amime.on_callback_query(
+    filters.regex(r"manage cancel (?P<type>\w+) (?P<id>\d+) (?P<page>\d+)")
+)
+async def cancel_type_callback(bot: Amime, callback: CallbackQuery):
+    cancel_type = callback.matches[0]["type"]
+    cancel_id = int(callback.matches[0]["id"])
+    user = callback.from_user
+
+    if cancel_type == "episode":
+        del ADDING[str(user.id)][str(cancel_id)]
+        await manage_episodes_callback(bot, callback)
+
+
+@Amime.on_callback_query(filters.regex(r"manage confirm add (?P<id>\d+) (?P<page>\d+)"))
+async def confirm_add_callback(bot: Amime, callback: CallbackQuery):
+    confirm_id = int(callback.matches[0]["id"])
+    user = callback.from_user
+    lang = callback._lang
+
+    adding = ADDING[str(user.id)][str(confirm_id)]
+    language = LANGUAGE[str(user.id)][str(confirm_id)]
+
+    missing = []
+
+    if "video" not in adding.keys():
+        missing.append("video")
+
+    if "number" not in adding.keys():
+        missing.append("number")
+
+    if len(missing) > 0:
+        await callback.answer(
+            lang.missing_items_episode(items=", ".join(missing)), show_alert=True
+        )
+        return
+
+    await Episodes.create(
+        anime=confirm_id,
+        file_id=adding["video"],
+        name=(adding["name"] if "name" in adding.keys() else ""),
+        added_by=(
+            user.first_name
+            if ("added_by" in adding.keys() and adding["added_by"])
+            else ""
+        ),
+        notes=(adding["notes"] if "notes" in adding.keys() else ""),
+        number=adding["number"],
+        duration=24,
+        language=language,
     )
+
+    await callback.answer(lang.episode_added, show_alert=True)
+
+    await manage_episodes_callback(bot, callback)
 
 
 @Amime.on_callback_query(

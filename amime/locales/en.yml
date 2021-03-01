@@ -93,6 +93,12 @@ notes:
 available_to_watch:
     Available to watch
 
+yes:
+    Yes
+
+no:
+    No
+
 
 # Texts
 not_found:
@@ -188,9 +194,6 @@ manage_anime:
 manage_episodes:
     Here you manage the episodes, you can edit them, delete them or add new episodes.
 
-list_of_questions:
-    A list of questions will be asked, answer them.
-
 send_me_the:
     Send me the <b>{item}</b>.
 
@@ -219,6 +222,12 @@ episode_request_successfully_sent:
 
 confirm:
     To continue, confirm using the button below.
+
+preview:
+    What you see below is just a preview of what it will look like when it is ready.
+
+missing_items_episode: |
+    You cannot add an episode without the following items: {items}.
 
 
 # Buttons

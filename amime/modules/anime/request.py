@@ -25,9 +25,29 @@ import datetime
 
 from pyrogram import filters
 from pyrogram.types import CallbackQuery
+from pyromod.helpers import ikb
 
 from ...amime import Amime
 from ...database import Requests
+from .view import view_anime
+
+
+@Amime.on_callback_query(filters.regex(r"request episodes question (?P<id>\d+)"))
+async def request_episodes_question_callback(bot: Amime, callback: CallbackQuery):
+    anime_id = int(callback.matches[0]["id"])
+    lang = callback._lang
+
+    keyboard = [
+        [
+            (lang.confirm_button, f"request episodes {anime_id}"),
+            (lang.cancel_button, f"anime {anime_id}"),
+        ]
+    ]
+
+    await callback.edit_message_text(
+        lang.confirm,
+        reply_markup=ikb(keyboard),
+    )
 
 
 @Amime.on_callback_query(filters.regex(r"request episodes (?P<id>\d+)"))
@@ -65,3 +85,5 @@ async def request_episodes_callback(bot: Amime, callback: CallbackQuery):
     await bot.send_message(bot.staff_chat.id, text)
 
     await callback.answer(lang.episode_request_successfully_sent, show_alert=True)
+
+    await view_anime(bot, callback)

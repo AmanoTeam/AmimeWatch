@@ -214,6 +214,9 @@ episodes_request_in_last_24h: |
 episode_request_successfully_sent:
     Your episode request has been sent successfully! Wait for collaborators to add episodes (if any).
 
+confirm:
+    To continue, confirm using the button below.
+
 
 # Buttons
 read_more_button:
@@ -266,6 +269,12 @@ manage_button:
 
 add_button:
     ➕ Add
+
+confirm_button:
+    ✔️ Confirm
+
+cancel_button:
+    ✖️ Cancel
 
 previous_button:
     ⏪ Previous

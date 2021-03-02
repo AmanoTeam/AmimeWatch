@@ -166,9 +166,7 @@ async def watch_callback(bot: Amime, callback: CallbackQuery):
         ]
     )
 
-    keyboard.append(
-        [(lang.back_button, f"episodes {anime_id} {season} {number // 12}")]
-    )
+    keyboard.append([(lang.back_button, f"episodes {anime_id} {season} 1")])
 
     await callback.edit_message_media(
         InputMediaVideo(

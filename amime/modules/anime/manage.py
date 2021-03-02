@@ -383,7 +383,7 @@ async def confirm_add_callback(bot: Amime, callback: CallbackQuery):
 
     await callback.answer(lang.episode_added, show_alert=True)
 
-    del ADDING[str(user.id)][str(cancel_id)]
+    del ADDING[str(user.id)][str(confirm_id)]
 
     await manage_episodes_callback(bot, callback)
 

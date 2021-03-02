@@ -95,7 +95,7 @@ async def manage_episodes_callback(bot: Amime, callback: CallbackQuery):
         [
             (f"{lang.season_button}: {season}", f"manage season {anime_id} {page}"),
             (
-                f"{lang.delete_button} {lang.season.lower()}",
+                f"{lang.delete_button} {lang.all.lower()}",
                 f"manage del season {anime_id} {season} {page}",
             ),
         ]

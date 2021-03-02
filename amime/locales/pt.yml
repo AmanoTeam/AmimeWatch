@@ -250,7 +250,7 @@ settings_season:
 report:
     Escolha abaixo o tipo de reportagem que você quer fazer.
 
-reported_the_same_episode_in_last_24h: |
+reported_in_last_24h: |
     Você já reportou um episódio nas últimas 24h.
     
     Data: {date}

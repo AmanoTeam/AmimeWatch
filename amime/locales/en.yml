@@ -250,7 +250,7 @@ settings_season:
 report:
     Choose the type of report you want to do below.
 
-reported_the_same_episode_in_last_24h: |
+reported_in_last_24h: |
     You have already reported an episode in the past 24 hours.
     
     Date: {date}

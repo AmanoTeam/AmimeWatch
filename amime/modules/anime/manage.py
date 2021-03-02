@@ -208,7 +208,7 @@ async def manage_add_episode_callback(bot: Amime, callback: CallbackQuery):
         keyboard[0].append(("➕ " + lang.name, f"manage add name {anime_id} {page}"))
 
     if "number" in adding.keys():
-        text += f"\n<b>{lang.episode}</b>: <code>{adding['number']}/{len(episodes) + 1}</code>"
+        text += f"\n<b>{lang.episode}</b>: <code>{adding['number']}</code>"
         keyboard[0].append(
             ("✏️ " + lang.episode_number, f"manage add number {anime_id} {page}")
         )

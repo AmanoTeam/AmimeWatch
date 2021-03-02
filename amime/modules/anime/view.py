@@ -102,9 +102,7 @@ async def view_anime(bot: Amime, union: Union[CallbackQuery, Message]):
                 if await filters.collaborator(bot, union) or await filters.sudo(
                     bot, union
                 ):
-                    keyboard[-1].append(
-                        (lang.manage_button, f"manage anime {anime.id}")
-                    )
+                    keyboard.append([(lang.manage_button, f"manage anime {anime.id}")])
 
                 if not (
                     await filters.collaborator(bot, union)

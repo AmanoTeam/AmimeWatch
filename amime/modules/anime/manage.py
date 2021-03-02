@@ -232,7 +232,9 @@ async def manage_add_episode_callback(bot: Amime, callback: CallbackQuery):
 
     if "notes" in adding.keys():
         text += f"\n\n<b>{lang.notes}</b>: <i>{adding['notes']}</i>"
-        keyboard[1].append(("✏️ " + lang.notes, f"manage add notes {anime_id} {page}"))
+        keyboard[1].append(
+            ("🗑️ " + lang.notes, f"manage cancel notes {anime_id} {page}")
+        )
     else:
         keyboard[1].append(("➕ " + lang.notes, f"manage add notes {anime_id} {page}"))
 
@@ -340,6 +342,9 @@ async def cancel_type_callback(bot: Amime, callback: CallbackQuery):
     if cancel_type == "episode":
         del ADDING[str(user.id)][str(cancel_id)]
         await manage_episodes_callback(bot, callback)
+    elif cancel_type == "notes":
+        del ADDING[str(user.id)][str(cancel_id)]["notes"]
+        await manage_add_episode_callback(bot, callback)
 
 
 @Amime.on_callback_query(filters.regex(r"manage confirm add (?P<id>\d+) (?P<page>\d+)"))

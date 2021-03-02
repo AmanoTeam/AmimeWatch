@@ -37,10 +37,13 @@ REPORTING: Dict = {}
 
 
 @Amime.on_callback_query(
-    filters.regex(r"report episode (?P<id>\d+) (?P<number>\d+) (?P<language>\w+)")
+    filters.regex(
+        r"report episode (?P<id>\d+) (?P<season>\d+) (?P<number>\d+) (?P<language>\w+)"
+    )
 )
 async def report_episode_callback(bot: Amime, callback: CallbackQuery):
     anime_id = int(callback.matches[0]["id"])
+    season = int(callback.matches[0]["season"])
     number = int(callback.matches[0]["number"])
     language = callback.matches[0]["language"]
     user = callback.from_user
@@ -61,7 +64,7 @@ async def report_episode_callback(bot: Amime, callback: CallbackQuery):
     buttons: List[Tuple] = []
     for report_type in report_types:
         name = lang.strings[lang.code][report_type]
-        data = f"report type {report_type} {anime_id} {number} {language}"
+        data = f"report type {report_type} {anime_id} {season} {number} {language}"
         buttons.append((name, data))
     keyboard += array_chunk(buttons, 2)
 
@@ -72,17 +75,33 @@ async def report_episode_callback(bot: Amime, callback: CallbackQuery):
     if "notes" in reporting.keys():
         text += f"\n\n<b>{lang.notes}</b>: <i>{reporting['notes']}</i>"
         keyboard.append(
-            [(f"✏️ {lang.notes}", f"report add notes {anime_id} {number} {language}")]
+            [
+                (
+                    f"✏️ {lang.notes}",
+                    f"report add notes {anime_id} {season} {number} {language}",
+                )
+            ]
         )
     else:
         keyboard.append(
-            [(f"➕ {lang.notes}", f"report add notes {anime_id} {number} {language}")]
+            [
+                (
+                    f"➕ {lang.notes}",
+                    f"report add notes {anime_id} {season} {number} {language}",
+                )
+            ]
         )
 
     keyboard.append(
         [
-            (lang.confirm_button, f"report confirm {anime_id} {number} {language}"),
-            (lang.cancel_button, f"report cancel {anime_id} {number} {language}"),
+            (
+                lang.confirm_button,
+                f"report confirm {anime_id} {season} {number} {language}",
+            ),
+            (
+                lang.cancel_button,
+                f"report cancel {anime_id} {season} {number} {language}",
+            ),
         ]
     )
 
@@ -94,7 +113,7 @@ async def report_episode_callback(bot: Amime, callback: CallbackQuery):
 
 @Amime.on_callback_query(
     filters.regex(
-        r"report type (?P<type>\w+) (?P<id>\d+) (?P<number>\d+) (?P<language>\w+)"
+        r"report type (?P<type>\w+) (?P<id>\d+) (?P<season>\d+) (?P<number>\d+) (?P<language>\w+)"
     )
 )
 async def report_type_callback(bot: Amime, callback: CallbackQuery):
@@ -110,7 +129,7 @@ async def report_type_callback(bot: Amime, callback: CallbackQuery):
 
 @Amime.on_callback_query(
     filters.regex(
-        r"report add (?P<type>\w+) (?P<id>\d+) (?P<number>\d+) (?P<language>\w+)"
+        r"report add (?P<type>\w+) (?P<id>\d+) (?P<season>\d+) (?P<number>\d+) (?P<language>\w+)"
     )
 )
 async def report_add_callback(bot: Amime, callback: CallbackQuery):
@@ -142,10 +161,13 @@ async def report_add_callback(bot: Amime, callback: CallbackQuery):
 
 
 @Amime.on_callback_query(
-    filters.regex(r"report confirm (?P<id>\d+) (?P<number>\d+) (?P<language>\w+)")
+    filters.regex(
+        r"report confirm (?P<id>\d+) (?P<season>\d+) (?P<number>\d+) (?P<language>\w+)"
+    )
 )
 async def report_confirm_callback(bot: Amime, callback: CallbackQuery):
     anime_id = int(callback.matches[0]["id"])
+    season = int(callback.matches[0]["season"])
     number = int(callback.matches[0]["number"])
     user = callback.from_user
     lang = callback._lang
@@ -182,6 +204,8 @@ async def report_confirm_callback(bot: Amime, callback: CallbackQuery):
     text += "\n<b>Anime</b>:"
     text += f"\n    <b>ID</b>: <code>{anime.id}</code>"
     text += f"\n    <b>Name</b>: <code>{anime.title.romaji}</code>"
+    if season > 0:
+        text += f"\n    <b>Season</b>: <code>{season}</code>"
     text += f"\n    <b>Episode</b>: <code>{number}</code>"
     text += "\n\n<b>Report</b>:"
     report_type = lang.strings[lang.code][reporting["type"]]
@@ -200,7 +224,9 @@ async def report_confirm_callback(bot: Amime, callback: CallbackQuery):
 
 
 @Amime.on_callback_query(
-    filters.regex(r"report cancel (?P<id>\d+) (?P<number>\d+) (?P<language>\w+)")
+    filters.regex(
+        r"report cancel (?P<id>\d+) (?P<season>\d+) (?P<number>\d+) (?P<language>\w+)"
+    )
 )
 async def report_cancel_callback(bot: Amime, callback: CallbackQuery):
     anime_id = int(callback.matches[0]["id"])

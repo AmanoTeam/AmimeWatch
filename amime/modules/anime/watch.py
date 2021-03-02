@@ -31,10 +31,13 @@ from ...database import Episodes, Users, Viewed, Watched
 
 
 @Amime.on_callback_query(
-    filters.regex(r"^watch (?P<id>\d+) (?P<number>\d+) (?P<language>\w+)")
+    filters.regex(
+        r"^watch (?P<id>\d+) (?P<season>\d+) (?P<number>\d+) (?P<language>\w+)"
+    )
 )
 async def watch_callback(bot: Amime, callback: CallbackQuery):
     anime_id = int(callback.matches[0]["id"])
+    season = int(callback.matches[0]["season"])
     number = int(callback.matches[0]["number"])
     language = callback.matches[0]["language"]
     user = callback.from_user
@@ -46,9 +49,13 @@ async def watch_callback(bot: Amime, callback: CallbackQuery):
 
     user_db = await Users.get(id=user.id)
 
-    episode = await Episodes.get(anime=anime_id, number=number, language=language)
-    episodes = await Episodes.filter(anime=anime_id, language=language)
+    episode = await Episodes.get(
+        anime=anime_id, season=season, number=number, language=language
+    )
+    episodes = await Episodes.filter(anime=anime_id, season=season, language=language)
     episodes = sorted(episodes, key=lambda ep: ep.number)
+    all_episodes = await Episodes.filter(anime=anime_id, language=language)
+    all_episodes = sorted(all_episodes, key=lambda episode: episode.number)
 
     if len(await Viewed.filter(user=user.id, item=episode.id, type="anime")) < 1:
         await Viewed.create(user=user.id, item=episode.id, type="anime")
@@ -56,14 +63,9 @@ async def watch_callback(bot: Amime, callback: CallbackQuery):
     if len(episode.name) > 0:
         text += f"\n<b>{lang.name}</b>: <code>{episode.name}</code>"
 
-    for index, ep in enumerate(episodes):
-        if ep.number == number:
-            text += f"\n<b>{lang.episode}</b>: <code>{index + 1}/{len(episodes)}</code>"
-            if index == 0:
-                text += f" (<b>{lang.first}</b>)"
-            elif (index + 1) == len(episodes):
-                text += f" (<b>{lang.last}</b>)"
-            break
+    if season > 0:
+        text += f"\n<b>{lang.season}</b>: <code>{episode.season}</code>"
+    text += f"\n<b>{lang.episode}</b>: <code>{episode.number}</code>"
     text += f"\n<b>{lang.duration}</b>: <code>{episode.duration}m</code>"
     text += f"\n<b>{lang.language}</b>: <code>{lang.strings[episode.language]['NAME']}</code>"
 
@@ -81,7 +83,7 @@ async def watch_callback(bot: Amime, callback: CallbackQuery):
                     if len(await Watched.filter(user=user.id, episode=episode.id)) > 0
                     else lang.mark_as_watched_button
                 ),
-                f"watched {anime_id} {number} {language}",
+                f"watched {anime_id} {season} {number} {language}",
             )
         ]
     ]
@@ -93,10 +95,34 @@ async def watch_callback(bot: Amime, callback: CallbackQuery):
             previous_number = ep.number
     if previous_number != 0:
         media_buttons.append(
-            (lang.previous_button, f"watch {anime_id} {previous_number} {language}")
+            (
+                lang.previous_button,
+                f"watch {anime_id} {season} {previous_number} {language}",
+            )
         )
     else:
-        media_buttons.append((lang.dot_button, "noop"))
+        previous_season = 0
+        seasons = []
+        for ep in all_episodes:
+            if ep.season not in seasons:
+                seasons.append(ep.season)
+        for s in seasons:
+            eps = await Episodes.filter(anime=anime_id, season=s, language=language)
+            eps = sorted(eps, key=lambda episode: episode.number, reverse=True)
+            for ep in eps:
+                if ep.season < season:
+                    previous_season = ep.season
+                    previous_number = ep.number
+                    break
+        if season > 0 and previous_season != 0:
+            media_buttons.append(
+                (
+                    lang.previous_button,
+                    f"watch {anime_id} {previous_season} {previous_number} {language}",
+                )
+            )
+        else:
+            media_buttons.append((lang.dot_button, "noop"))
 
     next_number = 0
     for ep in episodes:
@@ -105,10 +131,24 @@ async def watch_callback(bot: Amime, callback: CallbackQuery):
             break
     if next_number != 0:
         media_buttons.append(
-            (lang.next_button, f"watch {anime_id} {next_number} {language}")
+            (lang.next_button, f"watch {anime_id} {season} {next_number} {language}")
         )
     else:
-        media_buttons.append((lang.dot_button, "noop"))
+        next_season = 0
+        for ep in all_episodes:
+            if ep.season > season:
+                next_season = ep.season
+                next_number = ep.number
+                break
+        if season > 0 and next_season != 0:
+            media_buttons.append(
+                (
+                    lang.next_button,
+                    f"watch {anime_id} {next_season} {next_number} {language}",
+                )
+            )
+        else:
+            media_buttons.append((lang.dot_button, "noop"))
 
     if len(media_buttons) > 0:
         if not (
@@ -118,10 +158,17 @@ async def watch_callback(bot: Amime, callback: CallbackQuery):
             keyboard.append(media_buttons)
 
     keyboard.append(
-        [(lang.report_button, f"report episode {anime_id} {number} {language}")]
+        [
+            (
+                lang.report_button,
+                f"report episode {anime_id} {season} {number} {language}",
+            )
+        ]
     )
 
-    keyboard.append([(lang.back_button, f"episodes {anime_id} {number // 12 }")])
+    keyboard.append(
+        [(lang.back_button, f"episodes {anime_id} {season} {number // 12}")]
+    )
 
     await callback.edit_message_media(
         InputMediaVideo(
@@ -133,16 +180,21 @@ async def watch_callback(bot: Amime, callback: CallbackQuery):
 
 
 @Amime.on_callback_query(
-    filters.regex(r"^watched (?P<id>\d+) (?P<number>\d+) (?P<language>\w+)")
+    filters.regex(
+        r"^watched (?P<id>\d+) (?P<season>\d+) (?P<number>\d+) (?P<language>\w+)"
+    )
 )
 async def watched_callback(bot: Amime, callback: CallbackQuery):
     anime_id = int(callback.matches[0]["id"])
+    season = int(callback.matches[0]["season"])
     number = int(callback.matches[0]["number"])
     language = callback.matches[0]["language"]
     user = callback.from_user
     lang = callback._lang
 
-    episode = await Episodes.get(anime=anime_id, number=number, language=language)
+    episode = await Episodes.get(
+        anime=anime_id, season=season, number=number, language=language
+    )
 
     watched = await Watched.filter(user=user.id, episode=episode.id)
     if len(watched) > 0:

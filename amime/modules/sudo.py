@@ -93,7 +93,7 @@ async def upgrade_callback(bot: Amime, callback: CallbackQuery):
     sent = await callback.message.reply_text("Upgrading...")
 
     proc = await asyncio.create_subprocess_shell(
-        "git pull --no-edit",
+        "git reset --hard origin/main",
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.STDOUT,
     )

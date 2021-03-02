@@ -99,6 +99,19 @@ season:
 all:
     Tudo
 
+other:
+    Outro
+
+bad_quality:
+    Qualidade ruim
+
+wrong_episode:
+    Episódio errado
+
+wrong_title:
+    Título errado
+
+
 # Texts
 not_found:
     Nenhum <b>{type}</b> com {key} <code>{value}</code> foi encontrado.
@@ -231,6 +244,17 @@ missing_items_episode: |
 settings_season:
     Escolha abaixo qual temporada você quer ver.
 
+report:
+    Escolha abaixo o tipo de reportagem que você quer fazer.
+
+reported_the_same_episode_in_last_24h: |
+    Você já reportou um episódio nas últimas 24h.
+    
+    Data: {date}
+
+episode_successfully_reported:
+    Você reportou o episódio com sucesso!
+
 
 # Buttons
 read_more_button:
@@ -313,6 +337,9 @@ view_more_button:
 
 season_button:
     📜 Temporada
+
+report_button:
+    ⛔ Reportar
 
 
 # Help texts

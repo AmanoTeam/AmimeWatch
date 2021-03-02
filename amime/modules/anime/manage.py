@@ -218,7 +218,7 @@ async def manage_add_episode_callback(bot: Amime, callback: CallbackQuery):
         )
 
     if "duration" in adding.keys():
-        text += f"\n<b>{lang.duration}</b>: <code>{adding['duration']}</code>"
+        text += f"\n<b>{lang.duration}</b>: <code>{adding['duration']}m</code>"
 
     if "added_by" in adding.keys() and adding["added_by"]:
         text += f"\n<b>{lang.added_by}</b>: {user.mention()}"
@@ -301,6 +301,7 @@ async def add_type_callback(bot: Amime, callback: CallbackQuery):
             pass
 
         ADDING[str(user.id)][str(add_id)][add_type] = answer.video.file_id
+        ADDING[str(user.id)][str(add_id)]["duration"] = answer.video.duration // 60
     elif add_type == "season":
         SEASON[str(user.id)][str(add_id)] = SEASON[str(user.id)][str(add_id)] + 1
         await manage_episodes_callback(bot, callback)
@@ -377,7 +378,7 @@ async def confirm_add_callback(bot: Amime, callback: CallbackQuery):
         notes=(adding["notes"] if "notes" in adding.keys() else ""),
         season=season,
         number=adding["number"],
-        duration=24,
+        duration=adding["duration"],
         language=language,
     )
 

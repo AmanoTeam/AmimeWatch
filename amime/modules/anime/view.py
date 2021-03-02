@@ -95,9 +95,9 @@ async def view_anime(bot: Amime, union: Union[CallbackQuery, Message]):
 
                 episodes = await Episodes.filter(anime=anime.id)
                 episodes = sorted(episodes, key=lambda episode: episode.number)
-                season = episodes[0].season
 
                 if len(episodes) > 0:
+                    season = episodes[0].season
                     keyboard[-1].append(
                         (lang.episodes_button, f"episodes {anime.id} {season} 1")
                     )

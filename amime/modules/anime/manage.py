@@ -96,7 +96,7 @@ async def manage_episodes_callback(bot: Amime, callback: CallbackQuery):
             (f"{lang.season_button}: {season}", f"manage season {anime_id} {page}"),
             (
                 f"{lang.delete_button} {lang.all.lower()}",
-                f"manage del season {anime_id} {season} {page}",
+                f"manage del season {anime_id} {season} {language} {page}",
             ),
         ]
     )
@@ -110,7 +110,7 @@ async def manage_episodes_callback(bot: Amime, callback: CallbackQuery):
 
     layout = Pagination(
         [*episodes_dict.items()],
-        item_data=lambda i, pg: f"manage del {i[1].anime} {i[1].number} {pg}",
+        item_data=lambda i, pg: f"manage del episode {i[1].anime} {i[1].number} {pg}",
         item_title=item_title,
         page_data=lambda pg: f"manage episodes {anime_id} {pg}",
     )
@@ -389,22 +389,49 @@ async def confirm_add_callback(bot: Amime, callback: CallbackQuery):
 
 
 @Amime.on_callback_query(
-    filters.regex(r"^manage del (?P<id>\d+) (?P<number>\d+) (?P<page>\d+)")
+    filters.regex(r"^manage del episode (?P<id>\d+) (?P<number>\d+) (?P<page>\d+)")
 )
-async def manage_del_callback(bot: Amime, callback: CallbackQuery):
+async def manage_del_episode_callback(bot: Amime, callback: CallbackQuery):
+    anime_id = int(callback.matches[0]["id"])
+    number = int(callback.matches[0]["number"])
+    page = int(callback.matches[0]["page"])
+    lang = callback._lang
+
+    keyboard = [
+        [
+            (
+                lang.confirm_button,
+                f"manage confirm del episode {anime_id} {number} {page}",
+            ),
+            (lang.cancel_button, f"manage episodes {anime_id} {page}"),
+        ]
+    ]
+
+    await callback.edit_message_text(
+        lang.confirm,
+        reply_markup=ikb(keyboard),
+    )
+
+
+@Amime.on_callback_query(
+    filters.regex(
+        r"^manage confirm del episode (?P<id>\d+) (?P<number>\d+) (?P<page>\d+)"
+    )
+)
+async def manage_confirm_del_episode_callback(bot: Amime, callback: CallbackQuery):
     anime_id = int(callback.matches[0]["id"])
     number = int(callback.matches[0]["number"])
     user = callback.from_user
 
-    try:
-        episode = await Episodes.get(
-            anime=anime_id,
-            number=number,
-            language=LANGUAGE[str(user.id)][str(anime_id)],
-        )
-        await episode.delete()
-    except:
-        pass
+    season = SEASON[str(user.id)][str(anime_id)]
+
+    episode = await Episodes.get(
+        anime=anime_id,
+        season=season,
+        number=number,
+        language=LANGUAGE[str(user.id)][str(anime_id)],
+    )
+    await episode.delete()
 
     await manage_episodes_callback(bot, callback)
 
@@ -458,11 +485,14 @@ async def manage_set_season_callback(bot: Amime, callback: CallbackQuery):
 
 
 @Amime.on_callback_query(
-    filters.regex(r"^manage del season (?P<id>\d+) (?P<season>\d+) (?P<page>\d+)")
+    filters.regex(
+        r"^manage del season (?P<id>\d+) (?P<season>\d+) (?P<language>\w+) (?P<page>\d+)"
+    )
 )
 async def manage_del_season_callback(bot: Amime, callback: CallbackQuery):
     anime_id = int(callback.matches[0]["id"])
     season = int(callback.matches[0]["season"])
+    language = callback.matches[0]["language"]
     page = int(callback.matches[0]["page"])
     user = callback.from_user
     lang = callback._lang
@@ -471,7 +501,7 @@ async def manage_del_season_callback(bot: Amime, callback: CallbackQuery):
         [
             (
                 lang.confirm_button,
-                f"manage confirm del season {anime_id} {season} {page}",
+                f"manage confirm del season {anime_id} {season} {language} {page}",
             ),
             (lang.cancel_button, f"manage episodes {anime_id} {page}"),
         ]
@@ -485,18 +515,21 @@ async def manage_del_season_callback(bot: Amime, callback: CallbackQuery):
 
 @Amime.on_callback_query(
     filters.regex(
-        r"^manage confirm del season (?P<id>\d+) (?P<season>\d+) (?P<page>\d+)"
+        r"^manage confirm del season (?P<id>\d+) (?P<season>\d+) (?P<language>\w+) (?P<page>\d+)"
     )
 )
 async def manage_confirm_del_season_callback(bot: Amime, callback: CallbackQuery):
     anime_id = int(callback.matches[0]["id"])
     season = int(callback.matches[0]["season"])
+    language = callback.matches[0]["language"]
     user = callback.from_user
 
     if season > 0:
         SEASON[str(user.id)][str(anime_id)] = SEASON[str(user.id)][str(anime_id)] - 1
 
-    for episode in await Episodes.filter(anime=anime_id, season=season):
+    for episode in await Episodes.filter(
+        anime=anime_id, season=season, language=language
+    ):
         await episode.delete()
 
     await manage_episodes_callback(bot, callback)

@@ -195,9 +195,6 @@ async def manage_add_episode_callback(bot: Amime, callback: CallbackQuery):
 
     language = LANGUAGE[str(user.id)][str(anime_id)]
 
-    episodes = await Episodes.filter(anime=anime_id, language=language)
-    episodes = sorted(episodes, key=lambda ep: ep.number)
-
     text = lang.preview + "\n"
 
     text += f"<b>{anime.title.romaji}</b> (<code>{anime.title.native}</code>)\n"
@@ -384,6 +381,8 @@ async def confirm_add_callback(bot: Amime, callback: CallbackQuery):
     )
 
     await callback.answer(lang.episode_added, show_alert=True)
+
+    del ADDING[str(user.id)][str(cancel_id)]
 
     await manage_episodes_callback(bot, callback)
 

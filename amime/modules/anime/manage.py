@@ -21,6 +21,7 @@
 # SOFTWARE.
 
 import aioanilist
+import os
 
 from pyrogram import filters
 from pyrogram.types import CallbackQuery, Message, InputMediaPhoto, InputMediaVideo
@@ -302,8 +303,29 @@ async def add_type_callback(bot: Amime, callback: CallbackQuery):
         except:
             pass
 
-        ADDING[str(user.id)][str(add_id)][add_type] = answer.video.file_id
-        ADDING[str(user.id)][str(add_id)]["duration"] = answer.video.duration // 60
+        await callback.edit_message_text(f"{lang.downloading}...")
+
+        async def progress(current, total):
+            percent = float(f"{current * 100 / total:.1f}")
+            if (int(percent) % 5) == 0:
+                await callback.edit_message_text(f"{lang.downloading}... {percent}%")
+
+        video_path = await bot.download_media(answer.video, progress=progress)
+        video_extension = video_path.split(".")[-1]
+        video = (
+            await bot.edit_message_media(
+                chat.id,
+                message.message_id,
+                InputMediaVideo(
+                    video_path,
+                ),
+                file_name=f"@{bot.me.username}.{video_extension}",
+            )
+        ).video
+        os.remove(video_path)
+
+        ADDING[str(user.id)][str(add_id)][add_type] = video.file_id
+        ADDING[str(user.id)][str(add_id)]["duration"] = video.duration // 60
     elif add_type == "season":
         SEASON[str(user.id)][str(add_id)] = SEASON[str(user.id)][str(add_id)] + 1
         await manage_episodes_callback(bot, callback)

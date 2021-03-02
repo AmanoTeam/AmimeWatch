@@ -5,3 +5,6 @@
 
 # Byte-compiled
 __pycache__/
+
+# Videos saved
+*/downloads/*

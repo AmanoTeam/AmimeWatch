@@ -111,6 +111,9 @@ wrong_episode:
 wrong_title:
     Wrong title
 
+downloading:
+    Downloading
+
 
 # Texts
 not_found:

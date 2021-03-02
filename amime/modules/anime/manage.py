@@ -303,29 +303,8 @@ async def add_type_callback(bot: Amime, callback: CallbackQuery):
         except:
             pass
 
-        await callback.edit_message_text(f"{lang.downloading}...")
-
-        async def progress(current, total):
-            percent = float(f"{current * 100 / total:.1f}")
-            if (int(percent) % 5) == 0:
-                await callback.edit_message_text(f"{lang.downloading}... {percent}%")
-
-        video_path = await bot.download_media(answer.video, progress=progress)
-        video_extension = video_path.split(".")[-1]
-        video = (
-            await bot.edit_message_media(
-                chat.id,
-                message.message_id,
-                InputMediaVideo(
-                    video_path,
-                ),
-                file_name=f"@{bot.me.username}.{video_extension}",
-            )
-        ).video
-        os.remove(video_path)
-
-        ADDING[str(user.id)][str(add_id)][add_type] = video.file_id
-        ADDING[str(user.id)][str(add_id)]["duration"] = video.duration // 60
+        ADDING[str(user.id)][str(add_id)][add_type] = answer.video.file_id
+        ADDING[str(user.id)][str(add_id)]["duration"] = answer.video.duration // 60
     elif add_type == "season":
         SEASON[str(user.id)][str(add_id)] = SEASON[str(user.id)][str(add_id)] + 1
         await manage_episodes_callback(bot, callback)
@@ -372,6 +351,8 @@ async def cancel_type_callback(bot: Amime, callback: CallbackQuery):
 @Amime.on_callback_query(filters.regex(r"manage confirm add (?P<id>\d+) (?P<page>\d+)"))
 async def confirm_add_callback(bot: Amime, callback: CallbackQuery):
     confirm_id = int(callback.matches[0]["id"])
+    message = callback.message
+    chat = message.chat
     user = callback.from_user
     lang = callback._lang
 
@@ -393,9 +374,42 @@ async def confirm_add_callback(bot: Amime, callback: CallbackQuery):
         )
         return
 
+    await callback.answer(lang.episode_added, show_alert=True)
+
+    await manage_episodes_callback(bot, callback)
+
+    try:
+        video_path = await bot.download_media(adding["video"])
+        video_extension = video_path.split(".")[-1]
+        video = (
+            await bot.edit_message_media(
+                chat.id,
+                message.message_id,
+                InputMediaVideo(
+                    video_path,
+                ),
+                file_name=f"@{bot.me.username}.{video_extension}",
+            )
+        ).video
+        print(ksks)
+        os.remove(video_path)
+    except BaseException as excep:
+        text = "<b>Error processing an episode</b>\n"
+        text += "\n<b>Anime</b>:"
+        text += f"\n    <b>ID</b>: <code>{confirm_id}</code>"
+        text += "\n\n<b>Episode</b>:"
+        if season > 0:
+            text += f"\n    <b>Season</b>: <code>{season}</code>"
+        text += f"\n    <b>Number</b>: <code>{adding['number']}</code>"
+        text += "\n\n<b>Error</b>:"
+        text += f"\n    <b>{excep.__class__.__name__}</b>:"
+        text += f"\n        <i>{excep}</i>"
+        await bot.send_message(bot.staff_chat.id, text)
+        return
+
     await Episodes.create(
         anime=confirm_id,
-        file_id=adding["video"],
+        file_id=video.file_id,
         name=(adding["name"] if "name" in adding.keys() else ""),
         added_by=(
             user.first_name
@@ -409,11 +423,7 @@ async def confirm_add_callback(bot: Amime, callback: CallbackQuery):
         language=language,
     )
 
-    await callback.answer(lang.episode_added, show_alert=True)
-
     del ADDING[str(user.id)][str(confirm_id)]
-
-    await manage_episodes_callback(bot, callback)
 
 
 @Amime.on_callback_query(

@@ -31,7 +31,7 @@ from pyrogram.types import (
     InputTextMessageContent,
 )
 from pyromod.helpers import ikb
-from typing import List
+from typing import Dict, List
 
 from ..amime import Amime
 
@@ -90,15 +90,18 @@ async def answer(bot: Amime, inline_query: InlineQuery):
                                 text += f"\n<b>{lang.end_date}</b>: <code>{result.end_date.day or 0}/{result.end_date.month or 0}/{result.end_date.year or 0}</code>"
                             text += f"\n\n<b>{lang.short_description}</b>: <i>{description}</i>"
 
-                        keyboard = [
-                            [
-                                (
-                                    lang.view_more_button,
-                                    f"https://t.me/{bot.me.username}?start={content_type}_{result.id}",
-                                    "url",
-                                )
+                        kwargs: Dict = {}
+                        if not is_gallery:
+                            keyboard = [
+                                [
+                                    (
+                                        lang.view_more_button,
+                                        f"https://t.me/{bot.me.username}?start={content_type}_{result.id}",
+                                        "url",
+                                    )
+                                ]
                             ]
-                        ]
+                            kwargs["reply_markup"] = ikb(keyboard)
 
                         results.append(
                             InlineQueryResultPhoto(
@@ -106,7 +109,7 @@ async def answer(bot: Amime, inline_query: InlineQuery):
                                 title=result.title.romaji,
                                 description=description,
                                 caption=text,
-                                reply_markup=ikb(keyboard),
+                                **kwargs,
                             )
                         )
     else:

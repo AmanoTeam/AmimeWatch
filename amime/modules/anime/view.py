@@ -65,12 +65,8 @@ async def view_anime(bot: Amime, union: Union[CallbackQuery, Message]):
                 text += f"\n<b>{lang.studios}</b>: <code>{', '.join(studio.name for studio in anime.studios.nodes)}</code>"
             text += f"\n<b>{lang.format}</b>: <code>{anime.format}</code>"
             text += f"\n<b>{lang.duration}</b>: <code>{anime.duration or 24}m</code>"
-            episodes = await Episodes.filter(anime=anime.id)
             if not anime.format.lower() == "movie":
-                if len(episodes) > 0:
-                    text += f"\n<b>{lang.episode}s</b>: (<b>{lang.available_to_watch}: <code>{len(episodes)}/{anime.episodes}</code></b>)"
-                else:
-                    text += f"\n<b>{lang.episode}s</b>: <code>{anime.episodes}</code>"
+                text += f"\n<b>{lang.episode}s</b>: <code>{anime.episodes}</code>"
             text += f"\n<b>{lang.start_date}</b>: <code>{anime.start_date.day or 0}/{anime.start_date.month or 0}/{anime.start_date.year or 0}</code>"
             if not anime.status.lower() == "releasing":
                 text += f"\n<b>{lang.end_date}</b>: <code>{anime.end_date.day or 0}/{anime.end_date.month or 0}/{anime.end_date.year or 0}</code>"
@@ -97,7 +93,7 @@ async def view_anime(bot: Amime, union: Union[CallbackQuery, Message]):
                     ]
                 )
 
-                if len(episodes) > 0:
+                if len(await Episodes.filter(anime=anime.id)) > 0:
                     keyboard[-1].append(
                         (lang.episodes_button, f"episodes {anime.id} 1")
                     )

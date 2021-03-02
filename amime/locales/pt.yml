@@ -87,9 +87,6 @@ added_by:
 notes:
     Notas
 
-available_to_watch:
-    Disponíveis para assistir
-
 yes:
     Sim
 
@@ -101,7 +98,6 @@ season:
 
 all:
     Tudo
-
 
 # Texts
 not_found:

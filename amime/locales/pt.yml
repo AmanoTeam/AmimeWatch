@@ -96,6 +96,12 @@ yes:
 no:
     Não
 
+season:
+    Temporada
+
+all:
+    Tudo
+
 
 # Texts
 not_found:
@@ -226,6 +232,9 @@ preview:
 missing_items_episode: |
     Você não pode adicionar um episódio sem os seguintes itens: {items}.
 
+settings_season:
+    Escolha abaixo qual temporada você quer ver.
+
 
 # Buttons
 read_more_button:
@@ -285,6 +294,9 @@ confirm_button:
 cancel_button:
     ✖️ Cancelar
 
+delete_button:
+    🗑️ Excluir
+
 previous_button:
     ⏪ Anterior
 
@@ -302,6 +314,9 @@ mark_as_unwatched_button:
 
 view_more_button:
     👁️‍🗨️ Ver mais
+
+season_button:
+    📜 Temporada
 
 
 # Help texts

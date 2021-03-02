@@ -46,6 +46,7 @@ class Episodes(Model):
     name = fields.TextField()
     added_by = fields.TextField()
     notes = fields.TextField()
+    season = fields.IntField()
     number = fields.IntField()
     duration = fields.IntField()
     language = fields.CharField(max_length=6)

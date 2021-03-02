@@ -279,6 +279,7 @@ async def add_type_callback(bot: Amime, callback: CallbackQuery):
     await callback.edit_message_reply_markup({})
 
     if add_type == "added_by":
+        adding = ADDING[str(user.id)][str(add_id)]
         if "added_by" in adding.keys():
             ADDING[str(user.id)][str(add_id)]["added_by"] = not ADDING[str(user.id)][
                 str(add_id)

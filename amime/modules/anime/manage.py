@@ -415,15 +415,21 @@ async def confirm_add_callback(bot: Amime, callback: CallbackQuery):
 
     await manage_episodes_callback(bot, callback)
 
-    try:
+    video_path = await bot.download_media(adding["video"])
+    attempt: int = 0
+    while not video_path:
+        attempt += 1
+        if attempt >= 3:
+            return
         video_path = await bot.download_media(adding["video"])
+    try:
         video_extension = video_path.split(".")[-1]
         video = (
             await bot.send_video(
                 bot.videos_chat.id,
                 video_path,
                 caption=f"<b>{anime.title.romaji} </b> - {season} - {adding['number']}",
-                file_name=f"@{bot.me.username}- {anime.title.romaji} - {season} - {adding['number']}.{video_extension}",
+                file_name=f"@{bot.me.username} - {anime.title.romaji} - {season} - {adding['number']}.{video_extension}",
             )
         ).video
         os.remove(video_path)

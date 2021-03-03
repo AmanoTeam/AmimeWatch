@@ -65,7 +65,10 @@ async def watch_callback(bot: Amime, callback: CallbackQuery):
 
     if season > 0:
         text += f"\n<b>{lang.season}</b>: <code>{episode.season}</code>"
-    text += f"\n<b>{lang.episode}</b>: <code>{episode.number}</code>"
+    episode_number = f"{episode.number}"
+    if episode.unified_until > 0:
+        episode_number += f"-{episode.unified_until}"
+    text += f"\n<b>{lang.episode}</b>: <code>{episode_number}</code>"
     text += f"\n<b>{lang.duration}</b>: <code>{episode.duration}m</code>"
     text += f"\n<b>{lang.language}</b>: <code>{lang.strings[episode.language]['NAME']}</code>"
 

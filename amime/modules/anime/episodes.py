@@ -78,7 +78,10 @@ async def episodes_callback(bot: Amime, callback: CallbackQuery):
 
     def item_title(i, pg) -> str:
         status = "✅" if i[1][2] else "👁️" if i[1][1] else "🙈"
-        return f"{status} {i[1][0].number}"
+        number = f"{i[1][0].number}"
+        if i[1][0].unified_until > 0:
+            number += f"-{i[1][0].unified_until}"
+        return f"{status} {number}"
 
     layout = Pagination(
         [*episodes_dict.items()],

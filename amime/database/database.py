@@ -30,26 +30,27 @@ class Chats(Model):
     id = fields.IntField(pk=True)
     title = fields.TextField()
     username = fields.CharField(max_length=32)
-    language = fields.CharField(max_length=6)
+    language = fields.CharField(max_length=6, default="en")
 
 
 class Collaborators(Model):
     id = fields.IntField(pk=True)
     user = fields.IntField()
-    language = fields.CharField(max_length=6)
+    language = fields.CharField(max_length=6, default="en")
 
 
 class Episodes(Model):
     id = fields.IntField(pk=True)
     anime = fields.IntField()
     file_id = fields.TextField()
-    name = fields.TextField()
-    added_by = fields.TextField()
-    notes = fields.TextField()
-    season = fields.IntField()
+    name = fields.TextField(default="")
+    added_by = fields.TextField(default="")
+    notes = fields.TextField(default="")
+    season = fields.IntField(default=0)
     number = fields.IntField()
-    duration = fields.IntField()
-    language = fields.CharField(max_length=6)
+    duration = fields.IntField(default=24)
+    language = fields.CharField(max_length=6, default="ja")
+    unified_until = fields.IntField(default=0)
 
 
 class Favorites(Model):
@@ -64,7 +65,7 @@ class Reports(Model):
     user = fields.IntField()
     item = fields.IntField()
     type = fields.CharField(max_length=7)
-    notes = fields.TextField()
+    notes = fields.TextField(default="")
     datetime = fields.DatetimeField()
 
 
@@ -80,9 +81,9 @@ class Users(Model):
     id = fields.IntField(pk=True)
     name = fields.TextField()
     username = fields.CharField(max_length=32)
-    language_bot = fields.CharField(max_length=6)
-    language_anime = fields.CharField(max_length=6)
-    is_collaborator = fields.BooleanField()
+    language_bot = fields.CharField(max_length=6, default="en")
+    language_anime = fields.CharField(max_length=6, default="en")
+    is_collaborator = fields.BooleanField(default=False)
 
 
 class Viewed(Model):

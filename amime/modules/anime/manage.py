@@ -107,7 +107,10 @@ async def manage_episodes_callback(bot: Amime, callback: CallbackQuery):
         episodes_dict[episode.id] = episode
 
     def item_title(i, pg) -> str:
-        return f"🗑️ {i[1].number}"
+        number = f"{i[1].number}"
+        if i[1].unified_until > 0:
+            number += f"-{i[1].unified_until}"
+        return f"🗑️ {number}"
 
     layout = Pagination(
         [*episodes_dict.items()],
@@ -209,7 +212,10 @@ async def manage_add_episode_callback(bot: Amime, callback: CallbackQuery):
         keyboard[0].append(("➕ " + lang.name, f"manage add name {anime_id} {page}"))
 
     if "number" in adding.keys():
-        text += f"\n<b>{lang.episode}</b>: <code>{adding['number']}</code>"
+        number = adding["number"]
+        if int(adding["unified_until"]) > 0:
+            number += f"-{adding['unified_until']}"
+        text += f"\n<b>{lang.episode}</b>: <code>{number}</code>"
         keyboard[0].append(
             ("✏️ " + lang.episode_number, f"manage add number {anime_id} {page}")
         )
@@ -289,6 +295,25 @@ async def add_type_callback(bot: Amime, callback: CallbackQuery):
             ]["added_by"]
         else:
             ADDING[str(user.id)][str(add_id)]["added_by"] = True
+    elif add_type == "number":
+        answer = await chat.ask(lang.send_me_the(item=lang.episode_number.lower()))
+
+        try:
+            await answer.delete()
+        except:
+            pass
+        try:
+            await answer.request.delete()
+        except:
+            pass
+
+        number = answer.text.split("-")
+
+        ADDING[str(user.id)][str(add_id)]["number"] = number[0]
+        if len(number) > 1:
+            ADDING[str(user.id)][str(add_id)]["unified_until"] = number[1]
+        else:
+            ADDING[str(user.id)][str(add_id)]["unified_until"] = "0"
     elif add_type == "video":
         answer = await chat.ask(
             lang.send_me_the(item=lang.video.lower()), filters.video
@@ -310,11 +335,7 @@ async def add_type_callback(bot: Amime, callback: CallbackQuery):
         await manage_episodes_callback(bot, callback)
         return
     else:
-        item = (
-            lang.episode_number
-            if add_type == "number"
-            else lang.strings[lang.code][add_type]
-        )
+        item = lang.strings[lang.code][add_type]
 
         answer = await chat.ask(lang.send_me_the(item=item.lower()))
 
@@ -407,6 +428,7 @@ async def confirm_add_callback(bot: Amime, callback: CallbackQuery):
         number=adding["number"],
         duration=adding["duration"],
         language=language,
+        unified_until=adding["unified_until"],
     )
 
     await callback.answer(lang.episode_added, show_alert=True)

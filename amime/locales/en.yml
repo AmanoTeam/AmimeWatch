@@ -210,10 +210,10 @@ send_me_the:
     Send me the <b>{item}</b>.
 
 duplicate_episode_number:
-    This anime already has an episode with that number in that same language, you cannot put two episodes with the same number, choose another one or delete the other episode.
+    This anime already has an episode with that number in that same season and language, you cannot put two episodes with the same number, choose another one or delete the other episode.
 
 episode_added:
-    The episode is being processed, it will appear on the list of episodes soon.
+    The episode was successfully added.
 
 episodes: |
     Here are the episodes available for the anime <b>{name}</b> (<b>ID</b>: <code>{id}</code>), have fun!

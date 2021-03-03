@@ -376,6 +376,39 @@ async def confirm_add_callback(bot: Amime, callback: CallbackQuery):
         )
         return
 
+    if (
+        len(
+            await Episodes.filter(
+                anime=confirm_id,
+                season=season,
+                number=adding["number"],
+                language=language,
+            )
+        )
+        > 0
+    ):
+        await callback.answer(
+            lang.duplicate_episode_number,
+            show_alert=True,
+        )
+        return
+
+    await Episodes.create(
+        anime=confirm_id,
+        file_id=adding["video"],
+        name=(adding["name"] if "name" in adding.keys() else ""),
+        added_by=(
+            user.first_name
+            if ("added_by" in adding.keys() and adding["added_by"])
+            else ""
+        ),
+        notes=(adding["notes"] if "notes" in adding.keys() else ""),
+        season=season,
+        number=adding["number"],
+        duration=adding["duration"],
+        language=language,
+    )
+
     await callback.answer(lang.episode_added, show_alert=True)
 
     del ADDING[str(user.id)][str(confirm_id)]
@@ -408,21 +441,14 @@ async def confirm_add_callback(bot: Amime, callback: CallbackQuery):
         await bot.send_message(bot.staff_chat.id, text)
         return
 
-    await Episodes.create(
+    episode = await Episodes.get(
         anime=confirm_id,
-        file_id=video.file_id,
-        name=(adding["name"] if "name" in adding.keys() else ""),
-        added_by=(
-            user.first_name
-            if ("added_by" in adding.keys() and adding["added_by"])
-            else ""
-        ),
-        notes=(adding["notes"] if "notes" in adding.keys() else ""),
         season=season,
         number=adding["number"],
-        duration=adding["duration"],
         language=language,
     )
+    episode.update_from_dict({"file_id": video.file_id})
+    await episode.save()
 
 
 @Amime.on_callback_query(

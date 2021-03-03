@@ -39,6 +39,7 @@ class Amime(Client):
     SUDO_USERS = [1155717290, 918317361]  # @AndrielFR and @Hitalo
     BACKUP_ID = -1001339690483
     STAFF_ID = -1001382912209
+    VIDEOS_ID = -1001343429763
 
     def __init__(self):
         name = self.__class__.__name__.lower()
@@ -67,6 +68,7 @@ class Amime(Client):
 
         self.backup_chat = await self.get_chat(Amime.BACKUP_ID)
         self.staff_chat = await self.get_chat(Amime.STAFF_ID)
+        self.videos_chat = await self.get_chat(Amime.VIDEOS_ID)
 
         schedule.every(1).hour.do(backup.save_in_telegram, bot=self)
 

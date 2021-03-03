@@ -356,6 +356,8 @@ async def confirm_add_callback(bot: Amime, callback: CallbackQuery):
     user = callback.from_user
     lang = callback._lang
 
+    anime = await aioanilist.Client().get("anime", confirm_id)
+
     adding = ADDING[str(user.id)][str(confirm_id)]
     language = LANGUAGE[str(user.id)][str(confirm_id)]
     season = SEASON[str(user.id)][str(confirm_id)]
@@ -376,19 +378,19 @@ async def confirm_add_callback(bot: Amime, callback: CallbackQuery):
 
     await callback.answer(lang.episode_added, show_alert=True)
 
+    del ADDING[str(user.id)][str(confirm_id)]
+
     await manage_episodes_callback(bot, callback)
 
     try:
         video_path = await bot.download_media(adding["video"])
         video_extension = video_path.split(".")[-1]
         video = (
-            await bot.edit_message_media(
-                chat.id,
-                message.message_id,
-                InputMediaVideo(
-                    video_path,
-                ),
-                file_name=f"@{bot.me.username}.{video_extension}",
+            await bot.send_video(
+                bot.videos_chat.id,
+                video_path,
+                caption=f"<b>{anime.title.romaji} </b> - {season} - {adding['number']}",
+                file_name=f"@{bot.me.username}- {anime.title.romaji} - {season} - {adding['number']}.{video_extension}",
             )
         ).video
         os.remove(video_path)
@@ -421,8 +423,6 @@ async def confirm_add_callback(bot: Amime, callback: CallbackQuery):
         duration=adding["duration"],
         language=language,
     )
-
-    del ADDING[str(user.id)][str(confirm_id)]
 
 
 @Amime.on_callback_query(

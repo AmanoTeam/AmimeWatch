@@ -82,7 +82,7 @@ async def request_episodes_callback(bot: Amime, callback: CallbackQuery):
     text += f"\n    <b>Name</b>: <code>{anime.title.romaji}</code>"
     text += "\n\n#REQUEST #EPISODE"
 
-    await bot.send_message(bot.staff_chat.id, text)
+    await bot.send_message(bot.requests_chat.id, text)
 
     await callback.answer(lang.episode_request_successfully_sent, show_alert=True)
 

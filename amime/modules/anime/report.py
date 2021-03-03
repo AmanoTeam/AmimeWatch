@@ -214,7 +214,7 @@ async def report_confirm_callback(bot: Amime, callback: CallbackQuery):
         text += f"\n    <b>Notes</b>: <i>{reporting['notes']}</i>"
     text += "\n\n#REPORT #EPISODE"
 
-    await bot.send_message(bot.staff_chat.id, text)
+    await bot.send_message(bot.requests_chat.id, text)
 
     await callback.answer(lang.episode_successfully_reported, show_alert=True)
 

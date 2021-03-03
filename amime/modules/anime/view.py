@@ -35,7 +35,7 @@ from ..favorites import get_favorite_button
 @Amime.on_message(filters.cmd(r"anime (?P<query>.+)"))
 async def anime_message(bot: Amime, message: Message):
     query = message.matches[0]["query"]
-    
+
     if query.isdecimal():
         anime_id = int(query)
     else:
@@ -43,7 +43,7 @@ async def anime_message(bot: Amime, message: Message):
             result = await client.search("anime", query, limit=1)
             anime = await client.get("anime", result[0].id)
             anime_id = anime.id
-    
+
     message.matches = [{"id": anime_id}]
     await view_anime(bot, message)
 

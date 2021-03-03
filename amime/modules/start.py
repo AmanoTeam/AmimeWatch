@@ -80,16 +80,6 @@ async def start_union(bot: Amime, union: Union[CallbackQuery, Message]):
         disable_web_page_preview=True,
     )
 
-    if len(await Users.filter(id=user.id)) == 0:
-        await Users.create(
-            id=user.id,
-            name=user.first_name,
-            username=user.username or "",
-            language_bot="en",
-            language_anime="en",
-            is_collaborator=False,
-        )
-
 
 @Amime.on_message(filters.cmd(r"start help$") & filters.private)
 async def start_help_message(bot: Amime, message: Message):

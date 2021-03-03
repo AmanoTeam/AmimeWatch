@@ -51,15 +51,6 @@ async def settings_union(bot: Amime, union: Union[CallbackQuery, Message]):
     chat = message.chat
     lang = union._lang
 
-    if await filters.group(bot, message):
-        if len(await Chats.filter(id=chat.id)) == 0:
-            await Chats.create(
-                id=chat.id,
-                title=chat.title,
-                username=chat.username or "",
-                language="en",
-            )
-
     keyboard = [
         [(lang.language_button, f"language {'bot' if is_private else 'group'}")]
     ]

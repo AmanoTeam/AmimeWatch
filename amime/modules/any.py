@@ -29,12 +29,32 @@ from ..database import Chats, Users
 
 @Amime.on_message(group=-1)
 async def set_language_message(bot: Amime, message: Message):
+    chat = message.chat
+    user = message.from_user
     lang = message._lang
     code: str = ""
 
     if await filters.private(bot, message):
+        if len(await Users.filter(id=user.id)) == 0:
+            await Users.create(
+                id=user.id,
+                name=user.first_name,
+                username=user.username or "",
+                language_bot="en",
+                language_anime="en",
+                is_collaborator=False,
+            )
+
         code = (await Users.get(id=message.from_user.id)).language_bot
     else:
+        if len(await Chats.filter(id=chat.id)) == 0:
+            await Chats.create(
+                id=chat.id,
+                title=chat.title,
+                username=chat.username or "",
+                language="en",
+            )
+
         code = (await Chats.get(id=message.chat.id)).language
     message._lang = lang.get_language(code)
 
@@ -42,11 +62,31 @@ async def set_language_message(bot: Amime, message: Message):
 @Amime.on_callback_query(group=-1)
 async def set_language_callback(bot: Amime, callback: CallbackQuery):
     message = callback.message
+    chat = message.chat
+    user = callback.from_user
     lang = callback._lang
     code: str = ""
 
     if await filters.private(bot, message):
+        if len(await Users.filter(id=user.id)) == 0:
+            await Users.create(
+                id=user.id,
+                name=user.first_name,
+                username=user.username or "",
+                language_bot="en",
+                language_anime="en",
+                is_collaborator=False,
+            )
+
         code = (await Users.get(id=callback.from_user.id)).language_bot
     else:
+        if len(await Chats.filter(id=chat.id)) == 0:
+            await Chats.create(
+                id=chat.id,
+                title=chat.title,
+                username=chat.username or "",
+                language="en",
+            )
+
         code = (await Chats.get(id=message.chat.id)).language
     callback._lang = lang.get_language(code)

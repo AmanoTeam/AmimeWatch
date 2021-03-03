@@ -391,7 +391,6 @@ async def confirm_add_callback(bot: Amime, callback: CallbackQuery):
                 file_name=f"@{bot.me.username}.{video_extension}",
             )
         ).video
-        print(ksks)
         os.remove(video_path)
     except BaseException as excep:
         text = "<b>Error processing an episode</b>\n"

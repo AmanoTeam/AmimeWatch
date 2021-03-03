@@ -190,7 +190,7 @@ async def manage_add_episode_callback(bot: Amime, callback: CallbackQuery):
     if not str(user.id) in ADDING.keys():
         ADDING[str(user.id)] = {}
     if not str(anime_id) in ADDING[str(user.id)].keys():
-        ADDING[str(user.id)][str(anime_id)] = {}
+        ADDING[str(user.id)][str(anime_id)] = {"added_by": True}
 
     adding = ADDING[str(user.id)][str(anime_id)]
 

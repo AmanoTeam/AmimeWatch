@@ -60,6 +60,25 @@ class Favorites(Model):
     type = fields.CharField(max_length=7)
 
 
+class Notifications(Model):
+    id = fields.IntField(pk=True)
+    item = fields.IntField()
+    type = fields.CharField(max_length=7)
+    season = fields.IntField()
+    number = fields.IntField()
+    language = fields.CharField(max_length=6, default="en")
+    datetime = fields.DatetimeField()
+
+
+class Notify(Model):
+    id = fields.IntField(pk=True)
+    recipient = fields.IntField()
+    recipient_type = fields.CharField(max_length=5)
+    item = fields.IntField()
+    type = fields.CharField(max_length=7)
+    language = fields.CharField(max_length=6, default="en")
+
+
 class Reports(Model):
     id = fields.IntField(pk=True)
     user = fields.IntField()

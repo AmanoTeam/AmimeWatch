@@ -111,6 +111,12 @@ wrong_episode:
 wrong_title:
     Título errado
 
+notify_episodes:
+    Notificar episódios
+
+date:
+    Data
+
 
 # Texts
 not_found:
@@ -255,6 +261,20 @@ reported_in_last_24h: |
 episode_successfully_reported:
     Você reportou o episódio com sucesso!
 
+episode_notifications_on:
+    Você ativou as notificações de episódios para este anime neste chat.
+
+episode_notifications_off:
+    Você desativou as notificações de episódios para este anime neste chat.
+
+episode_notification: |
+    Eae <i>Otaku(s)</i>! Vamos assistir um pouco?
+    
+    Os novos episódios de <b>{name}</b> (<b>ID</b>: <code>{id}</code>) foram adicionados.
+    
+    Abaixo está a lista de episódios que foram adicionados, divirta-se.
+    
+    <b>Episódios</b>:
 
 # Buttons
 read_more_button:
@@ -340,6 +360,9 @@ season_button:
 
 report_button:
     ⛔ Reportar
+
+notify_users_button:
+    🔔 Notificar usuários
 
 
 # Help texts

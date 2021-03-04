@@ -21,6 +21,7 @@
 # SOFTWARE.
 
 import aioanilist
+import datetime
 import os
 
 from pyrogram import filters
@@ -30,7 +31,7 @@ from pyromod.nav import Pagination
 from typing import Dict, List, Tuple
 
 from ...amime import Amime
-from ...database import Collaborators, Episodes
+from ...database import Collaborators, Episodes, Notifications
 
 
 ADDING: Dict = {}
@@ -101,6 +102,16 @@ async def manage_episodes_callback(bot: Amime, callback: CallbackQuery):
             ),
         ]
     )
+
+    notifications = await Notifications.filter(
+        item=anime_id,
+        type="anime",
+        language=language,
+    )
+    if len(notifications) > 0:
+        keyboard.append(
+            [(lang.notify_users_button, f"notify anime {anime_id} {language}")]
+        )
 
     episodes_dict: Dict = {}
     for episode in episodes:
@@ -431,6 +442,15 @@ async def confirm_add_callback(bot: Amime, callback: CallbackQuery):
         unified_until=adding["unified_until"],
     )
 
+    await Notifications.create(
+        item=confirm_id,
+        type="anime",
+        season=season,
+        number=adding["number"],
+        language=language,
+        datetime=datetime.datetime.now().replace(tzinfo=datetime.timezone.utc),
+    )
+
     await callback.answer(lang.episode_added, show_alert=True)
 
     del ADDING[str(user.id)][str(confirm_id)]
@@ -515,14 +535,26 @@ async def manage_confirm_del_episode_callback(bot: Amime, callback: CallbackQuer
     user = callback.from_user
 
     season = SEASON[str(user.id)][str(anime_id)]
+    language = LANGUAGE[str(user.id)][str(anime_id)]
 
     episode = await Episodes.get(
         anime=anime_id,
         season=season,
         number=number,
-        language=LANGUAGE[str(user.id)][str(anime_id)],
+        language=language,
     )
     await episode.delete()
+
+    notification = await Notifications.filter(
+        item=anime_id,
+        type="anime",
+        season=season,
+        number=number,
+        language=language,
+    )
+    if len(notification) > 0:
+        notification = notification[0]
+        await notification.delete()
 
     await manage_episodes_callback(bot, callback)
 

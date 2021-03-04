@@ -28,7 +28,7 @@ from pyromod.helpers import ikb
 from typing import Union
 
 from ...amime import Amime
-from ...database import Episodes
+from ...database import Chats, Episodes, Notify, Users
 from ..favorites import get_favorite_button
 
 
@@ -57,7 +57,14 @@ async def view_anime(bot: Amime, union: Union[CallbackQuery, Message]):
     lang = union._lang
     anime_id = int(union.matches[0]["id"])
     is_callback = isinstance(union, CallbackQuery)
-    is_private = await filters.private(bot, union.message if is_callback else union)
+    message = union.message if is_callback else union
+    is_private = await filters.private(bot, message)
+    chat = message.chat
+    user = union.from_user
+
+    if not is_private:
+        chat_db = await Chats.get(id=chat.id)
+    user_db = await Users.get(id=user.id)
 
     async with aioanilist.Client() as client:
         anime = await client.get("anime", anime_id)
@@ -132,6 +139,35 @@ async def view_anime(bot: Amime, union: Union[CallbackQuery, Message]):
                         ]
                     )
 
+            recipient = user.id if is_private else chat.id
+            recipient_type = "user" if is_private else "group"
+            language = user_db.language_anime if is_private else chat_db.language
+            notify = await Notify.filter(
+                recipient=recipient,
+                recipient_type=recipient_type,
+                item=anime.id,
+                type="anime",
+                language=language,
+            )
+            if len(notify) > 0:
+                keyboard.append(
+                    [
+                        (
+                            f"🔕 {lang.notify_episodes}",
+                            f"notify chat {anime.id} {recipient} {recipient_type} {language}",
+                        )
+                    ]
+                )
+            else:
+                keyboard.append(
+                    [
+                        (
+                            f"🔔 {lang.notify_episodes}",
+                            f"notify chat {anime.id} {recipient} {recipient_type} {language}",
+                        )
+                    ]
+                )
+
             photo = f"https://img.anili.st/media/{anime.id}"
 
             if not is_callback:
@@ -156,3 +192,43 @@ async def view_anime(bot: Amime, union: Union[CallbackQuery, Message]):
             await union.reply_text(
                 lang.not_found(type="anime", key="id", value=anime_id)
             )
+
+
+@Amime.on_callback_query(
+    filters.regex(
+        r"^notify chat (?P<id>\d+) (?P<recipient>\-\d+) (?P<recipient_type>group|user) (?P<language>\w+)"
+    )
+)
+async def notify_chat_callback(bot: Amime, callback: CallbackQuery):
+    anime_id = int(callback.matches[0]["id"])
+    recipient = int(callback.matches[0]["recipient"])
+    recipient_type = callback.matches[0]["recipient_type"]
+    language = callback.matches[0]["language"]
+    lang = callback._lang
+
+    if recipient_type == "group":
+        if not await filters.administrator(bot, callback):
+            return
+
+    notify = await Notify.filter(
+        recipient=recipient,
+        recipient_type=recipient_type,
+        item=anime_id,
+        type="anime",
+        language=language,
+    )
+    if len(notify) > 0:
+        notify = notify[0]
+        await notify.delete()
+        await callback.answer(lang.episode_notifications_off, show_alert=True)
+    else:
+        await Notify.create(
+            recipient=recipient,
+            recipient_type=recipient_type,
+            item=anime_id,
+            type="anime",
+            language=language,
+        )
+        await callback.answer(lang.episode_notifications_on, show_alert=True)
+
+    await view_anime(bot, callback)

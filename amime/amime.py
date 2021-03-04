@@ -41,6 +41,7 @@ class Amime(Client):
     STAFF_ID = -1001382912209
     VIDEOS_ID = -1001343429763
     REQUESTS_ID = -1001176439164
+    CHANNEL_ID = -1001354975349
 
     def __init__(self):
         name = self.__class__.__name__.lower()
@@ -71,6 +72,7 @@ class Amime(Client):
         self.staff_chat = await self.get_chat(Amime.STAFF_ID)
         self.videos_chat = await self.get_chat(Amime.VIDEOS_ID)
         self.requests_chat = await self.get_chat(Amime.REQUESTS_ID)
+        self.channel_id = Amime.CHANNEL_ID
 
         schedule.every(1).hour.do(backup.save_in_telegram, bot=self)
 

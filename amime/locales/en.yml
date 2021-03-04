@@ -117,6 +117,9 @@ notify_episodes:
 date:
     Date
 
+added:
+    Added
+
 
 # Texts
 not_found:
@@ -268,13 +271,12 @@ episode_notifications_off:
     You turned off episode notifications for this anime in this chat.
 
 episode_notification: |
-    Hey <i>Otaku(s)</i>! Shall we watch a little?
-    
-    The new episodes of <b>{name}</b> (<b>ID</b>: <code>{id}</code>) have been added.
-    
-    Below is the list of episodes that have been added, have fun.
-    
-    <b>Episodes</b>:
+    Hey <i>Otaku(s)</i>, new episodes of <b>{title}</b> (<b>ID</b>: <code>{id}</code>) have been added!
+
+    Just below is the list of new episodes, already get your goodies and let's watch.
+
+notified_users:
+    You have successfully notified users of your new episodes! {count} chats were notified.
 
 
 # Buttons
@@ -364,6 +366,9 @@ report_button:
 
 notify_users_button:
     🔔 Notify users
+
+watch_button:
+    🎥 Watch
 
 
 # Help texts

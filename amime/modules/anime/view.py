@@ -62,10 +62,6 @@ async def view_anime(bot: Amime, union: Union[CallbackQuery, Message]):
     chat = message.chat
     user = union.from_user
 
-    if not is_private:
-        chat_db = await Chats.get(id=chat.id)
-    user_db = await Users.get(id=user.id)
-
     async with aioanilist.Client() as client:
         anime = await client.get("anime", anime_id)
 
@@ -121,11 +117,6 @@ async def view_anime(bot: Amime, union: Union[CallbackQuery, Message]):
                     )
                     keyboard[-1].sort(reverse=True)
 
-                if await filters.collaborator(bot, union) or await filters.sudo(
-                    bot, union
-                ):
-                    keyboard.append([(lang.manage_button, f"manage anime {anime.id}")])
-
                 if not (
                     await filters.collaborator(bot, union)
                     or await filters.sudo(bot, union)
@@ -141,20 +132,18 @@ async def view_anime(bot: Amime, union: Union[CallbackQuery, Message]):
 
             recipient = user.id if is_private else chat.id
             recipient_type = "user" if is_private else "group"
-            language = user_db.language_anime if is_private else chat_db.language
             notify = await Notify.filter(
                 recipient=recipient,
                 recipient_type=recipient_type,
                 item=anime.id,
                 type="anime",
-                language=language,
             )
             if len(notify) > 0:
                 keyboard.append(
                     [
                         (
                             f"🔕 {lang.notify_episodes}",
-                            f"notify chat {anime.id} {recipient} {recipient_type} {language}",
+                            f"notify chat {anime.id} {recipient} {recipient_type}",
                         )
                     ]
                 )
@@ -163,10 +152,18 @@ async def view_anime(bot: Amime, union: Union[CallbackQuery, Message]):
                     [
                         (
                             f"🔔 {lang.notify_episodes}",
-                            f"notify chat {anime.id} {recipient} {recipient_type} {language}",
+                            f"notify chat {anime.id} {recipient} {recipient_type}",
                         )
                     ]
                 )
+
+            if is_private:
+                if await filters.collaborator(bot, union) or await filters.sudo(
+                    bot, union
+                ):
+                    keyboard[-1].append(
+                        (lang.manage_button, f"manage anime {anime.id}")
+                    )
 
             photo = f"https://img.anili.st/media/{anime.id}"
 
@@ -196,14 +193,13 @@ async def view_anime(bot: Amime, union: Union[CallbackQuery, Message]):
 
 @Amime.on_callback_query(
     filters.regex(
-        r"^notify chat (?P<id>\d+) (?P<recipient>\-\d+) (?P<recipient_type>group|user) (?P<language>\w+)"
+        r"^notify chat (?P<id>\d+) (?P<recipient>(\-)?\d+) (?P<recipient_type>group|user)"
     )
 )
 async def notify_chat_callback(bot: Amime, callback: CallbackQuery):
     anime_id = int(callback.matches[0]["id"])
     recipient = int(callback.matches[0]["recipient"])
     recipient_type = callback.matches[0]["recipient_type"]
-    language = callback.matches[0]["language"]
     lang = callback._lang
 
     if recipient_type == "group":
@@ -215,7 +211,6 @@ async def notify_chat_callback(bot: Amime, callback: CallbackQuery):
         recipient_type=recipient_type,
         item=anime_id,
         type="anime",
-        language=language,
     )
     if len(notify) > 0:
         notify = notify[0]
@@ -227,7 +222,6 @@ async def notify_chat_callback(bot: Amime, callback: CallbackQuery):
             recipient_type=recipient_type,
             item=anime_id,
             type="anime",
-            language=language,
         )
         await callback.answer(lang.episode_notifications_on, show_alert=True)
 

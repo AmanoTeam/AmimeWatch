@@ -117,6 +117,9 @@ notify_episodes:
 date:
     Data
 
+added:
+    Adicionado
+
 
 # Texts
 not_found:
@@ -268,13 +271,13 @@ episode_notifications_off:
     Você desativou as notificações de episódios para este anime neste chat.
 
 episode_notification: |
-    Eae <i>Otaku(s)</i>! Vamos assistir um pouco?
-    
-    Os novos episódios de <b>{name}</b> (<b>ID</b>: <code>{id}</code>) foram adicionados.
-    
-    Abaixo está a lista de episódios que foram adicionados, divirta-se.
-    
-    <b>Episódios</b>:
+    Olá, <i>Otaku(s)</i>, novos episódios de <b>{title}</b> (<b>ID</b>: <code>{id}</code>) foram adicionados!
+
+    Logo abaixo está a lista dos novos episódios, já pegue suas guloseimas e vamos assistir.
+
+notified_users:
+    Você notificou os usuários com sucesso sobre seus novos episódios! {count} chats foram notificados.
+
 
 # Buttons
 read_more_button:
@@ -363,6 +366,9 @@ report_button:
 
 notify_users_button:
     🔔 Notificar usuários
+
+watch_button:
+    🎥 Assistir
 
 
 # Help texts

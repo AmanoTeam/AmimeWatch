@@ -24,16 +24,43 @@ import aioanilist
 
 from pyrogram import filters
 from pyrogram.types import CallbackQuery
+from pyromod.helpers import ikb
 from typing import Dict
 
 from ...amime import Amime
 from ...database import Chats, Notifications, Notify, Users
+from .manage import manage_episodes_callback
 
 
-@Amime.on_callback_query(filters.regex(r"notify anime (?P<id>\d+) (?P<language>\w+)"))
+@Amime.on_callback_query(
+    filters.regex(r"notify anime (?P<id>\d+) (?P<language>\w+) (?P<page>\d+)")
+)
 async def notify_anime_callback(bot: Amime, callback: CallbackQuery):
     anime_id = int(callback.matches[0]["id"])
     language = callback.matches[0]["language"]
+    page = int(callback.matches[0]["page"])
+    lang = callback._lang
+
+    keyboard = [
+        [
+            (lang.confirm_button, f"notify anime confirm {anime_id} {language} {page}"),
+            (lang.cancel_button, f"manage episodes {anime_id} {page}"),
+        ]
+    ]
+
+    await callback.edit_message_text(
+        lang.confirm,
+        reply_markup=ikb(keyboard),
+    )
+
+
+@Amime.on_callback_query(
+    filters.regex(r"notify anime confirm (?P<id>\d+) (?P<language>\w+) (?P<page>\d+)")
+)
+async def notify_anime_confirm_callback(bot: Amime, callback: CallbackQuery):
+    anime_id = int(callback.matches[0]["id"])
+    language = callback.matches[0]["language"]
+    page = int(callback.matches[0]["page"])
     message = callback.message
     chat = message.chat
     user = callback.from_user
@@ -41,37 +68,92 @@ async def notify_anime_callback(bot: Amime, callback: CallbackQuery):
 
     anime = await aioanilist.Client().get("anime", anime_id)
 
-    chats = await Notify.filter(item=anime.id, type="anime", language=language)
+    chats = await Notify.filter(item=anime.id, type="anime")
     episodes = await Notifications.filter(
         item=anime.id, type="anime", language=language
     )
 
     seasons: Dict = {}
     for episode in episodes:
-        if str(episode.season) not in seasons.keys():
-            seasons[str(episode.season)] = []
-        if str(episode.number) not in seasons[str(episode.season)]:
-            seasons[str(episode.season)].append(str(episode.number))
+        if episode.season not in seasons.keys():
+            seasons[episode.season] = []
+        if episode not in seasons[episode.season]:
+            seasons[episode.season].append(episode)
+
+    lang = lang.get_language("en")
+    date = episodes[-1].datetime.strftime("%H:%M:%S - %d/%m/%Y")
+    text = lang.episode_notification(title=anime.title.romaji, id=anime.id)
+    text += f"\n<b>Added</b>:"
+    for season, eps in seasons.items():
+        if int(season) > 0:
+            text += f"\n    <b>S{season}</b>: "
+            for ep in eps:
+                text += f"E{ep.number} ({ep.language}), "
+            text = text[: len(text) - 2]
+    text += f"\n\n<b>Date</b>: {date}"
+    keyboard = [
+        [
+            (
+                lang.watch_button,
+                f"https://t.me/{bot.me.username}?start=anime_{anime.id}",
+                "url",
+            )
+        ]
+    ]
+    await bot.send_photo(
+        chat_id=bot.channel_id,
+        photo=f"https://img.anili.st/media/{anime.id}",
+        caption=text,
+        reply_markup=ikb(keyboard),
+    )
+
+    notified_chats = []
 
     for chat in chats:
-        language = chat.language
-        lang = lang.get_language(language)
+        if chat.recipient_type == "group":
+            recipient_language = (await Chats.get(id=chat.recipient)).language
+        else:
+            recipient_language = (await Users.get(id=chat.recipient)).language_bot
+        lang = lang.get_language(recipient_language)
 
-        date = episodes[-1].datetime.strftime("%H:%M:%S - %d/%m/%Y")
-
-        text = lang.episode_notification(name=anime.title.romaji, id=anime.id)
+        text = lang.episode_notification(title=anime.title.romaji, id=anime.id)
+        text += f"\n<b>{lang.added}</b>:"
         for season, eps in seasons.items():
             if int(season) > 0:
-                text += f"\n    <b>{lang.season[0]}{season}</b>: {lang.episode[0]}<code>{', '.join(eps)}</code>"
-            else:
-                text += f"\n    {lang.episode[0]}<code>{', '.join(eps)}</code>"
+                text += f"\n    <b>{lang.season[0]}{season}</b>: "
+                for ep in eps:
+                    text += f"{lang.episode[0]}{ep.number} ({ep.language}), "
+                text = text[: len(text) - 2]
         text += f"\n\n<b>{lang.date}</b>: {date}"
 
-        await bot.send_photo(
-            chat_id=chat.recipient,
-            photo=f"https://img.anili.st/media/{anime.id}",
-            caption=text,
+        if chat.recipient_type == "group":
+            keyboard = [
+                [
+                    (
+                        lang.watch_button,
+                        f"https://t.me/{bot.me.username}?start=anime_{anime.id}",
+                        "url",
+                    )
+                ]
+            ]
+        else:
+            keyboard = [[(lang.watch_button, f"anime {anime.id}")]]
+
+        notified_chats.append(
+            await bot.send_photo(
+                chat_id=chat.recipient,
+                photo=f"https://img.anili.st/media/{anime.id}",
+                caption=text,
+                reply_markup=ikb(keyboard),
+            )
         )
+
+    await callback.answer(
+        lang.notified_users(count=len(notified_chats)), show_alert=True
+    )
 
     for episode in episodes:
         await episode.delete()
+
+    callback.matches = [{"id": anime_id, "page": page}]
+    await manage_episodes_callback(bot, callback)

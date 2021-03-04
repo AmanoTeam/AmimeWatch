@@ -110,7 +110,7 @@ async def manage_episodes_callback(bot: Amime, callback: CallbackQuery):
     )
     if len(notifications) > 0:
         keyboard.append(
-            [(lang.notify_users_button, f"notify anime {anime_id} {language}")]
+            [(lang.notify_users_button, f"notify anime {anime_id} {language} {page}")]
         )
 
     episodes_dict: Dict = {}

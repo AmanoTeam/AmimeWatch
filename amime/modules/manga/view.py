@@ -62,8 +62,8 @@ async def view_manga(bot: Amime, union: Union[CallbackQuery, Message]):
         manga = await client.get("manga", manga_id)
 
         if manga:
-            if manga.description and len(manga.description) > 700:
-                manga.description_short = manga.description[0:500] + "..."
+            if manga.description and len(manga.description) > 450:
+                manga.description_short = manga.description[0:430] + "..."
 
             text = f"<b>{manga.title.romaji}</b> (<code>{manga.title.native}</code>)\n"
 

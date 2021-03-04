@@ -70,8 +70,8 @@ async def view_anime(bot: Amime, union: Union[CallbackQuery, Message]):
         anime = await client.get("anime", anime_id)
 
         if anime:
-            if anime.description and len(anime.description) > 700:
-                anime.description_short = anime.description[0:500] + "..."
+            if anime.description and len(anime.description) > 450:
+                anime.description_short = anime.description[0:430] + "..."
 
             text = f"<b>{anime.title.romaji}</b> (<code>{anime.title.native}</code>)\n"
 

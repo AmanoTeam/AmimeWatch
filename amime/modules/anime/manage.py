@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import aioanilist
+import anilist
 import datetime
 import os
 
@@ -199,7 +199,7 @@ async def manage_add_episode_callback(bot: Amime, callback: CallbackQuery):
     user = callback.from_user
     lang = callback._lang
 
-    anime = await aioanilist.Client().get("anime", anime_id)
+    anime = await anilist.AsyncClient().get(anime_id)
 
     if not str(user.id) in ADDING.keys():
         ADDING[str(user.id)] = {}
@@ -388,7 +388,7 @@ async def confirm_add_callback(bot: Amime, callback: CallbackQuery):
     user = callback.from_user
     lang = callback._lang
 
-    anime = await aioanilist.Client().get("anime", confirm_id)
+    anime = await anilist.AsyncClient().get(confirm_id)
 
     adding = ADDING[str(user.id)][str(confirm_id)]
     language = LANGUAGE[str(user.id)][str(confirm_id)]

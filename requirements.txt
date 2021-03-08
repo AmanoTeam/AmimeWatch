@@ -10,4 +10,4 @@ TgCrypto==1.2.2
 tortoise-orm==0.16.21
 typing-extensions==3.7.4.3
 
-git+https://github.com/aioanilist/aioanilist
+git+https://github.com/AmanoTeam/python-anilist

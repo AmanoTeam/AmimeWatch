@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import aioanilist
+import anilist
 import datetime
 
 from pyrogram import filters
@@ -174,7 +174,7 @@ async def report_confirm_callback(bot: Amime, callback: CallbackQuery):
 
     reporting = REPORTING[str(user.id)][str(anime_id)]
 
-    anime = await aioanilist.Client().get("anime", anime_id)
+    anime = await anilist.AsyncClient().get(anime_id)
 
     reports = await Reports.filter(item=anime_id, type="anime")
 
@@ -193,7 +193,7 @@ async def report_confirm_callback(bot: Amime, callback: CallbackQuery):
 
     await Reports.create(
         user=user.id,
-        item=anime_id,
+        item=anime.id,
         type="anime",
         notes=(reporting["notes"] if "notes" in reporting.keys() else ""),
         datetime=now_date,

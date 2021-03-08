@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import aioanilist
+import anilist
 import re
 
 from pyrogram import filters
@@ -54,10 +54,10 @@ async def answer(bot: Amime, inline_query: InlineQuery):
                     search = " ".join(query[1:])
                 content_type = "anime" if query[0] == "!a" else "manga"
 
-                async with aioanilist.Client() as client:
-                    results_search = await client.search(content_type, search, limit=10)
+                async with anilist.AsyncClient() as client:
+                    results_search = await client.search(search, content_type, 10)
                     for result in results_search:
-                        result = await client.get(content_type, result.id)
+                        result = await client.get(result.id, content_type)
                         photo = (
                             result.banner
                             or result.cover.extra_large
@@ -81,8 +81,7 @@ async def answer(bot: Amime, inline_query: InlineQuery):
                             )
                             text += f"\n<b>{lang.genres}</b>: <code>{', '.join(result.genres)}</code>"
                             if hasattr(result, "studios"):
-                                if result.studios.nodes:
-                                    text += f"\n<b>{lang.studios}</b>: <code>{', '.join(studio.name for studio in result.studios.nodes)}</code>"
+                                text += f"\n<b>{lang.studios}</b>: <code>{', '.join(result.studios)}</code>"
                             if hasattr(result, "format"):
                                 text += f"\n<b>{lang.format}</b>: <code>{result.format}</code>"
                             text += f"\n<b>{lang.start_date}</b>: <code>{result.start_date.day or 0}/{result.start_date.month or 0}/{result.start_date.year or 0}</code>"

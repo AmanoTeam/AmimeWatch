@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import aioanilist
+import anilist
 import datetime
 
 from pyrogram import filters
@@ -56,7 +56,7 @@ async def request_episodes_callback(bot: Amime, callback: CallbackQuery):
     user = callback.from_user
     lang = callback._lang
 
-    anime = await aioanilist.Client().get("anime", anime_id)
+    anime = await anilist.AsyncClient().get(anime_id)
 
     requests = await Requests.filter(item=anime_id, type="anime")
 

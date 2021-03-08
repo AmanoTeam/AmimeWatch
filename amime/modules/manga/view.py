@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import aioanilist
+import anilist
 
 from pyrogram import filters
 from pyrogram.types import CallbackQuery, Message
@@ -38,9 +38,9 @@ async def manga_message(bot: Amime, message: Message):
     if query.isdecimal():
         manga_id = int(query)
     else:
-        async with aioanilist.Client() as client:
-            result = await client.search("manga", query, limit=1)
-            manga = await client.get("manga", result[0].id)
+        async with anilist.AsyncClient() as client:
+            result = await client.search(query, "manga", 1)
+            manga = await client.get(result[0].id, "manga")
             manga_id = manga.id
 
     message.matches = [{"id": manga_id}]
@@ -58,21 +58,18 @@ async def view_manga(bot: Amime, union: Union[CallbackQuery, Message]):
     is_callback = isinstance(union, CallbackQuery)
     is_private = await filters.private(bot, union.message if is_callback else union)
 
-    async with aioanilist.Client() as client:
-        manga = await client.get("manga", manga_id)
+    async with anilist.AsyncClient() as client:
+        manga = await client.get(manga_id, "manga")
 
         if manga:
-            if manga.description and len(manga.description) > 450:
-                manga.description_short = manga.description[0:430] + "..."
-
             text = f"<b>{manga.title.romaji}</b> (<code>{manga.title.native}</code>)\n"
 
             text += f"\n<b>{lang.id}</b>: <code>{manga.id}</code>"
             text += f"\n<b>{lang.score}</b>: (<b>{lang.average} = <code>{manga.score.average or 0}</code></b>)"
             text += f"\n<b>{lang.status}</b>: <code>{manga.status}</code>"
             text += f"\n<b>{lang.genres}</b>: <code>{', '.join(manga.genres)}</code>"
-            text += f"\n<b>{lang.volume}s</b>: <code>{manga.volumes or 0}</code>"
-            text += f"\n<b>{lang.chapter}s</b>: <code>{manga.chapters or 0}</code>"
+            text += f"\n<b>{lang.volume}s</b>: <code>{manga.volumes if hasattr(manga, 'volumes') else 0}</code>"
+            text += f"\n<b>{lang.chapter}s</b>: <code>{manga.chapters if hasattr(manga, 'chapters') else 0}</code>"
             text += f"\n<b>{lang.start_date}</b>: <code>{manga.start_date.day or 0}/{manga.start_date.month or 0}/{manga.start_date.year or 0}</code>"
             if not manga.status.lower() == "releasing":
                 text += f"\n<b>{lang.end_date}</b>: <code>{manga.end_date.day or 0}/{manga.end_date.month or 0}/{manga.end_date.year or 0}</code>"

@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import aioanilist
+import anilist
 
 from pyrogram import filters
 from pyrogram.types import CallbackQuery
@@ -66,7 +66,7 @@ async def notify_anime_confirm_callback(bot: Amime, callback: CallbackQuery):
     user = callback.from_user
     lang = callback._lang
 
-    anime = await aioanilist.Client().get("anime", anime_id)
+    anime = await anilist.AsyncClient().get(anime_id)
 
     chats = await Notify.filter(item=anime.id, type="anime")
     episodes = await Notifications.filter(
@@ -155,5 +155,5 @@ async def notify_anime_confirm_callback(bot: Amime, callback: CallbackQuery):
     for episode in episodes:
         await episode.delete()
 
-    callback.matches = [{"id": anime_id, "page": page}]
+    callback.matches = [{"id": anime.id, "page": page}]
     await manage_episodes_callback(bot, callback)

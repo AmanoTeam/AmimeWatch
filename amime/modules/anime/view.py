@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import aioanilist
+import anilist
 
 from pyrogram import filters
 from pyrogram.types import CallbackQuery, Message
@@ -39,9 +39,9 @@ async def anime_message(bot: Amime, message: Message):
     if query.isdecimal():
         anime_id = int(query)
     else:
-        async with aioanilist.Client() as client:
-            result = await client.search("anime", query, limit=1)
-            anime = await client.get("anime", result[0].id)
+        async with anilist.AsyncClient() as client:
+            result = await client.search(query, limit=1)
+            anime = await client.get(result[0].id)
             anime_id = anime.id
 
     message.matches = [{"id": anime_id}]
@@ -62,21 +62,20 @@ async def view_anime(bot: Amime, union: Union[CallbackQuery, Message]):
     chat = message.chat
     user = union.from_user
 
-    async with aioanilist.Client() as client:
-        anime = await client.get("anime", anime_id)
+    async with anilist.AsyncClient() as client:
+        anime = await client.get(anime_id)
 
         if anime:
-            if anime.description and len(anime.description) > 450:
-                anime.description_short = anime.description[0:430] + "..."
-
             text = f"<b>{anime.title.romaji}</b> (<code>{anime.title.native}</code>)\n"
 
             text += f"\n<b>{lang.id}</b>: <code>{anime.id}</code>"
             text += f"\n<b>{lang.score}</b>: (<b>{lang.average} = <code>{anime.score.average or 0}</code></b>)"
             text += f"\n<b>{lang.status}</b>: <code>{anime.status}</code>"
             text += f"\n<b>{lang.genres}</b>: <code>{', '.join(anime.genres)}</code>"
-            if anime.studios.nodes:
-                text += f"\n<b>{lang.studios}</b>: <code>{', '.join(studio.name for studio in anime.studios.nodes)}</code>"
+            if anime.studios:
+                text += (
+                    f"\n<b>{lang.studios}</b>: <code>{', '.join(anime.studios)}</code>"
+                )
             text += f"\n<b>{lang.format}</b>: <code>{anime.format}</code>"
             text += f"\n<b>{lang.duration}</b>: <code>{anime.duration or 24}m</code>"
             if not anime.format.lower() == "movie":
@@ -95,8 +94,9 @@ async def view_anime(bot: Amime, union: Union[CallbackQuery, Message]):
 
             keyboard = [[(lang.read_more_button, anime.url, "url")]]
 
-            if hasattr(anime.trailer, "url"):
-                keyboard[0].append((lang.trailer_button, anime.trailer.url, "url"))
+            if hasattr(anime, "trailer"):
+                if hasattr(anime.trailer, "url"):
+                    keyboard[0].append((lang.trailer_button, anime.trailer.url, "url"))
 
             if is_private:
                 keyboard.append(

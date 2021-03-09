@@ -51,7 +51,7 @@ async def about_union(bot: Amime, union: Union[CallbackQuery, Message]):
         lang.about.format(
             bot_name=bot.me.first_name,
             github="<a href='https://github.com/AmanoTeam/AmimeWatch'>GitHub</a>",
-            channel=f"<a href='https://t.me/AmimeWatchChannel'>{lang.channel}</a>",
+            channel=f"<a href='https://t.me/AmimeWatch'>{lang.channel}</a>",
             group=f"<a href='https://t.me/AmimeWatchGroup'>{lang.group}</a>",
         ),
         reply_markup=ikb(keyboard),

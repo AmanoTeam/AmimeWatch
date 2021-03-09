@@ -370,6 +370,12 @@ notify_users_button:
 watch_button:
     🎥 Assistir
 
+group_button:
+    👥 Grupo
+
+channel_button:
+    📢 Canal
+
 
 # Help texts
 anime_help: |

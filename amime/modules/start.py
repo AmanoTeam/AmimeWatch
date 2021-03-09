@@ -67,6 +67,10 @@ async def start_union(bot: Amime, union: Union[CallbackQuery, Message]):
     keyboard = [
         [(lang.help_button, "help"), (lang.about_button, "about")],
         [(lang.favorites_button, "favorites"), (lang.settings_button, "settings")],
+        [
+            (lang.group_button, "https://t.me/AmimeWatchGroup", "url"),
+            (lang.channel_button, "https://t.me/AmimeWatch", "url"),
+        ],
     ]
     user = union.from_user
 

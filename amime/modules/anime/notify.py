@@ -85,11 +85,12 @@ async def notify_anime_confirm_callback(bot: Amime, callback: CallbackQuery):
     text = lang.episode_notification(title=anime.title.romaji, id=anime.id)
     text += f"\n<b>Added</b>:"
     for season, eps in seasons.items():
+        text += "\n    "
         if int(season) > 0:
-            text += f"\n    <b>S{season}</b>: "
-            for ep in eps:
+            text += f"<b>S{season}</b>: "
+        for ep in eps:
                 text += f"E{ep.number} ({ep.language}), "
-            text = text[: len(text) - 2]
+        text = text[: len(text) - 2]
     text += f"\n\n<b>Date</b>: {date}"
     keyboard = [
         [
@@ -119,11 +120,12 @@ async def notify_anime_confirm_callback(bot: Amime, callback: CallbackQuery):
         text = lang.episode_notification(title=anime.title.romaji, id=anime.id)
         text += f"\n<b>{lang.added}</b>:"
         for season, eps in seasons.items():
+            text += "\n    "
             if int(season) > 0:
-                text += f"\n    <b>{lang.season[0]}{season}</b>: "
-                for ep in eps:
-                    text += f"{lang.episode[0]}{ep.number} ({ep.language}), "
-                text = text[: len(text) - 2]
+                text += f"<b>{lang.season[0]}{season}</b>: "
+            for ep in eps:
+                text += f"{lang.episode[0]}{ep.number} ({ep.language}), "
+            text = text[: len(text) - 2]
         text += f"\n\n<b>{lang.date}</b>: {date}"
 
         if chat.recipient_type == "group":

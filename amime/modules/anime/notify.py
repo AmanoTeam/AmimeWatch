@@ -89,7 +89,7 @@ async def notify_anime_confirm_callback(bot: Amime, callback: CallbackQuery):
         if int(season) > 0:
             text += f"<b>S{season}</b>: "
         for ep in eps:
-                text += f"E{ep.number} ({ep.language}), "
+            text += f"E{ep.number} ({ep.language}), "
         text = text[: len(text) - 2]
     text += f"\n\n<b>Date</b>: {date}"
     keyboard = [

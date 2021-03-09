@@ -391,6 +391,9 @@ characters_button:
 studios_button:
     🖼️ Studios
 
+search_button:
+    🔎 Search
+
 
 # Help texts
 anime_help: |

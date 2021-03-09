@@ -49,17 +49,17 @@ short_description:
     Descrição curta
 
 favorite:
-    Favorito
+    Favoritar
 
 channel:
     Canal
 
 group:
     Grupo
-        
+
 module:
     Módulo
-    
+
 name:
     Nome
 
@@ -79,7 +79,7 @@ first:
     Primeiro
 
 last:
-    Última
+    Último
 
 added_by:
     Adicionado por
@@ -127,22 +127,22 @@ not_found:
 
 inline: |
     Toque no botão abaixo para saber como usar meu <b>modo inline</b>.
-    
+
     Você será redirecionado para <b>meu privado</b> e aprenderá a usá-lo lá.
-    
+
 start: |
     Olá {mention}, meu nome é <b>{bot_name}</b>!
-    
-    Eu sou um <b>bot</b> criado para fornecer-lhe a <i>melhor</i> experiência de animes, como informações detalhadas diretamente do {anilist} e até mesmo obter os últimos episódios de seu anime favorito.
-    
+
+    Eu sou um <b>bot</b> criado para fornecer-lhe a <i>melhor</i> experiência de animes, como informações detalhadas diretamente do {anilist} e até mesmo obter os últimos episódios do seu anime favorito.
+
     Explore minhas funções nos botões abaixo:
-    
+
 help:
-    Vamos explorar? Clique nos botões abaixo e descubra todo o meu potencial, espero que você goste!
-    
+    Vamos explorar? Clique nos botões abaixo e descubra todo o meu potencial, espero que goste!
+
 about: |
     <b>{bot_name}</b> é um bot desenvolvido em <i>Python</i> com a biblioteca <b>MTProto Pyrogram</b>, feito para ser rápido, estável e completo quando se trata de animes.
-    
+
     Links: {github} | {channel} | {group}
 
 help_in_pm:
@@ -168,24 +168,24 @@ removed_from_favorites:
 
 collaborators: |
     Abaixo está a lista de colaboradores do <b>{bot_name}</b>
-    
+
     Eles estão no seguinte formato:
         <b>Nome</b> (<i>idioma</i>)
 
 user_is_sudo:
-    O usuário {mention} é um usuário <b>sudo</b>, pode fazer nada com ele.
+    O usuário {mention} é um usuário <b>sudo</b>, posso fazer nada com ele.
 
 is_already_a_collaborator_in_all_these_languages:
-    O usuário {mention} já é um contribuinte para todos os idiomas especificados.
+    O usuário {mention} já é um contridor para todos os idiomas especificados.
 
 is_not_a_collaborator_in_all_of_these_languages:
-    O usuário {mention} não é um contribuinte em qualquer idioma que você especificou.
+    O usuário {mention} não é um contribuidor nos idiomas que você especificou.
 
 promoted_to_collaborator: |
     {mention_sudo} promoveu {mention_user} a um <b>colaborador</b> do seguinte idioma: <code>{languages}</code>.
 
 demoted_collaborator: |
-    {mention_sudo} rebaixado {mention_user} para um usuário normal no seguinte idioma: <code>{languages}</code>.
+    {mention_sudo} rebaixou {mention_user} para um usuário normal do seguinte idioma: <code>{languages}</code>.
 
 is_already_a_collaborator_in_some_languages: |
     Este usuário já é um <b>colaborador</b> no seguinte idioma: <code>{languages}</code>.
@@ -197,15 +197,15 @@ languages_not_exists: |
     Os seguinte idiomas não foram encontrados ou ainda não existem: <code>{languages}</code>.
 
 settings_private: |
-    Você está nas minhas configurações, aqui você pode mudar o seu idioma e algumas outras pequenas coisas, tudo está lá embaixo.
-    
-    Se você quiser alterar minhas configurações em algum grupo, use o comando /settings nele.
-    
+    Você está nas minhas configurações, aqui você pode mudar o seu idioma e outras coisas, tudo está logo abaixo.
+
+    Se você quiser alterar minhas configurações em algum grupo, envieno comando /settings nele.
+
     Quaisquer alterações que você fizer só afetarão o chat em que você usou o comando.
 
 settings_group: |
-    Você está nas minhas configurações, aqui você pode mudar minha linguagem e algumas outras pequenas coisas, tudo está lá embaixo.
-    
+    Você está nas minhas configurações, aqui você pode mudar o idioma do grupo e algumas outras coisas, tudo está logo abaixo.
+
 settings_language:
     Escolha qual idioma você deseja usar abaixo.
 
@@ -213,39 +213,39 @@ manage_anime:
     Escolha o que você quer fazer com este anime.
 
 manage_episodes:
-    Aqui você gerencia os episódios, você pode editá-los, excluí-los ou adicionar novos episódios.
+    Aqui você poderá gerenciar os episódios deste Anime, você pode editá-los, excluí-los ou adicionar novos episódios.
 
 send_me_the:
     Envie-me o item <b>{item}</b>.
 
 duplicate_episode_number:
-    Este anime já tem um episódio com esse número nesta mesma temporada e neste mesmo idioma, você não pode colocar dois episódios com o mesmo número, escolher outro ou excluir o outro episódio.
+    Este anime já tem um episódio com esse número nesta mesma temporada e neste mesmo idioma, você não pode colocar dois episódios com o mesmo número, defina outro número ou exclua o episódio já existente.
 
 episode_added:
-    O episódio foi adicionado com sucesso.
+    O episódio foi adicionado com sucesso!
 
 episodes: |
     Aqui estão os episódios disponíveis para o anime <b>{name}</b> (<b>ID</b>: <code>{id}</code>), divirta-se!
     Atualmente tenho <code>{count}</code> episódio(s) em <b>{language}</b>.
-    
+
     <b>Sobre os emojis</b>:
         ✅ - Assistido
         👁️ - Apenas visualizado
         🙈 - Nunca aberto
 
 episodes_request_in_last_24h: |
-    Um pedido de episódio já foi feito para este anime nas últimas 24 horas, aguarde os colaboradores adicionarem os episódios.
-    
+    Um pedido de novos episódios já foi feito para este mesmo anime nas últimas 24 horas, aguarde que os colaboradores adicionem os episódios.
+
     Data: {date}
 
 episode_request_successfully_sent:
     Sua solicitação de episódio foi enviada com sucesso! Aguarde os colaboradores adicionarem os episódios (se houver).
 
 confirm:
-    Para continuar, confirme usando o botão abaixo.
+    Para continuar confirme usando o botão abaixo.
 
 preview:
-    O que você vê abaixo é apenas uma prévia de como ficará quando estiver pronto.
+    O que você vê abaixo é apenas uma prévia de como ficará seu upload quando estiver pronto.
 
 missing_items_episode: |
     Você não pode adicionar um episódio sem os seguintes itens: {items}.
@@ -254,11 +254,11 @@ settings_season:
     Escolha abaixo qual temporada você quer ver.
 
 report:
-    Escolha abaixo o tipo de reportagem que você quer fazer.
+    Escolha abaixo o tipo de relatório que você quer fazer.
 
 reported_in_last_24h: |
     Você já reportou um episódio nas últimas 24h.
-    
+
     Data: {date}
 
 episode_successfully_reported:
@@ -273,16 +273,14 @@ episode_notifications_off:
 episode_notification: |
     Olá, <i>Otaku(s)</i>, novos episódios de <b>{title}</b> (<b>ID</b>: <code>{id}</code>) foram adicionados!
 
-    Logo abaixo está a lista dos novos episódios, já pegue suas guloseimas e vamos assistir.
-
 notified_users:
-    Você notificou os usuários com sucesso sobre seus novos episódios! {count} chats foram notificados.
+    Você notificou os usuários com sucesso sobre novos episódios deste Anime! {count} chats foram notificados.
 
 anime_more:
-    Oooh, parece que você quer me ver mais profundamente... Então vamos lá, escolha o que você quer ver abaixo.
+    Oooh, parece que você quer saber mais... Então vamos lá, escolha o que você quer ver abaixo.
 
 function_in_progress:
-    Oops! Isso ainda não está pronto, fique ligado em nosso canal, todas as atualizações serão anunciadas lá.
+    Oops! Isso ainda não está pronto, fique ligado em nosso canal, todas as atualizações serão anunciadas lá!
 
 
 # Buttons
@@ -391,33 +389,36 @@ characters_button:
 studios_button:
     🖼️ Estúdios
 
+search_button:
+    🔎 Pesquisar
+
 
 # Help texts
 anime_help: |
-    <b>Ajuda sobre</b>: anime
-    
-    Meu <b>módulo de animes</b> permite que os usuários vejam uma lista básica de informações sobre o anime específico com base no {anilist}, mas também permite que os usuários assistam aos episódios, para isso, use o <b>{request_episodes_button}</b> botão na parte inferior de todo anime, com ele, uma mensagem solicitando episódios desse anime será enviada para <i>nossos colaboradores</i> em seu idioma, eles verificarão os episódios desse anime em seu idioma, e <b>se existirem</b>, eles irão adicionar a lista de episódios no seu idioma, porém, se não houver episódios do anime em questão no seu idioma ou legendados, eles não poderão fazer nada, mas você pode assisti-los legendados no idioma <b>de sua preferência</b>.
-    
+    <b>Ajuda sobre</b>: Animes
+
+    Meu <b>módulo de Animes</b> permite que os usuários vejam informações sobre um anime específico com base no {anilist}, mas também permite que os usuários assistam aos episódios, para isso, use o botão "<b>{request_episodes_button}</b>" na parte inferior de todo anime, com ele, uma mensagem solicitando episódios do anime específico será enviada para <i>nossos colaboradores</i> em seu idioma, eles verificarão os episódios desse anime em seu idioma, e <b>se existirem</b>, eles irão adicionar a lista de episódios no seu idioma, porém, se não houver episódios do anime em questão no seu idioma (dublados ou legendados), eles não poderão fazer nada, mas você pode assisti-los legendados no idioma <b>de sua preferência</b>.
+
     <b>Como usar</b>?
-        Envie-me o anime usando o módulo <b>inline</b> ou use o comando <code>/anime &lt;id&gt;</code>.
+        Envie-me o anime usando o módulo <b>inline</b> ou use o comando <code>/anime &lt;id ou nome&gt;</code>.
 
 manga_help: |
-    <b>Ajuda sobre</b>: mangá
-    
-    Meu módulo <b>mangá</b> permite que os usuários vejam uma lista básica de informações sobre o mangá específico com base em {anilist}.
-    
-    <b>How to use</b>?
-        Envie-me o mangá usando o módulo <b>inline</b> ou use o comando <code>/mangá &lt;id&gt;</code>.
+    <b>Ajuda sobre</b>: Mangás
+
+    Meu <b>módulo de Mangás</b> permite que os usuários vejam uma lista de informações sobre o mangá específico com base no {anilist}.
+
+    <b>Como usar</b>?
+        Envie-me o mangá usando o módulo <b>inline</b> ou use o comando <code>/mangá &lt;id ou nome&gt;</code>.
 
 inline_help: |
-    <b>Ajuda sobre</b>: inline
+    <b>Ajuda sobre</b>: Inline
     
-    Meu módulo <b>inline</b> permite que os usuários procurem animes ou mangás, e também pode procurar apenas imagens se <b>você preferir</b>.
-    
+    Meu <b>módulo inline</b> permite que os usuários procurem animes, mangás e também imagens de animes se <b>você preferir</b>!
+
     <b>Como usar</b>?
-        Digite meu nome de usuário e proceda: @{bot_username}
-        
-        <b>Sinalizadores</b>:
+        Digite meu nome de usuário com espaço: @{bot_username}
+
+        <b>Comandos</b>:
             <code>!a</code> - procurar animes.
             <code>!m</code> - procurar mangás.
             <code>!g</code> - usar o modo galeria (somente fotos).
@@ -426,5 +427,5 @@ inline_help: |
             <code>@{bot_username} !a !g Naruto Shippuden</code>
             <code>@{bot_username} !m Jujutsu Kaizen</code>
             <code>@{bot_username} !a Shingeki no Kyojin</code>
-        
+
         Teste você mesmo. 😅

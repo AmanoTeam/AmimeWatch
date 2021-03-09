@@ -71,6 +71,7 @@ async def start_union(bot: Amime, union: Union[CallbackQuery, Message]):
             (lang.group_button, "https://t.me/AmimeWatchGroup", "url"),
             (lang.channel_button, "https://t.me/AmimeWatch", "url"),
         ],
+        [(lang.search_button, "!a ", "switch_inline_query_current_chat")],
     ]
     user = union.from_user
 

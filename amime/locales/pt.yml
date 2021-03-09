@@ -278,6 +278,12 @@ episode_notification: |
 notified_users:
     Você notificou os usuários com sucesso sobre seus novos episódios! {count} chats foram notificados.
 
+anime_more:
+    Oooh, parece que você quer me ver mais profundamente... Então vamos lá, escolha o que você quer ver abaixo.
+
+function_in_progress:
+    Oops! Isso ainda não está pronto, fique ligado em nosso canal, todas as atualizações serão anunciadas lá.
+
 
 # Buttons
 read_more_button:
@@ -375,6 +381,15 @@ group_button:
 
 channel_button:
     📢 Canal
+
+description_button:
+    📜 Descrição
+
+characters_button:
+    👥 Personagens
+
+studios_button:
+    🖼️ Estúdios
 
 
 # Help texts

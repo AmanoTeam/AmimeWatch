@@ -65,18 +65,27 @@ async def view_manga(bot: Amime, union: Union[CallbackQuery, Message]):
             text = f"<b>{manga.title.romaji}</b> (<code>{manga.title.native}</code>)\n"
 
             text += f"\n<b>{lang.id}</b>: <code>{manga.id}</code>"
-            text += f"\n<b>{lang.score}</b>: (<b>{lang.average} = <code>{manga.score.average or 0}</code></b>)"
+            if hasattr(manga, "score"):
+                if hasattr(manga.score, "average"):
+                    text += f"\n<b>{lang.score}</b>: (<b>{lang.average} = <code>{manga.score.average}</code></b>)"
             text += f"\n<b>{lang.status}</b>: <code>{manga.status}</code>"
-            text += f"\n<b>{lang.genres}</b>: <code>{', '.join(manga.genres)}</code>"
-            text += f"\n<b>{lang.volume}s</b>: <code>{manga.volumes if hasattr(manga, 'volumes') else 0}</code>"
-            text += f"\n<b>{lang.chapter}s</b>: <code>{manga.chapters if hasattr(manga, 'chapters') else 0}</code>"
-            text += f"\n<b>{lang.start_date}</b>: <code>{manga.start_date.day or 0}/{manga.start_date.month or 0}/{manga.start_date.year or 0}</code>"
-            if not manga.status.lower() == "releasing":
-                text += f"\n<b>{lang.end_date}</b>: <code>{manga.end_date.day or 0}/{manga.end_date.month or 0}/{manga.end_date.year or 0}</code>"
+            if hasattr(manga, "genres"):
+                text += (
+                    f"\n<b>{lang.genres}</b>: <code>{', '.join(manga.genres)}</code>"
+                )
+            if hasattr(manga, "volumes"):
+                text += f"\n<b>{lang.volume}s</b>: <code>{manga.volumes}</code>"
+            if hasattr(manga, "chapters"):
+                text += f"\n<b>{lang.chapter}s</b>: <code>{manga.chapters}</code>"
+            if hasattr(manga, "start_date"):
+                text += f"\n<b>{lang.start_date}</b>: <code>{manga.start_date.day or 0}/{manga.start_date.month or 0}/{manga.start_date.year or 0}</code>"
+            if hasattr(manga, "end_date"):
+                if not manga.status.lower() == "releasing":
+                    text += f"\n<b>{lang.end_date}</b>: <code>{manga.end_date.day or 0}/{manga.end_date.month or 0}/{manga.end_date.year or 0}</code>"
 
             text += "\n"
 
-            if manga.description:
+            if hasattr(manga, "description"):
                 if hasattr(manga, "description_short"):
                     text += f"\n<b>{lang.short_description}</b>: <i>{manga.description_short}</i>"
                 else:

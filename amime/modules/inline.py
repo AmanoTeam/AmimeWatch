@@ -58,12 +58,14 @@ async def answer(bot: Amime, inline_query: InlineQuery):
                     results_search = await client.search(search, content_type, 10)
                     for result in results_search:
                         result = await client.get(result.id, content_type)
-                        photo = (
-                            result.banner
-                            or result.cover.extra_large
-                            or result.cover.large
-                            or result.cover.medium
-                        )
+                        if hasattr(result, "banner"):
+                            photo = result.banner
+                        elif hasattr(result.cover, "extra_large"):
+                            photo = result.cover.extra_large
+                        elif hasattr(result.cover, "large"):
+                            photo = result.cover.large
+                        elif hasattr(result.cover, "medium"):
+                            photo = result.cover.medium
 
                         description = result.description
                         if description:

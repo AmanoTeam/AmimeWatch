@@ -102,13 +102,16 @@ async def view_manga(bot: Amime, union: Union[CallbackQuery, Message]):
                     ]
                 )
 
-            photo = (
-                manga.banner
-                or manga.cover.extra_large
-                or manga.cover.large
-                or manga.cover.medium
-                or False
-            )
+            if hasattr(manga, "banner"):
+                photo = manga.banner
+            elif hasattr(manga.cover, "extra_large"):
+                photo = manga.cover.extra_large
+            elif hasattr(manga.cover, "large"):
+                photo = manga.cover.large
+            elif hasattr(manga.cover, "medium"):
+                photo = manga.cover.medium
+            else:
+                photo = False
 
             message = union.message if is_callback else union
 

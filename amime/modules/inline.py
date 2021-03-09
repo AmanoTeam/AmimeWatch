@@ -77,18 +77,21 @@ async def answer(bot: Amime, inline_query: InlineQuery):
                         else:
                             text = f"<b>{result.title.romaji}</b> (<code>{result.title.native}</code>)\n"
                             text += f"\n<b>{lang.id}</b>: <code>{result.id}</code> (<b>{content_type.upper()}</b>)"
-                            text += f"\n<b>{lang.score}</b>: (<b>{lang.average} = <code>{result.score.average or 0}</code></b>)"
+                            if hasattr(result, "score"):
+                                if hasattr(result.score, "average"):
+                                    text += f"\n<b>{lang.score}</b>: (<b>{lang.average} = <code>{result.score.average}</code></b>)"
                             text += (
                                 f"\n<b>{lang.status}</b>: <code>{result.status}</code>"
                             )
-                            text += f"\n<b>{lang.genres}</b>: <code>{', '.join(result.genres)}</code>"
+                            if hasattr(result, "genres"):
+                                text += f"\n<b>{lang.genres}</b>: <code>{', '.join(result.genres)}</code>"
                             if hasattr(result, "studios"):
                                 text += f"\n<b>{lang.studios}</b>: <code>{', '.join(result.studios)}</code>"
                             if hasattr(result, "format"):
                                 text += f"\n<b>{lang.format}</b>: <code>{result.format}</code>"
-                            text += f"\n<b>{lang.start_date}</b>: <code>{result.start_date.day or 0}/{result.start_date.month or 0}/{result.start_date.year or 0}</code>"
+                            text += f"\n<b>{lang.start_date}</b>: <code>{result.start_date.day if hasattr(result.start_date, 'day') else 0}/{result.start_date.month if hasattr(result.start_date, 'month') else 0}/{result.start_date.year if hasattr(result.start_date, 'year') else 0}</code>"
                             if not result.status.lower() == "releasing":
-                                text += f"\n<b>{lang.end_date}</b>: <code>{result.end_date.day or 0}/{result.end_date.month or 0}/{result.end_date.year or 0}</code>"
+                                text += f"\n<b>{lang.end_date}</b>: <code>{result.end_date.day if hasattr(result.end_date, 'day') else 0}/{result.end_date.month if hasattr(result.end_date, 'month') else 0}/{result.end_date.year if hasattr(result.end_date, 'year') else 0}</code>"
                             text += f"\n\n<b>{lang.short_description}</b>: <i>{description}</i>"
 
                         kwargs: Dict = {}

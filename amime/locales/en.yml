@@ -127,32 +127,32 @@ not_found:
 
 inline: |
     Touch the button below to learn how to use my <b>inline mode</b>.
-    
-    You will be redirected to <b>my private one</b> and learn how to use it there.
-    
+
+    You will be redirected to <b>private messages</b> and learn how to use it there.
+
 start: |
     Hello {mention}, my name is <b>{bot_name}</b>!
-    
-    I am a <b>bot</b> created to provide you with the <i>best anime experience</i>, like detailed information directly from {anilist} and even get the latest episodes of your favorite anime.
-    
+
+    I am a <b>bot</b> created to provide you the <i>best anime experience</i>, like detailed information directly from {anilist} and even get the latest episodes of your favorite anime.
+
     Explore my functions in the buttons below:
-    
+
 help:
     Let's explore? Click on the buttons below and discover all my potential, I hope you enjoy it!
-    
+
 about: |
-    <b>{bot_name}</b> is a bot developed in <i>Python</i> with the <b>MTProto Pyrogram</b> library, made to be fast, stable and complete when it comes to animes.
-    
+    <b>{bot_name}</b> is a bot developed in <i>Python</i> with the MTProto <b>Pyrogram</b> library, made to be fast, stable and complete when it comes to animes.
+
     Links: {github} | {channel} | {group}
 
 help_in_pm:
-    Contact me privately for help.
+    Contact me in private message for help.
 
 start_in_pm:
     Contact me in private so you can see everything I can do.
 
 favorites:
-    School which list of favorites you want to see.
+    Choose which list of favorites you want to see.
 
 favorites_empty:
     Your list of <b>{type}</b> favorites is empty.
@@ -168,7 +168,7 @@ removed_from_favorites:
 
 collaborators: |
     Below is the list of <b>{bot_name}</b> collaborators
-    
+
     They are in the following format:
         <b>Name</b> (<i>languages</i>)
 
@@ -198,14 +198,14 @@ languages_not_exists: |
 
 settings_private: |
     You are in my settings, here you can change my language and some other little things, everything is down there.
-    
+
     If you want to change my settings in any group, use the /settings command in it.
-    
+
     Any changes you make will only affect the chat in which you used the command.
 
 settings_group: |
     You are in my settings, here you can change my language and some other little things, everything is down there.
-    
+
 settings_language:
     Choose which language you want to use below.
 
@@ -227,7 +227,7 @@ episode_added:
 episodes: |
     Here are the episodes available for the anime <b>{name}</b> (<b>ID</b>: <code>{id}</code>), have fun!
     I currently have <code>{count}</code> episodes in <b>{language}</b>.
-    
+
     <b>About emojis</b>:
         ✅ - Watched
         👁️ - Only viewed
@@ -235,7 +235,7 @@ episodes: |
 
 episodes_request_in_last_24h: |
     An episode request has already been made for this anime in the past 24 hours, wait for the collaborators to add the episodes.
-    
+
     Date: {date}
 
 episode_request_successfully_sent:
@@ -258,7 +258,7 @@ report:
 
 reported_in_last_24h: |
     You have already reported an episode in the past 24 hours.
-    
+
     Date: {date}
 
 episode_successfully_reported:
@@ -272,8 +272,6 @@ episode_notifications_off:
 
 episode_notification: |
     Hey <i>Otaku(s)</i>, new episodes of <b>{title}</b> (<b>ID</b>: <code>{id}</code>) have been added!
-
-    Just below is the list of new episodes, already get your goodies and let's watch.
 
 notified_users:
     You have successfully notified users of your new episodes! {count} chats were notified.
@@ -398,36 +396,36 @@ search_button:
 # Help texts
 anime_help: |
     <b>Help on</b>: anime
-    
+
     My <b>anime module</b> allows users to see a basic list of information about the specific anime based on {anilist}, but also allows users to watch episodes, for that, use the <b>{request_episodes_button}</b> button at the bottom of all anime, with it, a message requesting episodes of such anime will be sent to <i>our collaborators</i> in your language, they will check the episodes of that anime in their language, and <b>if they exist</b>, they will add the list of episodes in their language, however, if there are no episodes of the anime in question in your language or subtitled, they will not be able to do anything, but you can watch them subtitled in the language <b>you prefer</b>.
-    
+
     <b>How to use</b>?
         Send me the anime using the <b>inline module</b> or use the command <code>/anime &lt;id&gt;</code>.
 
 manga_help: |
     <b>Help on</b>: manga
-    
+
     My <b>manga module</b> allows users to see a basic list of information about the specific manga based on {anilist}.
-    
+
     <b>How to use</b>?
         Send me the manga using the <b>inline module</b> or use the command <code>/manga &lt;id&gt;</code>.
 
 inline_help: |
     <b>Help on</b>: inline
-    
+
     My <b>inline module</b> allows users to search for anime or manga, and can also only see the photo if <b>you prefer</b>.
-    
+
     <b>How to use</b>?
         Type my username and proceed: @{bot_username}
-        
+
         <b>Flags</b>:
             <code>!a</code> - search anime.
             <code>!m</code> - search manga.
             <code>!g</code> - use gallery mode (photos only).
-            
+
         <b>Examples</b>:
             <code>@{bot_username} !a !g Naruto Shippuden</code>
             <code>@{bot_username} !m Jujutsu Kaizen</code>
             <code>@{bot_username} !a Shingeki no Kyojin</code>
-        
+
         Test it yourself. 😅

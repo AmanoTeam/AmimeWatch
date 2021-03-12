@@ -67,7 +67,8 @@ async def answer(bot: Amime, inline_query: InlineQuery):
                         elif hasattr(result.cover, "medium"):
                             photo = result.cover.medium
 
-                        description = result.description
+                        if hasattr(result, "description"):
+                            description = result.description
                         if description:
                             description = re.sub(re.compile(r"<.*?>"), "", description)
                             description = description[0:260] + "..."

@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import aioanilist
+import anilist
 
 from pyrogram import filters
 from pyrogram.types import CallbackQuery, Message, User
@@ -82,8 +82,8 @@ async def favorites_content_union(
 
     favorites_dict: Dict = {}
     for favorite in favorites:
-        async with aioanilist.Client() as client:
-            content = await client.get(content_type, favorite.item)
+        async with anilist.AsyncClient() as client:
+            content = await client.get(favorite.item, content_type)
         favorites_dict[favorite.id] = [favorite, content]
 
     def item_title(i, pg) -> str:

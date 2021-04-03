@@ -29,7 +29,7 @@ from typing import List
 from .. import log
 
 
-async def load(bot):
+def load(bot):
     modules: List[Module] = []
 
     files = glob.glob(f"amime/modules/*.py") + glob.glob(f"amime/modules/*/*.py")
@@ -46,10 +46,11 @@ async def load(bot):
             continue
 
         functions = [*filter(callable, module.__dict__.values())]
-        functions = [*filter(lambda function: hasattr(function, "handler"), functions)]
+        functions = [*filter(lambda function: hasattr(function, "handlers"), functions)]
 
         for function in functions:
-            bot.add_handler(*function.handler)
+            for handler in function.handlers:
+                bot.add_handler(*handler)
 
     log.info(
         f"{len(modules)} module{'s' if len(modules) != 1 else ''} imported successfully!"

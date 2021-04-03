@@ -66,7 +66,7 @@ class Amime(Client):
         )
 
         langs.load()
-        await modules.load(self)
+        modules.load(self)
 
         self.backup_chat = await self.get_chat(Amime.BACKUP_ID)
         self.staff_chat = await self.get_chat(Amime.STAFF_ID)

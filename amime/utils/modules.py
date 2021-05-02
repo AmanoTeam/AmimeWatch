@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2021 Amano Team
+# Copyright (c) 2021 Andriel Rodrigues for Amano Team
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -22,27 +22,29 @@
 
 import glob
 import importlib
-import traceback
 
+from types import ModuleType
 from typing import List
 
-from .. import log
+from amime import log
+
+modules: List[ModuleType] = []
 
 
 def load(bot):
-    modules: List[Module] = []
+    global modules
 
-    files = glob.glob(f"amime/modules/*.py") + glob.glob(f"amime/modules/*/*.py")
+    files = glob.glob(f"amime/modules/**/*.py", recursive=True)
     files = sorted(files, key=lambda file: file.split("/")[2])
+
     for file_name in files:
         try:
             module = importlib.import_module(
                 file_name.replace("/", ".").replace(".py", "")
             )
             modules.append(module)
-        except:
-            log.error(f"Failed to import the module: {file_name}")
-            traceback.print_exc()
+        except BaseException:
+            log.error(f"Failed to import the module: {file_name}", exc_info=True)
             continue
 
         functions = [*filter(callable, module.__dict__.values())]
@@ -54,4 +56,30 @@ def load(bot):
 
     log.info(
         f"{len(modules)} module{'s' if len(modules) != 1 else ''} imported successfully!"
+    )
+
+
+def reload(bot):
+    global modules
+
+    for index, module in enumerate(modules):
+        functions = [*filter(callable, module.__dict__.values())]
+        functions = [*filter(lambda function: hasattr(function, "handlers"), functions)]
+
+        for function in functions:
+            for handler in function.handlers:
+                bot.remove_handler(*handler)
+
+        module = importlib.reload(module)
+        modules[index] = module
+
+        functions = [*filter(callable, module.__dict__.values())]
+        functions = [*filter(lambda function: hasattr(function, "handlers"), functions)]
+
+        for function in functions:
+            for handler in function.handlers:
+                bot.add_handler(*handler)
+
+    log.info(
+        f"{len(modules)} module{'s' if len(modules) != 1 else ''} reloaded successfully!"
     )

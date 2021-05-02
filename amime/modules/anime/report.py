@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2021 Amano Team
+# Copyright (c) 2021 Andriel Rodrigues for Amano Team
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -28,26 +28,31 @@ from pyrogram.types import CallbackQuery
 from pyromod.helpers import array_chunk, ikb
 from typing import Dict
 
-from ...amime import Amime
-from ...database import Reports
-from .watch import watch_callback
+from amime.amime import Amime
+from amime.config import CHATS
+from amime.database import Reports, Users
+from amime.modules.anime.watch import anime_episode
 
+# fmt: off
+REPORT_TYPES = [
+    "bad_quality", "wrong_episode",
+    "wrong_title", "other",
+]
+# fmt: on
 
 REPORTING: Dict = {}
 
 
-@Amime.on_callback_query(
-    filters.regex(
-        r"report episode (?P<id>\d+) (?P<season>\d+) (?P<number>\d+) (?P<language>\w+)"
-    )
-)
-async def report_episode_callback(bot: Amime, callback: CallbackQuery):
-    anime_id = int(callback.matches[0]["id"])
-    season = int(callback.matches[0]["season"])
-    number = int(callback.matches[0]["number"])
-    language = callback.matches[0]["language"]
+@Amime.on_callback_query(filters.regex(r"^report episode (\d+) (\d+) (\d+) (\-?\d+)"))
+async def report_episode(bot: Amime, callback: CallbackQuery):
+    message = callback.message
     user = callback.from_user
     lang = callback._lang
+
+    anime_id = int(callback.matches[0].group(1))
+    season = int(callback.matches[0].group(2))
+    number = int(callback.matches[0].group(3))
+    report_type = int(callback.matches[0].group(4))
 
     if str(user.id) not in REPORTING.keys():
         REPORTING[str(user.id)] = {}
@@ -56,135 +61,138 @@ async def report_episode_callback(bot: Amime, callback: CallbackQuery):
 
     reporting = REPORTING[str(user.id)][str(anime_id)]
 
-    text = lang.report + "\n"
+    buttons = []
+    for index, r_type in enumerate(REPORT_TYPES):
+        text = ("✅ " if index == report_type else "") + lang.strings[lang.code][r_type]
+        data = f"report episode {anime_id} {season} {number} {index}"
+        buttons.append((text, data))
 
-    keyboard = []
+    text = lang.report_text + "\n"
 
-    report_types = ["bad_quality", "wrong_episode", "wrong_title", "other"]
-    buttons: List[Tuple] = []
-    for report_type in report_types:
-        name = lang.strings[lang.code][report_type]
-        data = f"report type {report_type} {anime_id} {season} {number} {language}"
-        buttons.append((name, data))
-    keyboard += array_chunk(buttons, 2)
-
-    if "type" in reporting.keys():
-        report_type = lang.strings[lang.code][reporting["type"]]
-        text += f"\n<b>{lang.type}</b>: <code>{report_type}</code>"
+    if report_type != -1:
+        text += f"\n<b>{lang.type}</b>: {lang.strings[lang.code][REPORT_TYPES[report_type]]}"
 
     if "notes" in reporting.keys():
         text += f"\n\n<b>{lang.notes}</b>: <i>{reporting['notes']}</i>"
-        keyboard.append(
-            [
-                (
-                    f"✏️ {lang.notes}",
-                    f"report add notes {anime_id} {season} {number} {language}",
-                )
-            ]
+        buttons.append(
+            (
+                f"🗑️ {lang.notes}",
+                f"report episode edit notes {anime_id} {season} {number} {report_type}",
+            )
         )
     else:
-        keyboard.append(
-            [
-                (
-                    f"➕ {lang.notes}",
-                    f"report add notes {anime_id} {season} {number} {language}",
-                )
-            ]
+        buttons.append(
+            (
+                f"➕ {lang.notes}",
+                f"report episode edit notes {anime_id} {season} {number} {report_type}",
+            )
         )
 
-    keyboard.append(
-        [
+    keyboard = array_chunk(buttons, 2)
+
+    buttons = []
+
+    if (report_type == 3 and "notes" in reporting.keys()) or (
+        report_type > -1 and report_type < 3
+    ):
+        buttons.append(
             (
                 lang.confirm_button,
-                f"report confirm {anime_id} {season} {number} {language}",
-            ),
-            (
-                lang.cancel_button,
-                f"report cancel {anime_id} {season} {number} {language}",
-            ),
-        ]
-    )
+                f"report episode confirm {anime_id} {season} {number} {report_type}",
+            )
+        )
 
-    await callback.edit_message_text(
+    buttons.append((lang.back_button, f"episode {anime_id} {season} {number}"))
+
+    keyboard += array_chunk(buttons, 2)
+
+    await message.edit_text(
         text,
         reply_markup=ikb(keyboard),
     )
 
 
 @Amime.on_callback_query(
-    filters.regex(
-        r"report type (?P<type>\w+) (?P<id>\d+) (?P<season>\d+) (?P<number>\d+) (?P<language>\w+)"
-    )
+    filters.regex(r"^report episode edit notes (\d+) (\d+) (\d+) (\-?\d+)")
 )
-async def report_type_callback(bot: Amime, callback: CallbackQuery):
-    report_type = callback.matches[0]["type"]
-    anime_id = int(callback.matches[0]["id"])
-    user = callback.from_user
-    lang = callback._lang
-
-    REPORTING[str(user.id)][str(anime_id)]["type"] = report_type
-
-    await report_episode_callback(bot, callback)
-
-
-@Amime.on_callback_query(
-    filters.regex(
-        r"report add (?P<type>\w+) (?P<id>\d+) (?P<season>\d+) (?P<number>\d+) (?P<language>\w+)"
-    )
-)
-async def report_add_callback(bot: Amime, callback: CallbackQuery):
-    add_type = callback.matches[0]["type"]
-    anime_id = int(callback.matches[0]["id"])
+async def report_episode_edit_notes(bot: Amime, callback: CallbackQuery):
     message = callback.message
     chat = message.chat
     user = callback.from_user
     lang = callback._lang
 
-    await callback.edit_message_reply_markup({})
+    anime_id = int(callback.matches[0].group(1))
+    season = int(callback.matches[0].group(2))
+    number = int(callback.matches[0].group(3))
+    report_type = int(callback.matches[0].group(4))
 
-    item = lang.strings[lang.code][add_type]
+    reporting = REPORTING[str(user.id)][str(anime_id)]
 
-    answer = await chat.ask(lang.send_me_the(item=item.lower()))
+    if "notes" in reporting.keys():
+        del reporting["notes"]
+    else:
+        keyboard = [
+            [
+                (
+                    lang.cancel_button,
+                    f"report episode {anime_id} {season} {number} {report_type}",
+                ),
+            ],
+        ]
 
-    try:
-        await answer.delete()
-    except:
-        pass
-    try:
-        await answer.request.delete()
-    except:
-        pass
+        await message.edit_text(
+            lang.send_me_the_item_text(item=lang.notes.lower()),
+            reply_markup=ikb(keyboard),
+        )
 
-    REPORTING[str(user.id)][str(anime_id)][add_type] = answer.text
+        answer = await chat.listen(filters.text)
+        reporting["notes"] = answer.text
 
-    await report_episode_callback(bot, callback)
+        try:
+            await answer.delete()
+        except BaseException:
+            pass
+
+    REPORTING[str(user.id)][str(anime_id)] = reporting
+
+    await report_episode(bot, callback)
 
 
 @Amime.on_callback_query(
-    filters.regex(
-        r"report confirm (?P<id>\d+) (?P<season>\d+) (?P<number>\d+) (?P<language>\w+)"
-    )
+    filters.regex(r"^report episode confirm (\d+) (\d+) (\d+) (\-?\d+)")
 )
-async def report_confirm_callback(bot: Amime, callback: CallbackQuery):
-    anime_id = int(callback.matches[0]["id"])
-    season = int(callback.matches[0]["season"])
-    number = int(callback.matches[0]["number"])
+async def report_episode_confirm(bot: Amime, callback: CallbackQuery):
+    message = callback.message
+    chat = message.chat
     user = callback.from_user
     lang = callback._lang
+
+    anime_id = int(callback.matches[0].group(1))
+    season = int(callback.matches[0].group(2))
+    number = int(callback.matches[0].group(3))
+    report_type = int(callback.matches[0].group(4))
 
     reporting = REPORTING[str(user.id)][str(anime_id)]
 
     anime = await anilist.AsyncClient().get(anime_id)
 
+    user_db = await Users.get(id=user.id)
+    language = user_db.language_anime
+
+    is_collaborator = await filters.collaborator(bot, callback) or bot.is_sudo(user)
+
     reports = await Reports.filter(item=anime_id, type="anime")
+    reports = sorted(reports, key=lambda report: report.id)
 
     now_date = datetime.datetime.now().replace(tzinfo=datetime.timezone.utc)
-    for report in reports:
+
+    if not is_collaborator and len(reports) > 0:
+        report = reports[-1]
         report_date = report.datetime
         date = now_date - report_date
         if date.seconds < (1 * 60 * 60 * 24):
             await callback.answer(
-                lang.reported_in_last_24h(
+                lang.reported_in_last_24h_alert(
                     date=report_date.strftime("%H:%M:%S - %d/%m/%Y")
                 ),
                 show_alert=True,
@@ -193,7 +201,7 @@ async def report_confirm_callback(bot: Amime, callback: CallbackQuery):
 
     await Reports.create(
         user=user.id,
-        item=anime.id,
+        item=anime_id,
         type="anime",
         notes=(reporting["notes"] if "notes" in reporting.keys() else ""),
         datetime=now_date,
@@ -204,35 +212,24 @@ async def report_confirm_callback(bot: Amime, callback: CallbackQuery):
     text += "\n<b>Anime</b>:"
     text += f"\n    <b>ID</b>: <code>{anime.id}</code>"
     text += f"\n    <b>Name</b>: <code>{anime.title.romaji}</code>"
-    if season > 0:
-        text += f"\n    <b>Season</b>: <code>{season}</code>"
-    text += f"\n    <b>Episode</b>: <code>{number}</code>"
+    if not anime.format.lower() == "movie":
+        if season > 0:
+            text += f"\n    <b>Season</b>: <code>{season}</code>"
+        text += f"\n    <b>Episode</b>: <code>{number}</code>"
+    text += (
+        f"\n    <b>Language</b>: <code>{lang.strings[language]['LANGUAGE_NAME']}</code>"
+    )
+
     text += "\n\n<b>Report</b>:"
-    report_type = lang.strings[lang.code][reporting["type"]]
-    text += f"\n    <b>Type</b>: <code>{report_type}</code>"
+    text += f"\n    <b>Type</b>: <code>{lang.strings['en'][REPORT_TYPES[report_type]]}</code>"
     if "notes" in reporting.keys():
         text += f"\n    <b>Notes</b>: <i>{reporting['notes']}</i>"
     text += "\n\n#REPORT #EPISODE"
 
-    await bot.send_message(bot.requests_chat.id, text)
+    await bot.send_message(CHATS["requests"], text)
 
-    await callback.answer(lang.episode_successfully_reported, show_alert=True)
-
-    del REPORTING[str(user.id)][str(anime_id)]["type"]
-
-    await watch_callback(bot, callback)
-
-
-@Amime.on_callback_query(
-    filters.regex(
-        r"report cancel (?P<id>\d+) (?P<season>\d+) (?P<number>\d+) (?P<language>\w+)"
-    )
-)
-async def report_cancel_callback(bot: Amime, callback: CallbackQuery):
-    anime_id = int(callback.matches[0]["id"])
-    user = callback.from_user
-    lang = callback._lang
+    await callback.answer(lang.episode_successfully_reported_alert, show_alert=True)
 
     del REPORTING[str(user.id)][str(anime_id)]
 
-    await watch_callback(bot, callback)
+    await anime_episode(bot, callback)

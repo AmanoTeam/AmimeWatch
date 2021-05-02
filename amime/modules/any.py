@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2021 Amano Team
+# Copyright (c) 2021 Andriel Rodrigues for Amano Team
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -21,10 +21,10 @@
 # SOFTWARE.
 
 from pyrogram import filters
-from pyrogram.types import CallbackQuery, Message
+from pyrogram.types import CallbackQuery, InlineQuery, Message
 
-from ..amime import Amime
-from ..database import Chats, Users
+from amime.amime import Amime
+from amime.database import Chats, Users
 
 
 @Amime.on_message(group=-1)
@@ -33,29 +33,36 @@ async def set_language_message(bot: Amime, message: Message):
     user = message.from_user
     lang = message._lang
     code: str = ""
+    user_code = user.language_code or "en"
+    if "." in user_code:
+        user_code = user_code.split(".")[0]
+    if user_code not in lang.strings.keys():
+        user_code = "en"
 
     if await filters.private(bot, message):
-        if len(await Users.filter(id=user.id)) == 0:
-            await Users.create(
+        code = (
+            await Users.get_or_create(
+                {
+                    "name": user.first_name,
+                    "username": user.username or "",
+                    "language_bot": user_code,
+                    "language_anime": user_code,
+                    "is_collaborator": False,
+                },
                 id=user.id,
-                name=user.first_name,
-                username=user.username or "",
-                language_bot="en",
-                language_anime="en",
-                is_collaborator=False,
             )
-
-        code = (await Users.get(id=message.from_user.id)).language_bot
+        )[0].language_bot
     else:
-        if len(await Chats.filter(id=chat.id)) == 0:
-            await Chats.create(
+        code = (
+            await Chats.get_or_create(
+                {
+                    "title": chat.title,
+                    "username": chat.username or "",
+                    "language": "en",
+                },
                 id=chat.id,
-                title=chat.title,
-                username=chat.username or "",
-                language="en",
             )
-
-        code = (await Chats.get(id=message.chat.id)).language
+        )[0].language
     message._lang = lang.get_language(code)
 
 
@@ -66,27 +73,60 @@ async def set_language_callback(bot: Amime, callback: CallbackQuery):
     user = callback.from_user
     lang = callback._lang
     code: str = ""
+    user_code = user.language_code or "en"
+    if "." in user_code:
+        user_code = user_code.split(".")[0]
+    if user_code not in lang.strings.keys():
+        user_code = "en"
 
     if await filters.private(bot, message):
-        if len(await Users.filter(id=user.id)) == 0:
-            await Users.create(
+        code = (
+            await Users.get_or_create(
+                {
+                    "name": user.first_name,
+                    "username": user.username or "",
+                    "language_bot": user_code,
+                    "language_anime": user_code,
+                    "is_collaborator": False,
+                },
                 id=user.id,
-                name=user.first_name,
-                username=user.username or "",
-                language_bot="en",
-                language_anime="en",
-                is_collaborator=False,
             )
-
-        code = (await Users.get(id=callback.from_user.id)).language_bot
+        )[0].language_bot
     else:
-        if len(await Chats.filter(id=chat.id)) == 0:
-            await Chats.create(
+        code = (
+            await Chats.get_or_create(
+                {
+                    "title": chat.title,
+                    "username": chat.username or "",
+                    "language": "en",
+                },
                 id=chat.id,
-                title=chat.title,
-                username=chat.username or "",
-                language="en",
             )
-
-        code = (await Chats.get(id=message.chat.id)).language
+        )[0].language
     callback._lang = lang.get_language(code)
+
+
+@Amime.on_inline_query(group=-1)
+async def set_language_inline_query(bot: Amime, inline_query: InlineQuery):
+    user = inline_query.from_user
+    lang = inline_query._lang
+    code: str = ""
+    user_code = user.language_code or "en"
+    if "." in user_code:
+        user_code = user_code.split(".")[0]
+    if user_code not in lang.strings.keys():
+        user_code = "en"
+
+    code = (
+        await Users.get_or_create(
+            {
+                "name": user.first_name,
+                "username": user.username or "",
+                "language_bot": user_code,
+                "language_anime": user_code,
+                "is_collaborator": False,
+            },
+            id=user.id,
+        )
+    )[0].language_bot
+    inline_query._lang = lang.get_language(code)

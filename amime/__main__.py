@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2021 Amano Team
+# Copyright (c) 2021 Andriel Rodrigues for Amano Team
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -22,13 +22,11 @@
 
 import os
 
-from .utils import filters
-
 from pyrogram import idle
 from tortoise import run_async
 
-from .amime import Amime
-from .database import connect_database
+from amime.amime import Amime
+from amime.database import connect_database
 
 
 async def main():
@@ -36,8 +34,8 @@ async def main():
 
     await connect_database()
 
-    await Amime().start()
-
+    amime = Amime()
+    await amime.start()
     await idle()
 
 

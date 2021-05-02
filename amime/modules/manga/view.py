@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2021 Amano Team
+# Copyright (c) 2021 Andriel Rodrigues for Amano Team
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -21,118 +21,238 @@
 # SOFTWARE.
 
 import anilist
+import math
 
 from pyrogram import filters
 from pyrogram.types import CallbackQuery, Message
-from pyromod.helpers import ikb
+from pyromod.helpers import array_chunk, ikb
 from typing import Union
 
-from ...amime import Amime
-from ..favorites import get_favorite_button
+from amime.amime import Amime
+from amime.modules.favorites import get_favorite_button
+from amime.modules.notify import get_notify_button
 
 
-@Amime.on_message(filters.cmd(r"manga (?P<query>.+)"))
-async def manga_message(bot: Amime, message: Message):
-    query = message.matches[0]["query"]
-
-    if query.isdecimal():
-        manga_id = int(query)
-    else:
-        async with anilist.AsyncClient() as client:
-            result = await client.search(query, "manga", 1)
-            manga = await client.get(result[0].id, "manga")
-            manga_id = manga.id
-
-    message.matches = [{"id": manga_id}]
-    await view_manga(bot, message)
-
-
-@Amime.on_callback_query(filters.regex(r"^manga (?P<id>\d+)"))
-async def manga_callback(bot: Amime, callback: CallbackQuery):
-    await view_manga(bot, callback)
-
-
-async def view_manga(bot: Amime, union: Union[CallbackQuery, Message]):
-    lang = union._lang
-    manga_id = int(union.matches[0]["id"])
+@Amime.on_message(filters.cmd(r"manga (.+)"))
+@Amime.on_callback_query(filters.regex(r"^manga (\d+)\s?(\d+)"))
+async def manga_view(bot: Amime, union: Union[CallbackQuery, Message]):
     is_callback = isinstance(union, CallbackQuery)
-    is_private = await filters.private(bot, union.message if is_callback else union)
+    message = union.message if is_callback else union
+    chat = message.chat
+    user = union.from_user
+    lang = union._lang
+
+    is_private = await filters.private(bot, message)
+
+    if is_callback:
+        query = union.matches[0].group(1)
+
+        user_id = union.matches[0].group(2)
+
+        if user_id is not None:
+            user_id = int(user_id)
+
+            if user_id != user.id:
+                return
+    else:
+        query = union.matches[0].group(2)
+
+    if not bool(query):
+        return
 
     async with anilist.AsyncClient() as client:
+        if not query.isdecimal():
+            result = (await client.search(query, "manga", 1))[0]
+            manga_id = result.id
+        else:
+            manga_id = int(query)
+
         manga = await client.get(manga_id, "manga")
 
-        if manga:
-            text = f"<b>{manga.title.romaji}</b> (<code>{manga.title.native}</code>)\n"
+        if manga is None:
+            return
 
-            text += f"\n<b>{lang.id}</b>: <code>{manga.id}</code>"
-            if hasattr(manga, "score"):
-                if hasattr(manga.score, "average"):
-                    text += f"\n<b>{lang.score}</b>: (<b>{lang.average} = <code>{manga.score.average}</code></b>)"
-            text += f"\n<b>{lang.status}</b>: <code>{manga.status}</code>"
-            if hasattr(manga, "genres"):
-                text += (
-                    f"\n<b>{lang.genres}</b>: <code>{', '.join(manga.genres)}</code>"
-                )
-            if hasattr(manga, "volumes"):
-                text += f"\n<b>{lang.volume}s</b>: <code>{manga.volumes}</code>"
-            if hasattr(manga, "chapters"):
-                text += f"\n<b>{lang.chapter}s</b>: <code>{manga.chapters}</code>"
-            if hasattr(manga, "start_date"):
-                text += f"\n<b>{lang.start_date}</b>: <code>{manga.start_date.day or 0}/{manga.start_date.month or 0}/{manga.start_date.year or 0}</code>"
-            if hasattr(manga, "end_date"):
-                if not manga.status.lower() == "releasing":
-                    text += f"\n<b>{lang.end_date}</b>: <code>{manga.end_date.day or 0}/{manga.end_date.month or 0}/{manga.end_date.year or 0}</code>"
-
-            text += "\n"
-
-            if hasattr(manga, "description"):
-                if hasattr(manga, "description_short"):
-                    text += f"\n<b>{lang.short_description}</b>: <i>{manga.description_short}</i>"
-                else:
-                    text += f"\n<b>{lang.description}</b>: <i>{manga.description}</i>"
-
-            keyboard = [[(lang.read_more_button, manga.url, "url")]]
-
-            if is_private:
-                keyboard.append(
-                    [
-                        await get_favorite_button(
-                            lang, union.from_user, "manga", manga.id
-                        )
-                    ]
-                )
-
-            if hasattr(manga, "banner"):
-                photo = manga.banner
-            elif hasattr(manga.cover, "extra_large"):
+        photo: str = ""
+        if hasattr(manga, "banner"):
+            photo = manga.banner
+        elif hasattr(manga, "cover"):
+            if hasattr(manga.cover, "extra_large"):
                 photo = manga.cover.extra_large
             elif hasattr(manga.cover, "large"):
                 photo = manga.cover.large
             elif hasattr(manga.cover, "medium"):
                 photo = manga.cover.medium
-            else:
-                photo = False
 
-            message = union.message if is_callback else union
+        text = f"<b>{manga.title.romaji}</b> (<code>{manga.title.native}</code>)\n"
+        text += f"\n<b>ID</b>: <code>{manga.id}</code>"
+        if hasattr(manga, "score"):
+            if hasattr(manga.score, "average"):
+                text += f"\n<b>{lang.score}</b>: <code>{manga.score.average}</code>"
+        text += f"\n<b>{lang.status}</b>: <code>{manga.status}</code>"
+        text += f"\n<b>{lang.genres}</b>: <code>{', '.join(manga.genres)}</code>"
+        if hasattr(manga, "volumes"):
+            text += f"\n<b>{lang.volume}s</b>: <code>{manga.volumes}</code>"
+        if hasattr(manga, "chapters"):
+            text += f"\n<b>{lang.chapter}s</b>: <code>{manga.chapters}</code>"
+        if not manga.status.lower() == "not_yet_released":
+            text += f"\n<b>{lang.start_date}</b>: <code>{manga.start_date.day if hasattr(manga.start_date, 'day') else 0}/{manga.start_date.month if hasattr(manga.start_date, 'month') else 0}/{manga.start_date.year if hasattr(manga.start_date, 'year') else 0}</code>"
+        if not manga.status.lower() in ["not_yet_released", "releasing"]:
+            text += f"\n<b>{lang.end_date}</b>: <code>{manga.end_date.day if hasattr(manga.end_date, 'day') else 0}/{manga.end_date.month if hasattr(manga.end_date, 'month') else 0}/{manga.end_date.year if hasattr(manga.end_date, 'year') else 0}</code>"
 
-            if is_callback and message.photo:
-                await union.edit_message_text(
-                    text,
-                    reply_markup=ikb(keyboard),
-                )
-            else:
-                if photo:
-                    await message.reply_photo(
-                        photo=photo,
-                        caption=text,
-                        reply_markup=ikb(keyboard),
-                    )
-                else:
-                    await message.reply_text(
-                        text=text,
-                        reply_markup=ikb(keyboard),
-                    )
-        else:
-            await union.reply_text(
-                lang.not_found(type="manga", key="id", value=manga_id)
+        buttons = [
+            (lang.view_more_button, f"manga more {manga.id} {user.id}"),
+        ]
+
+        if is_private:
+            buttons.append(await get_favorite_button(lang, user, "manga", manga.id))
+
+        buttons.append(
+            await get_notify_button(
+                lang, user if is_private else chat, "manga", manga.id
             )
+        )
+
+        keyboard = array_chunk(buttons, 2)
+
+        if bool(message.photo) and not bool(message.via_bot):
+            await message.edit_text(
+                text,
+                reply_markup=ikb(keyboard),
+            )
+        else:
+            await message.reply_photo(
+                photo,
+                caption=text,
+                reply_markup=ikb(keyboard),
+            )
+
+
+@Amime.on_callback_query(filters.regex(r"^manga more (\d+) (\d+)"))
+async def manga_view_more(bot: Amime, callback: CallbackQuery):
+    message = callback.message
+    chat = message.chat
+    user = callback.from_user
+    lang = callback._lang
+
+    manga_id = int(callback.matches[0].group(1))
+    user_id = int(callback.matches[0].group(2))
+
+    if user_id != user.id:
+        return
+
+    async with anilist.AsyncClient() as client:
+        manga = await client.get(manga_id, "manga")
+
+        buttons = [
+            (lang.description_button, f"manga description {manga_id} {user_id} 1"),
+            (lang.characters_button, f"manga characters {manga_id} {user_id}"),
+            (lang.studios_button, f"manga studios {manga_id} {user_id}"),
+        ]
+
+        buttons.append(("🐢 Anilist", manga.url, "url"))
+
+        keyboard = array_chunk(buttons, 2)
+
+        keyboard.append([(lang.back_button, f"manga {manga_id} {user_id}")])
+
+        await message.edit_text(
+            lang.view_more_text,
+            reply_markup=ikb(keyboard),
+        )
+
+
+@Amime.on_callback_query(filters.regex(r"manga description (\d+) (\d+) (\d+)"))
+async def manga_view_description(bot: Amime, callback: CallbackQuery):
+    message = callback.message
+    chat = message.chat
+    user = callback.from_user
+    lang = callback._lang
+
+    manga_id = int(callback.matches[0].group(1))
+    user_id = int(callback.matches[0].group(2))
+    page = int(callback.matches[0].group(3))
+
+    if user_id != user.id:
+        return
+
+    async with anilist.AsyncClient() as client:
+        manga = await client.get(manga_id, "manga")
+
+        description = manga.description
+        amount = 1024
+        page = 1 if page <= 0 else page
+        offset = (page - 1) * amount
+        stop = offset + amount
+        pages = math.ceil(len(description) / amount)
+        description = description[offset - (3 if page > 1 else 0) : stop]
+
+        page_buttons = []
+        if page > 1:
+            page_buttons.append(
+                ("⬅️", f"manga description {manga_id} {user_id} {page - 1}")
+            )
+        if not page == pages:
+            description = description[: len(description) - 3] + "..."
+            page_buttons.append(
+                ("➡️", f"manga description {manga_id} {user_id} {page + 1}")
+            )
+
+        keyboard = []
+        if len(page_buttons) > 0:
+            keyboard.append(page_buttons)
+
+        keyboard.append([(lang.back_button, f"manga more {manga_id} {user_id}")])
+
+        await message.edit_text(
+            description,
+            reply_markup=ikb(keyboard),
+        )
+
+
+@Amime.on_callback_query(filters.regex(r"^manga characters (\d+) (\d+)"))
+async def manga_view_characters(bot: Amime, callback: CallbackQuery):
+    message = callback.message
+    chat = message.chat
+    user = callback.from_user
+    lang = callback._lang
+
+    manga_id = int(callback.matches[0].group(1))
+    user_id = int(callback.matches[0].group(2))
+
+    if user_id != user.id:
+        return
+
+    async with anilist.AsyncClient() as client:
+        manga = await client.get(manga_id, "manga")
+
+        keyboard = [
+            [
+                (lang.back_button, f"manga more {manga_id} {user_id}"),
+            ],
+        ]
+
+        text = lang.characters_text
+
+        for character in manga.characters:
+            text += f"\n• <code>{character.id}</code> - <a href='https://t.me/{bot.me.username}/?start=character_{character.id}'>{character.name.full}</a> (<i>{character.role}</i>)"
+
+        await message.edit_text(
+            text,
+            reply_markup=ikb(keyboard),
+        )
+
+
+@Amime.on_callback_query(filters.regex(r"^manga studios (\d+) (\d+)"))
+async def manga_view_studios(bot: Amime, callback: CallbackQuery):
+    message = callback.message
+    chat = message.chat
+    user = callback.from_user
+    lang = callback._lang
+
+    manga_id = int(callback.matches[0].group(1))
+    user_id = int(callback.matches[0].group(2))
+
+    if user_id != user.id:
+        return
+
+    await callback.answer(lang.unfinished_function_alert, show_alert=True)

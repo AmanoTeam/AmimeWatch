@@ -20,35 +20,40 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import re
-
 from pyrogram import filters
-from pyrogram.types import Message
+from pyrogram.types import CallbackQuery, Message
+from pyromod.helpers import ikb
+from typing import Union
 
 from amime.amime import Amime
-from amime.modules.anime.view import anime_view
-from amime.modules.character.view import character_view
-from amime.modules.manga.view import manga_view
 
 
-@Amime.on_message(filters.private & filters.via_bot)
-async def view(bot: Amime, message: Message):
-    from_bot = message.via_bot
+@Amime.on_message(filters.cmd(r"manga$") & filters.private)
+@Amime.on_callback_query(filters.regex(r"^manga$"))
+async def manga_start(bot: Amime, union: Union[CallbackQuery, Message]):
+    is_callback = isinstance(union, CallbackQuery)
+    message = union.message if is_callback else union
+    user = union.from_user
+    lang = union._lang
 
-    if from_bot.id == bot.me.id:
-        if bool(message.photo) and bool(message.caption):
-            text = message.caption
-            lines = text.splitlines()
+    keyboard = [
+        [
+            (lang.suggestions_button, "suggestions manga 1"),
+            (lang.categories_button, "categories manga 1"),
+        ],
+        [
+            (lang.upcoming_button, "upcoming manga 1"),
+            (lang.favorites_button, "favorites manga 1"),
+        ],
+        [
+            (lang.search_button, "!m ", "switch_inline_query_current_chat"),
+        ],
+    ]
 
-            for line in lines:
-                if "ID" in line:
-                    matches = re.match(r"ID:(\s)(\d+) \((\w+)\)", line)
-                    content_type = matches.group(3).lower()
-                    message.matches = [matches]
-                    if content_type == "anime":
-                        await anime_view(bot, message)
-                    elif content_type == "character":
-                        await character_view(bot, message)
-                    elif content_type == "manga":
-                        await manga_view(bot, message)
-                    break
+    if is_callback:
+        keyboard.append([(lang.back_button, "start")])
+
+    await (message.edit_text if is_callback else message.reply_text)(
+        lang.manga_text,
+        reply_markup=ikb(keyboard),
+    )

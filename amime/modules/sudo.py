@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2021 Amano Team
+# Copyright (c) 2021 Andriel Rodrigues for Amano Team
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -29,10 +29,10 @@ from pyrogram.types import CallbackQuery, Message
 from pyromod.helpers import ikb
 from typing import Dict
 
-from ..amime import Amime
+from amime.amime import Amime
 
 
-@Amime.on_message(filters.cmd(r"up(gr|d)a(d|t)e") & filters.sudo)
+@Amime.on_message(filters.cmd(r"up(grad|dat)e") & filters.sudo)
 async def upgrade_message(bot: Amime, message: Message):
     sent = await message.reply_text("Checking for updates...")
 

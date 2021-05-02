@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2021 Amano Team
+# Copyright (c) 2021 Andriel Rodrigues for Amano Team
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -23,65 +23,170 @@
 from pyrogram import filters
 from pyrogram.types import CallbackQuery, Message
 from pyromod.helpers import array_chunk, ikb
-from pyromod.nav import Pagination
-from typing import List, Tuple
+from typing import Dict, List, Tuple, Union
 
-from ..amime import Amime
-from ..database import Chats, Users
+from amime.amime import Amime
+from amime.database import Chats, Collaborators, Episodes, Users
 
 
-@Amime.on_callback_query(filters.regex(r"^language (?P<type>bot|group)"))
-async def language_callback(bot: Amime, callback: CallbackQuery):
-    language_type = callback.matches[0]["type"]
-    chat = callback.message.chat
-    user = callback.from_user
-    lang = callback._lang
+@Amime.on_message(filters.cmd(r"language$"))
+@Amime.on_callback_query(filters.regex(r"^language$"))
+async def language(bot: Amime, union: Union[CallbackQuery, Message]):
+    is_callback = isinstance(union, CallbackQuery)
+    message = union.message if is_callback else union
+    chat = message.chat
+    user = union.from_user
+    lang = union._lang
+    current_code: str = "en"
 
-    if language_type == "group":
-        if not await filters.administrator(bot, callback):
+    is_private = await filters.private(bot, message)
+    if not is_private:
+        if not await filters.administrator(bot, union):
             return
-        db = await Chats.get(id=chat.id)
+        current_code = (await Chats.get(id=chat.id)).language
     else:
-        db = await Users.get(id=user.id)
+        current_code = (await Users.get(id=user.id)).language_bot
 
     buttons: List[Tuple] = []
     for code, obj in lang.strings.items():
         text, data = (
-            (f"✅ {obj['NAME']}", "noop")
-            if obj["LANGUAGE_CODE"]
-            == (db.language if language_type == "group" else db.language_bot)
-            else (obj["NAME"], f"language set {language_type} {obj['LANGUAGE_CODE']}")
+            (f"✅ {obj['LANGUAGE_NAME']}", "noop")
+            if obj["LANGUAGE_CODE"] == current_code
+            else (obj["LANGUAGE_NAME"], f"language set {obj['LANGUAGE_CODE']}")
         )
         buttons.append((text, data))
 
     keyboard = array_chunk(buttons, 2)
-    keyboard.append([(lang.back_button, "settings")])
 
-    await callback.edit_message_text(lang.settings_language, reply_markup=ikb(keyboard))
+    if is_private:
+        keyboard.append([(lang.back_button, "start")])
+
+    await (message.edit_text if is_callback else message.reply_text)(
+        lang.language_text,
+        reply_markup=ikb(keyboard),
+    )
 
 
-@Amime.on_callback_query(
-    filters.regex(r"^language set (?P<type>bot|group) (?P<code>.+)")
-)
-async def language_set_callback(bot: Amime, callback: CallbackQuery):
-    language_type = callback.matches[0]["type"]
-    language_code = callback.matches[0]["code"]
-    chat = callback.message.chat
+@Amime.on_callback_query(filters.regex(r"^language set (?P<code>\w+)"))
+async def language_set(bot: Amime, callback: CallbackQuery):
+    code = callback.matches[0]["code"]
+
+    message = callback.message
+    chat = message.chat
     user = callback.from_user
     lang = callback._lang
 
-    if language_type == "group":
+    kwargs: Dict = {}
+
+    is_private = await filters.private(bot, message)
+    if not is_private:
         if not await filters.administrator(bot, callback):
             return
-        db = await Chats.get(id=chat.id)
-        db.update_from_dict({"language": language_code})
-        await db.save()
+        chat_db = await Chats.get(id=chat.id)
+        chat_db.update_from_dict({"language": code})
+        await chat_db.save()
     else:
-        db = await Users.get(id=user.id)
-        db.update_from_dict({f"language_{language_type}": language_code})
-        await db.save()
+        user_db = await Users.get(id=user.id)
+        user_db.update_from_dict({"language_bot": code})
+        await user_db.save()
 
-    callback._lang = lang.get_language(language_code)
+        keyboard = [
+            [(lang.back_button, "start")],
+        ]
+        kwargs["reply_markup"] = ikb(keyboard)
 
-    callback.matches = [{"type": language_type}]
-    await language_callback(bot, callback)
+    await message.edit_text(
+        lang.strings[code]["language_changed_text"],
+        **kwargs,
+    )
+
+
+@Amime.on_callback_query(
+    filters.regex(
+        r"^manage (?P<content_type>anime|manga) language (\d+) (\d+) (\w+) (\d+)"
+    )
+)
+async def language_manage(bot: Amime, callback: CallbackQuery):
+    message = callback.message
+    user = callback.from_user
+    lang = callback._lang
+
+    content_type = callback.matches[0]["content_type"]
+    anime_id = int(callback.matches[0].group(2))
+    season = int(callback.matches[0].group(3))
+    language = callback.matches[0].group(4)
+    page = int(callback.matches[0].group(5))
+
+    languages = []
+    if await filters.sudo(bot, callback):
+        languages = [*lang.strings.keys()]
+    else:
+        for collaborator in await Collaborators.filter(user=user.id):
+            if collaborator.language not in languages:
+                languages.append(collaborator.language)
+
+    buttons: List[Tuple] = []
+    for _language in languages:
+        text = (
+            "✅" if _language == language else ""
+        ) + f" {lang.strings[_language]['LANGUAGE_NAME']}"
+        data = (
+            "noop"
+            if _language == language
+            else f"manage anime language {anime_id} {season} {_language} 1"
+        )
+        buttons.append((text, data))
+
+    keyboard = array_chunk(buttons, 2)
+
+    keyboard.append(
+        [(lang.back_button, f"manage anime {anime_id} {season} {language} {page}")]
+    )
+
+    await message.edit_text(
+        lang.language_text,
+        reply_markup=ikb(keyboard),
+    )
+
+
+@Amime.on_callback_query(filters.regex(r"^episodes language (\d+) (\d+) (\d+)"))
+async def language_episodes(bot: Amime, callback: CallbackQuery):
+    message = callback.message
+    user = callback.from_user
+    lang = callback._lang
+
+    anime_id = int(callback.matches[0].group(1))
+    season = int(callback.matches[0].group(2))
+    page = int(callback.matches[0].group(3))
+
+    user_db = await Users.get(id=user.id)
+    language = user_db.language_anime
+
+    episodes = await Episodes.filter(anime=anime_id, language=language)
+    episodes = sorted(episodes, key=lambda episode: episode.number)
+
+    languages = []
+    for episode in episodes:
+        if episode.language not in languages:
+            languages.append(episode.language)
+
+    buttons: List[Tuple] = []
+    for _language in languages:
+        text = (
+            "✅" if _language == language else ""
+        ) + f" {lang.strings[_language]['LANGUAGE_NAME']}"
+        data = (
+            "noop"
+            if _language == language
+            else f"manage anime language {anime_id} {season} {_language} 1"
+        )
+        buttons.append((text, data))
+
+    keyboard = array_chunk(buttons, 2)
+
+    keyboard.append([(lang.back_button, f"episodes {anime_id} {season} {page}")])
+
+    await message.edit_text(
+        lang.language_text,
+        reply_markup=ikb(keyboard),
+    )

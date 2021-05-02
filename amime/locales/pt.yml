@@ -1,19 +1,86 @@
-NAME: Português
 LANGUAGE_CODE: pt
+LANGUAGE_NAME: Português
+
+back_button:
+    🔙 Voltar
 
 
 # Words
-id:
-    ID
+
+channel:
+    Canal
+
+group:
+    Grupo
+
+action:
+    Ação
+
+shounen:
+    Shounen
+
+martial_arts:
+    Artes marciais
+
+adventure:
+    Aventura
+
+comedy:
+    Comédia
+
+ecchi:
+    Ecchi
+
+devils:
+    Demônios
+
+drama:
+    Drama
+
+fantasy:
+    Fantasia
+
+yuri:
+    Yuri
+
+yaoi:
+    Yaoi
+
+school:
+    Escolar
+
+sports:
+    Esportes
+
+space:
+    Espacial
+
+hentai:
+    Hentai
+
+isekai:
+    Isekai
+
+shoujo:
+    Shoujo
+
+fight:
+    Luta
+
+mystery:
+    Mistério
+
+supernatural:
+    Sobrenatural
+
+music:
+    Musical
+
+slice_of_life:
+    Slice of life
 
 score:
     Pontuação
-
-average:
-    Média
-
-format:
-    Formato
 
 status:
     Status
@@ -24,68 +91,62 @@ genres:
 studios:
     Estúdios
 
+format:
+    Formato
+
+start_date:
+    Data de início
+
+end_date:
+    Data final
+
+short_description:
+    Descrição curta
+
+favorite:
+    Favorito
+
+notify:
+    Notificar
+
+duration:
+    Duração
+
+episode:
+    Episódio
+
 volume:
     Volume
 
 chapter:
     Capítulo
 
-episode:
-    Episódio
-
-duration:
-    Duração
-
-start_date:
-    Data de início
-
-end_date:
-    Data de finalização
-
-description:
-    Descrição
-
-short_description:
-    Descrição curta
-
-favorite:
-    Favoritar
-
-channel:
-    Canal
-
-group:
-    Grupo
-
-module:
-    Módulo
-
 name:
     Nome
 
-type:
-    Tipo
-
-video:
-    Vídeo
-
-episode_number:
-    Número do episódio
+season:
+    Temporada
 
 language:
     Idioma
 
-first:
-    Primeiro
-
-last:
-    Último
+notes:
+    Notas
 
 added_by:
     Adicionado por
 
-notes:
-    Notas
+video:
+    Vídeo
+
+number:
+    Número
+
+user_informations:
+    Informações de usuário
+
+collaborator:
+    Colaborador
 
 yes:
     Sim
@@ -93,14 +154,8 @@ yes:
 no:
     Não
 
-season:
-    Temporada
-
-all:
-    Tudo
-
-other:
-    Outro
+episodes_added:
+    Episódios adicionados
 
 bad_quality:
     Qualidade ruim
@@ -111,229 +166,152 @@ wrong_episode:
 wrong_title:
     Título errado
 
-notify_episodes:
-    Notificar episódios
+other:
+    Outro
+
+type:
+    Tipo
 
 date:
     Data
 
-added:
-    Adicionado
+invalid_user:
+    Usuário inválido
 
 
-# Texts
-not_found:
-    Nenhum <b>{type}</b> com {key} <code>{value}</code> foi encontrado.
+# Texts & buttons
 
-inline: |
-    Toque no botão abaixo para saber como usar meu <b>modo inline</b>.
+start_text: |
+    Olá {user_mention}, eu sou <b>{bot_name}</b>, um bot voltado para <i>otakus</i>, toque no botão abaixo e saiba mais.
 
-    Você será redirecionado para <b>meu privado</b> e aprenderá a usá-lo lá.
-
-start: |
-    Olá {mention}, meu nome é <b>{bot_name}</b>!
-
-    Eu sou um <b>bot</b> criado para fornecer-lhe a <i>melhor</i> experiência de animes, como informações detalhadas diretamente do {anilist} e até mesmo obter os últimos episódios do seu anime favorito.
-
-    Explore minhas funções nos botões abaixo:
-
-help:
-    Vamos explorar? Clique nos botões abaixo e descubra todo o meu potencial, espero que goste!
-
-about: |
-    <b>{bot_name}</b> é um bot desenvolvido em <i>Python</i> com a biblioteca <b>MTProto Pyrogram</b>, feito para ser rápido, estável e completo quando se trata de animes.
-
-    Links: {github} | {channel} | {group}
-
-help_in_pm:
-    Entre em contato comigo no privado para obter ajuda.
-
-start_in_pm:
-    Entre em contato comigo no privado para que você possa ver tudo o que eu posso fazer.
-
-favorites:
-    Escolha qual lista de favoritos você quer ver.
-
-favorites_empty:
-    Sua lista de <b>{type}</b> favoritos está vazia.
-
-favorites_list:
-    Abaixo está sua lista de <b>{type}</b> favoritos.
-
-added_to_favorites:
-    Este {type} foi adicionado à sua lista de favoritos.
-
-removed_from_favorites:
-    Este {type} foi removido da sua lista de favoritos.
-
-collaborators: |
-    Abaixo está a lista de colaboradores do <b>{bot_name}</b>
-
-    Eles estão no seguinte formato:
-        <b>Nome</b> (<i>idioma</i>)
-
-user_is_sudo:
-    O usuário {mention} é um usuário <b>sudo</b>, posso fazer nada com ele.
-
-is_already_a_collaborator_in_all_these_languages:
-    O usuário {mention} já é um contridor para todos os idiomas especificados.
-
-is_not_a_collaborator_in_all_of_these_languages:
-    O usuário {mention} não é um contribuidor nos idiomas que você especificou.
-
-promoted_to_collaborator: |
-    {mention_sudo} promoveu {mention_user} a um <b>colaborador</b> do seguinte idioma: <code>{languages}</code>.
-
-demoted_collaborator: |
-    {mention_sudo} rebaixou {mention_user} para um usuário normal do seguinte idioma: <code>{languages}</code>.
-
-is_already_a_collaborator_in_some_languages: |
-    Este usuário já é um <b>colaborador</b> no seguinte idioma: <code>{languages}</code>.
-
-is_not_a_collaborator_in_some_languages: |
-    Este usuário não é um <b>colaborador</b> nos seguintes idiomas: <code>{languages}</code>.
-
-languages_not_exists: |
-    Os seguinte idiomas não foram encontrados ou ainda não existem: <code>{languages}</code>.
-
-settings_private: |
-    Você está nas minhas configurações, aqui você pode mudar o seu idioma e outras coisas, tudo está logo abaixo.
-
-    Se você quiser alterar minhas configurações em algum grupo, envieno comando /settings nele.
-
-    Quaisquer alterações que você fizer só afetarão o chat em que você usou o comando.
-
-settings_group: |
-    Você está nas minhas configurações, aqui você pode mudar o idioma do grupo e algumas outras coisas, tudo está logo abaixo.
-
-settings_language:
-    Escolha qual idioma você deseja usar abaixo.
-
-manage_anime:
-    Escolha o que você quer fazer com este anime.
-
-manage_episodes:
-    Aqui você poderá gerenciar os episódios deste Anime, você pode editá-los, excluí-los ou adicionar novos episódios.
-
-send_me_the:
-    Envie-me o item <b>{item}</b>.
-
-duplicate_episode_number:
-    Este anime já tem um episódio com esse número nesta mesma temporada e neste mesmo idioma, você não pode colocar dois episódios com o mesmo número, defina outro número ou exclua o episódio já existente.
-
-episode_added:
-    O episódio foi adicionado com sucesso!
-
-episodes: |
-    Aqui estão os episódios disponíveis para o anime <b>{name}</b> (<b>ID</b>: <code>{id}</code>), divirta-se!
-    Atualmente tenho <code>{count}</code> episódio(s) em <b>{language}</b>.
-
-    <b>Sobre os emojis</b>:
-        ✅ - Assistido
-        👁️ - Apenas visualizado
-        🙈 - Nunca aberto
-
-episodes_request_in_last_24h: |
-    Um pedido de novos episódios já foi feito para este mesmo anime nas últimas 24 horas, aguarde que os colaboradores adicionem os episódios.
-
-    Data: {date}
-
-episode_request_successfully_sent:
-    Sua solicitação de episódio foi enviada com sucesso! Aguarde os colaboradores adicionarem os episódios (se houver).
-
-confirm:
-    Para continuar confirme usando o botão abaixo.
-
-preview:
-    O que você vê abaixo é apenas uma prévia de como ficará seu upload quando estiver pronto.
-
-missing_items_episode: |
-    Você não pode adicionar um episódio sem os seguintes itens: {items}.
-
-settings_season:
-    Escolha abaixo qual temporada você quer ver.
-
-report:
-    Escolha abaixo o tipo de relatório que você quer fazer.
-
-reported_in_last_24h: |
-    Você já reportou um episódio nas últimas 24h.
-
-    Data: {date}
-
-episode_successfully_reported:
-    Você reportou o episódio com sucesso!
-
-episode_notifications_on:
-    Você ativou as notificações de episódios para este anime neste chat.
-
-episode_notifications_off:
-    Você desativou as notificações de episódios para este anime neste chat.
-
-episode_notification: |
-    Olá, <i>Otaku(s)</i>, novos episódios de <b>{title}</b> (<b>ID</b>: <code>{id}</code>) foram adicionados!
-
-notified_users:
-    Você notificou os usuários com sucesso sobre novos episódios deste Anime! {count} chats foram notificados.
-
-anime_more:
-    Oooh, parece que você quer saber mais... Então vamos lá, escolha o que você quer ver abaixo.
-
-function_in_progress:
-    Oops! Isso ainda não está pronto, fique ligado em nosso canal, todas as atualizações serão anunciadas lá!
-
-
-# Buttons
-read_more_button:
-    🤓 Ler mais...
-
-trailer_button:
-    🎬 Trailer
-
-help_button:
-    ❓ Ajuda
-
-about_button:
-    👤 Sobre
-
-back_button:
-    🔙 Voltar
-
-anime_button:
-    🧕 Anime
-
-manga_button:
-    📜 Mangá
-
-inline_button:
-    ✍️ Inline
-
-collaborators_button:
-    👷‍♀️ Colaboradores
-
-request_episodes_button:
-    🙋‍♀️ Pedir episódios
+start_text_2: |
+    Olá {user_mention}, eu sou <b>{bot_name}</b>, um bot voltado para <i>otakus</i>, explore minhas funções usando os botões abaixos, você pode fazer bastante coisa. 😁
 
 start_button:
-    〰️ Iniciar
+    🔏 PM
 
-favorites_button:
-    🌟 Favoritos
+help_button:
+    👮‍♀️ Ajuda
 
-settings_button:
-    ⚙️ Configurações
+about_text: |
+    <b>{bot_name}</b> é um bot desenvolvido em <i>Python</i> com a biblioteca <b>MTProto Pyrogram</b>, feito para ser rápido, estável e completo quando se trata de animes.
+    Links: {github} | {channel} | {group}
+
+about_button:
+    👥 Sobre
+
+language_text: |
+    Escolha abaixo o idioma desejado.
+
+language_changed_text: |
+    Idioma alterado com sucesso!
 
 language_button:
     🌐 Idioma
 
-episodes_button:
-    🎬 Episódios
+search_button:
+    🔎 Pesquisar
+
+anime_text: |
+    Você está na seção <b>anime</b>, use os botões abaixo para fazer o que deseja, ver algumas sugestões, ver seus animes favoritos, pesquisar, etc...
+
+anime_button:
+    👸 Anime
+
+manga_text: |
+    Você está na seção <b>mangá</b>, use os botões abaixo para fazer o que deseja, ver algumas sugestões, ver seus mangás favoritos, pesquisar, etc...
+
+manga_button:
+    📖 Mangá
+
+suggestions_text: |
+    Abaixo estão <b>50</b> sugestões, espero que goste de alguma. 😅
+
+suggestions_button:
+    🍬 Sugestões
+
+favorites_text: |
+    Abaixo estão todos os items marcados como favorito.
+
+favorites_button:
+    ⭐ Favoritos
+
+categories_text: |
+    Abaixo estão algumas categorias, escolha uma e encontre algo do seu gosto. 😆
+
+categorie_text: |
+    Abaixo estão até <b>50</b> resultados da categoria <b>{genre}</b>.
+
+categories_button:
+    🐛 Categorias
+
+upcoming_text: |
+    Abaixo estão <b>50</b> items que ainda não foram lançados.
+
+upcoming_button:
+    🆕 Em breve
+
+donate_button:
+    🩸 Doar
+
+view_more_text: |
+    Aqui você conseguirá ver a descrição, personagens, equipe da staff e algumas outras coisas, faça bom uso. 🙃
+
+view_more_button:
+    👓 Ver mais
+
+watch_list_anime_text: |
+    Abaixo estão todos os episódios disponíveis. Divirta-se.
+    
+    <b>Sobre os emojis</b>:
+        🙈 - Nunca aberto
+        👁️ - Apenas visto
+        ✅ - Assistido
+
+watch_button:
+    📺 Assistir
+
+description_button:
+    📜 Descrição
+
+characters_text: |
+    Abaixo estão alguns personagens do item em questão.
+
+characters_button:
+    🧑‍🤝‍🧑 Personagens
+
+studios_button:
+    🌆 Estúdios
+
+trailer_button:
+    🎦 Trailer
+
+manage_anime_text: |
+    Abaixo estão todos os episódios adicionados.
+
+manage_episode_text: |
+    Abaixo estão todas as informações do episódio (isto é apenas uma prévia).
 
 manage_button:
     💼 Gerenciar
 
+season_text: |
+    Abaixo estão todas as temporadas disponíveis, escolha uma.
+
+season_button:
+    🌡️ Temporada
+
 add_button:
     ➕ Adicionar
+
+del_button:
+    ✖️ Excluir
+
+del_all_button:
+    ✖️ Excluir tudo
+
+confirm_text: |
+    Para continuar, confirme usando o botão abaixo.
 
 confirm_button:
     ✔️ Confirmar
@@ -341,8 +319,14 @@ confirm_button:
 cancel_button:
     ✖️ Cancelar
 
-delete_button:
-    🗑️ Excluir
+send_me_the_item_text: |
+    Envie-me o item: <b>{item}</b>.
+
+mark_as_watched_button:
+    ✅ Marcar como assistido
+
+mark_as_unwatched_button:
+    👁️ Marcar como não assistido
 
 previous_button:
     ⏪ Anterior
@@ -353,79 +337,71 @@ next_button:
 dot_button:
     ⏺️
 
-mark_as_watched_button:
-    ✅ Marcar como assistido
-
-mark_as_unwatched_button:
-    👁️ Marca como não assistido
-
-view_more_button:
-    👁️‍🗨️ Ver mais
-
-season_button:
-    📜 Temporada
+report_text:
+    Ponha abaixo as informações do seu relatório.
 
 report_button:
     ⛔ Reportar
 
+request_content_text:
+    Escolha abaixo o idioma em que você quer ver o conteúdo.
+
+request_content_button:
+    🙋‍♀️ Requisitar conteúdo
+
+notify_users_episodes_text: |
+    Opa! Novo(s) episódio(s) de <b>{title}</b> (<b>ID</b>: <code>{id}</code>) foram adicionado(s)!
+
 notify_users_button:
-    🔔 Notificar usuários
+    🛎️ Notificar usuários
 
-watch_button:
-    🎥 Assistir
-
-group_button:
-    👥 Grupo
-
-channel_button:
-    📢 Canal
-
-description_button:
-    📜 Descrição
-
-characters_button:
-    👥 Personagens
-
-studios_button:
-    🖼️ Estúdios
-
-search_button:
-    🔎 Pesquisar
+collaborator_button:
+    👷‍♀️ Colaborador
 
 
-# Help texts
-anime_help: |
-    <b>Ajuda sobre</b>: Animes
+# Alerts
+added_to_favorites_alert:
+    Item adicionado a sua lista de favoritos com sucesso!
 
-    Meu <b>módulo de Animes</b> permite que os usuários vejam informações sobre um anime específico com base no {anilist}, mas também permite que os usuários assistam aos episódios, para isso, use o botão "<b>{request_episodes_button}</b>" na parte inferior de todo anime, com ele, uma mensagem solicitando episódios do anime específico será enviada para <i>nossos colaboradores</i> em seu idioma, eles verificarão os episódios desse anime em seu idioma, e <b>se existirem</b>, eles irão adicionar a lista de episódios no seu idioma, porém, se não houver episódios do anime em questão no seu idioma (dublados ou legendados), eles não poderão fazer nada, mas você pode assisti-los legendados no idioma <b>de sua preferência</b>.
+removed_from_favorites_alert:
+    Item removido da sua lista de favoritos com sucesso!
 
-    <b>Como usar</b>?
-        Envie-me o anime usando o módulo <b>inline</b> ou use o comando <code>/anime &lt;id ou nome&gt;</code>.
+notifications_linked_alert:
+    Notificações ligadas com sucesso!
 
-manga_help: |
-    <b>Ajuda sobre</b>: Mangás
+notifications_turned_off_alert:
+    Notificações desligadas com sucesso!
 
-    Meu <b>módulo de Mangás</b> permite que os usuários vejam uma lista de informações sobre o mangá específico com base no {anilist}.
+unfinished_function_alert:
+    Opa! Essa função ainda não está pronta, aguarde por atualizações e fique ligado em nosso canal.
 
-    <b>Como usar</b>?
-        Envie-me o mangá usando o módulo <b>inline</b> ou use o comando <code>/mangá &lt;id ou nome&gt;</code>.
+episode_already_exists_alert:
+    Um episódio com este mesmo número já existe.
 
-inline_help: |
-    <b>Ajuda sobre</b>: Inline
+confirm_save_episode_alert:
+    O episódio foi salvo com sucesso!
+
+confirm_delete_episode_alert:
+    O episódio foi deletado com sucesso!
+
+very_short_video_alert:
+    O vídeo enviado é muito curto.
+
+reported_in_last_24h_alert: |
+    Você já reportou um episódio nas últimas 24h.
     
-    Meu <b>módulo inline</b> permite que os usuários procurem animes, mangás e também imagens de animes se <b>você preferir</b>!
+    Data: {date}
 
-    <b>Como usar</b>?
-        Digite meu nome de usuário com espaço: @{bot_username}
+episode_successfully_reported_alert:
+    Episódio reportado com sucesso!
 
-        <b>Comandos</b>:
-            <code>!a</code> - procurar animes.
-            <code>!m</code> - procurar mangás.
-            <code>!g</code> - usar o modo galeria (somente fotos).
-            
-        <b>Exemplos</b>:
-            <code>@{bot_username} !a !g Naruto Shippuden</code>
-            <code>@{bot_username} !m Jujutsu Kaizen</code>
-            <code>@{bot_username} !a Shingeki no Kyojin</code>
+request_sent_alert:
+    O seu pedido foi enviado para os nossos colaboradores, se os episódios forem encontrados, serão adicionados, aguarde...
 
-        Teste você mesmo. 😅
+requested_in_last_24h_alert: |
+    Este item já recebeu um pedido de conteúdo nas últimas 24h.
+    
+    Data: {date}
+
+notified_users_alert:
+    Os usuários foram notificados com sucesso!

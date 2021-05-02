@@ -2,6 +2,7 @@
 *.session*
 *.ini
 *.sqlite*
+config.py
 
 # Byte-compiled
 __pycache__/

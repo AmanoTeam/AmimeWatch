@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2021 Amano Team
+# Copyright (c) 2021 Andriel Rodrigues for Amano Team
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,7 @@ from langs import Langs
 from pyrogram.types import CallbackQuery, Message, InlineQuery
 from typing import Dict
 
-from .. import log
+from amime import log
 
 
 def load():

@@ -20,41 +20,49 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+import anilist
+
 from pyrogram import filters
-from pyrogram.types import CallbackQuery, Message
+from pyrogram.types import CallbackQuery
 from pyromod.helpers import ikb
-from typing import Dict, Union
+from pyromod.nav import Pagination
 
 from amime.amime import Amime
-from amime.config import GROUPS, CHANNELS
+from amime.database import Favorites
 
 
-@Amime.on_message(filters.cmd(r"about$"))
-@Amime.on_callback_query(filters.regex(r"^about$"))
-async def about(bot: Amime, union: Union[CallbackQuery, Message]):
-    is_callback = isinstance(union, CallbackQuery)
-    message = union.message if is_callback else union
-    user = union.from_user
-    lang = union._lang
+@Amime.on_callback_query(filters.regex(r"favorites anime (?P<page>\d+)"))
+async def anime_favorites(bot: Amime, callback: CallbackQuery):
+    page = int(callback.matches[0]["page"])
 
-    kwargs: Dict = {}
+    message = callback.message
+    user = callback.from_user
+    lang = callback._lang
 
-    is_private = await filters.private(bot, message)
-    if is_private and is_callback:
-        keyboard = [
-            [
-                (lang.back_button, "start"),
-            ],
-        ]
-        kwargs["reply_markup"] = ikb(keyboard)
+    keyboard = []
+    async with anilist.AsyncClient() as client:
+        favorites = await Favorites.filter(user=user.id, type="anime")
 
-    await (message.edit_text if is_callback else message.reply_text)(
-        lang.about_text.format(
-            bot_name=bot.me.first_name,
-            github="<a href='https://github.com/AmanoTeam/AmimeWatch'>GitHub</a>",
-            channel=f"<a href='https://t.me/c/{str(CHANNELS[lang.code])[4:]}/-1'>{lang.channel}</a>",
-            group=f"<a href='https://t.me/c/{str(GROUPS[lang.code])[4:]}/-1'>{lang.group}</a>",
-        ),
-        disable_web_page_preview=True,
-        **kwargs,
+        results = []
+        for favorite in favorites:
+            anime = await client.get(favorite.item, "anime")
+            results.append((favorite, anime))
+
+        layout = Pagination(
+            results,
+            item_data=lambda i, pg: f"anime {i[0].item}",
+            item_title=lambda i, pg: i[1].title.romaji,
+            page_data=lambda pg: f"favorites anime {pg}",
+        )
+
+        lines = layout.create(page, lines=8)
+
+        if len(lines) > 0:
+            keyboard += lines
+
+    keyboard.append([(lang.back_button, "anime")])
+
+    await message.edit_text(
+        lang.favorites_text,
+        reply_markup=ikb(keyboard),
     )

@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2021 Amano Team
+# Copyright (c) 2021 Andriel Rodrigues for Amano Team
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -21,187 +21,216 @@
 # SOFTWARE.
 
 import anilist
+import math
 
 from pyrogram import filters
-from pyrogram.types import CallbackQuery, InputMediaVideo
-from pyromod.helpers import ikb
+from pyrogram.types import CallbackQuery, InputMediaVideo, User
+from pyromod.helpers import bki, ikb
+from typing import Tuple
 
-from ...amime import Amime
-from ...database import Episodes, Users, Viewed, Watched
+from amime.amime import Amime
+from amime.database import Episodes, Viewed, Users, Watched
 
 
-@Amime.on_callback_query(
-    filters.regex(
-        r"^watch (?P<id>\d+) (?P<season>\d+) (?P<number>\d+) (?P<language>\w+)"
-    )
-)
-async def watch_callback(bot: Amime, callback: CallbackQuery):
-    anime_id = int(callback.matches[0]["id"])
-    season = int(callback.matches[0]["season"])
-    number = int(callback.matches[0]["number"])
-    language = callback.matches[0]["language"]
+@Amime.on_callback_query(filters.regex(r"^episode (\d+) (\d+) (\d+)"))
+async def anime_episode(bot: Amime, callback: CallbackQuery):
+    message = callback.message
     user = callback.from_user
     lang = callback._lang
 
-    anime = await anilist.AsyncClient().get(anime_id)
+    anime_id = int(callback.matches[0].group(1))
+    season = int(callback.matches[0].group(2))
+    number = int(callback.matches[0].group(3))
 
-    text = f"<b>{anime.title.romaji}</b> (<code>{anime.title.native}</code>)\n"
+    async with anilist.AsyncClient() as client:
+        anime = await client.get(anime_id, "anime")
 
-    user_db = await Users.get(id=user.id)
+        if anime is None:
+            return
 
-    episode = await Episodes.get(
-        anime=anime_id, season=season, number=number, language=language
-    )
-    episodes = await Episodes.filter(anime=anime_id, season=season, language=language)
-    episodes = sorted(episodes, key=lambda ep: ep.number)
-    all_episodes = await Episodes.filter(anime=anime_id, language=language)
-    all_episodes = sorted(all_episodes, key=lambda episode: episode.number)
+        text = f"<b>{anime.title.romaji}</b> (<code>{anime.title.native}</code>)\n"
 
-    if len(await Viewed.filter(user=user.id, item=episode.id, type="anime")) < 1:
-        await Viewed.create(user=user.id, item=episode.id, type="anime")
+        user_db = await Users.get(id=user.id)
+        language = user_db.language_anime
 
-    if len(episode.name) > 0:
-        text += f"\n<b>{lang.name}</b>: <code>{episode.name}</code>"
+        episodes = await Episodes.filter(
+            anime=anime_id, season=season, language=language
+        )
+        episodes = sorted(episodes, key=lambda episode: episode.number)
+        all_episodes = await Episodes.filter(anime=anime_id, language=language)
+        all_episodes = sorted(all_episodes, key=lambda episode: episode.number)
 
-    if season > 0:
-        text += f"\n<b>{lang.season}</b>: <code>{episode.season}</code>"
-    episode_number = f"{episode.number}"
-    if episode.unified_until > 0:
-        episode_number += f"-{episode.unified_until}"
-    text += f"\n<b>{lang.episode}</b>: <code>{episode_number}</code>"
-    text += f"\n<b>{lang.duration}</b>: <code>{episode.duration}m</code>"
-    text += f"\n<b>{lang.language}</b>: <code>{lang.strings[episode.language]['NAME']}</code>"
+        episode = await Episodes.get_or_none(
+            anime=anime_id,
+            season=season,
+            number=number,
+            language=language,
+        )
+        if episode is not None:
+            await Viewed.get_or_create(user=user.id, item=episode.id, type="anime")
 
-    if len(episode.added_by) > 0:
-        text += f"\n<b>{lang.added_by}</b>: <b>{episode.added_by}</b>"
+            keyboard = [[await get_watched_button(lang, user, episode.id)]]
 
-    if len(episode.notes) > 0:
-        text += f"\n\n<b>{lang.notes}</b>: <i>{episode.notes}</i>"
+            if len(episode.name) > 0:
+                text += f"\n<b>{lang.name}</b>: <code>{episode.name}</code>"
 
-    keyboard = [
-        [
-            (
-                (
-                    lang.mark_as_unwatched_button
-                    if len(await Watched.filter(user=user.id, episode=episode.id)) > 0
-                    else lang.mark_as_watched_button
+            if episode.season > 0:
+                text += f"\n<b>{lang.season}</b>: <code>{episode.season}</code>"
+
+            episode_number = f"{episode.number}"
+            if episode.unified_until > 0:
+                episode_number += f"-{episode.unified_until}"
+            text += f"\n<b>{lang.episode}</b>: <code>{episode_number}</code>"
+            text += f"\n<b>{lang.duration}</b>: <code>{episode.duration}m</code>"
+            text += f"\n<b>{lang.language}</b>: <code>{lang.strings[episode.language]['LANGUAGE_NAME']}</code>"
+
+            if len(episode.added_by) > 0:
+                if not episode.added_by.isdecimal():
+                    text += f"\n<b>{lang.added_by}</b>: <b>{episode.added_by}</b>"
+
+            if len(episode.notes) > 0:
+                text += f"\n\n<b>{lang.notes}</b>: <i>{episode.notes}</i>"
+
+            previous_button = await get_previous_episode_button(
+                lang, episodes, all_episodes, anime_id, season, number, language
+            )
+            next_button = await get_next_episode_button(
+                lang, episodes, all_episodes, anime_id, season, number
+            )
+            if not (
+                previous_button[0] == lang.dot_button
+                and next_button[0] == lang.dot_button
+            ):
+                keyboard.append([previous_button, next_button])
+
+            keyboard.extend(
+                [
+                    [
+                        (
+                            lang.report_button,
+                            f"report episode {anime_id} {season} {number} -1",
+                        )
+                    ],
+                    [
+                        (
+                            lang.back_button,
+                            f"episodes {anime_id} {season} {math.ceil(len(episodes) / (5 * 3))}",
+                        )
+                    ],
+                ]
+            )
+
+            await callback.edit_message_media(
+                InputMediaVideo(
+                    episode.file_id,
+                    caption=text,
                 ),
-                f"watched {anime_id} {season} {number} {language}",
+                reply_markup=ikb(keyboard),
             )
-        ]
-    ]
 
-    media_buttons = []
-    previous_number = 0
-    for ep in episodes:
-        if ep.number < number:
-            previous_number = ep.number
-    if previous_number != 0:
-        media_buttons.append(
-            (
-                lang.previous_button,
-                f"watch {anime_id} {season} {previous_number} {language}",
-            )
-        )
+
+async def get_watched_button(lang, user: User, episode_id: int) -> Tuple:
+    watched = await Watched.get_or_none(
+        user=user.id,
+        episode=episode_id,
+    )
+    if watched is None:
+        text = lang.mark_as_watched_button
     else:
-        previous_season = 0
-        seasons = []
-        for ep in all_episodes:
-            if ep.season not in seasons:
-                seasons.append(ep.season)
-        for s in seasons:
-            eps = await Episodes.filter(anime=anime_id, season=s, language=language)
-            eps = sorted(eps, key=lambda episode: episode.number, reverse=True)
-            for ep in eps:
-                if ep.season < season:
-                    previous_season = ep.season
-                    previous_number = ep.number
-                    break
-        if season > 0 and previous_season != 0:
-            media_buttons.append(
-                (
-                    lang.previous_button,
-                    f"watch {anime_id} {previous_season} {previous_number} {language}",
-                )
-            )
-        else:
-            media_buttons.append((lang.dot_button, "noop"))
-
-    next_number = 0
-    for ep in episodes:
-        if ep.number > number:
-            next_number = ep.number
-            break
-    if next_number != 0:
-        media_buttons.append(
-            (lang.next_button, f"watch {anime_id} {season} {next_number} {language}")
-        )
-    else:
-        next_season = 0
-        for ep in all_episodes:
-            if ep.season > season:
-                next_season = ep.season
-                next_number = ep.number
-                break
-        if season > 0 and next_season != 0:
-            media_buttons.append(
-                (
-                    lang.next_button,
-                    f"watch {anime_id} {next_season} {next_number} {language}",
-                )
-            )
-        else:
-            media_buttons.append((lang.dot_button, "noop"))
-
-    if len(media_buttons) > 0:
-        if not (
-            media_buttons[0][0] == lang.dot_button
-            and media_buttons[1][0] == lang.dot_button
-        ):
-            keyboard.append(media_buttons)
-
-    keyboard.append(
-        [
-            (
-                lang.report_button,
-                f"report episode {anime_id} {season} {number} {language}",
-            )
-        ]
-    )
-
-    keyboard.append([(lang.back_button, f"episodes {anime_id} {season} 1")])
-
-    await callback.edit_message_media(
-        InputMediaVideo(
-            episode.file_id,
-            caption=text,
-        ),
-        reply_markup=ikb(keyboard),
-    )
+        text = lang.mark_as_unwatched_button
+    return (text, f"watched {episode_id}")
 
 
-@Amime.on_callback_query(
-    filters.regex(
-        r"^watched (?P<id>\d+) (?P<season>\d+) (?P<number>\d+) (?P<language>\w+)"
-    )
-)
+@Amime.on_callback_query(filters.regex(r"^watched (?P<id>\d+)"))
 async def watched_callback(bot: Amime, callback: CallbackQuery):
-    anime_id = int(callback.matches[0]["id"])
-    season = int(callback.matches[0]["season"])
-    number = int(callback.matches[0]["number"])
-    language = callback.matches[0]["language"]
+    episode_id = int(callback.matches[0]["id"])
+    message = callback.message
     user = callback.from_user
     lang = callback._lang
 
-    episode = await Episodes.get(
-        anime=anime_id, season=season, number=number, language=language
+    watched = await Watched.get_or_none(
+        user=user.id,
+        episode=episode_id,
     )
 
-    watched = await Watched.filter(user=user.id, episode=episode.id)
-    if len(watched) > 0:
-        watched = watched[0]
-        await watched.delete()
+    if watched is None:
+        await Watched.create(user=user.id, episode=episode_id)
     else:
-        await Watched.create(user=user.id, episode=episode.id)
+        await watched.delete()
 
-    await watch_callback(bot, callback)
+    keyboard = bki(message.reply_markup)
+
+    for line, column in enumerate(keyboard):
+        for index, button in enumerate(column):
+            if button[1].startswith("watched"):
+                keyboard[line][index] = await get_watched_button(
+                    lang,
+                    user,
+                    episode_id,
+                )
+
+    await callback.edit_message_reply_markup(ikb(keyboard))
+
+
+async def get_previous_episode_button(
+    lang, episodes, all_episodes, anime, season, number, language
+) -> Tuple:
+    s = 0
+    n = 0
+
+    for episode in episodes:
+        if episode.number < number:
+            s = season
+            n = episode.number
+
+    if not n > 0:
+        seasons = []
+
+        for episode in all_episodes:
+            if episode.season not in seasons:
+                seasons.append(episode.season)
+
+        for _s in seasons:
+            episodes = await Episodes.filter(anime=anime, season=_s, language=language)
+            episodes = sorted(
+                episodes, key=lambda episode: episode.number, reverse=True
+            )
+
+            for episode in episodes:
+                if episode.season < season:
+                    s = episode.season
+                    n = episode.number
+                    break
+
+            if n > 0:
+                break
+
+    if n > 0:
+        return (lang.previous_button, f"episode {anime} {s} {n}")
+    else:
+        return (lang.dot_button, "noop")
+
+
+async def get_next_episode_button(
+    lang, episodes, all_episodes, anime, season, number
+) -> Tuple:
+    s = 0
+    n = 0
+
+    for episode in episodes:
+        if episode.number > number:
+            s = season
+            n = episode.number
+            break
+
+    if not n > 0:
+        for episode in all_episodes:
+            if episode.season > season:
+                s = episode.season
+                n = episode.number
+                break
+
+    if n > 0:
+        return (lang.next_button, f"episode {anime} {s} {n}")
+    else:
+        return (lang.dot_button, "noop")

@@ -1,0 +1,18 @@
+from typing import Dict, List
+
+
+GROUPS: Dict = {
+    "en": 0,
+    "pt": 0,
+}
+CHANNELS: Dict = {
+    "en": 0,
+    "pt": 0,
+}
+CHATS: Dict = {
+    "backup": 0,
+    "requests": 0,
+    "videos": 0,
+    "staff": 0,
+}
+SUDO_USERS: List[int] = [1155717290, 918317361, 705707638]  # @AndrielFR, @Hitalo and @VegaZS

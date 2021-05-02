@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2021 Amano Team
+# Copyright (c) 2021 Andriel Rodrigues for Amano Team
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -28,295 +28,277 @@ from pyrogram.types import CallbackQuery, Message
 from pyromod.helpers import array_chunk, ikb
 from typing import Union
 
-from ...amime import Amime
-from ...database import Chats, Episodes, Notify, Users
-from ..favorites import get_favorite_button
+from amime.amime import Amime
+from amime.database import Episodes, Users
+from amime.modules.favorites import get_favorite_button
+from amime.modules.notify import get_notify_button
 
 
-@Amime.on_message(filters.cmd(r"anime (?P<query>.+)"))
-async def anime_message(bot: Amime, message: Message):
-    query = message.matches[0]["query"]
-
-    if query.isdecimal():
-        anime_id = int(query)
-    else:
-        async with anilist.AsyncClient() as client:
-            try:
-                result = (await client.search(query, limit=1))[0]
-            except:
-                return
-            anime_id = result.id
-
-    message.matches = [{"id": anime_id}]
-    await view_anime(bot, message)
-
-
-@Amime.on_callback_query(filters.regex(r"^anime (?P<id>\d+)"))
-async def anime_callback(bot: Amime, callback: CallbackQuery):
-    await view_anime(bot, callback)
-
-
-async def view_anime(bot: Amime, union: Union[CallbackQuery, Message]):
-    anime_id = int(union.matches[0]["id"])
+@Amime.on_message(filters.cmd(r"anime (.+)"))
+@Amime.on_callback_query(filters.regex(r"^anime (\d+)\s?(\d+)?"))
+async def anime_view(bot: Amime, union: Union[CallbackQuery, Message]):
     is_callback = isinstance(union, CallbackQuery)
     message = union.message if is_callback else union
-    is_private = await filters.private(bot, message)
     chat = message.chat
     user = union.from_user
     lang = union._lang
 
+    is_private = await filters.private(bot, message)
+    is_collaborator = await filters.collaborator(bot, union) or await filters.sudo(
+        bot, union
+    )
+
+    if is_callback:
+        query = union.matches[0].group(1)
+
+        user_id = union.matches[0].group(2)
+
+        if user_id is not None:
+            user_id = int(user_id)
+
+            if user_id != user.id:
+                return
+    else:
+        query = union.matches[0].group(2)
+
+    if not bool(query):
+        return
+
     async with anilist.AsyncClient() as client:
-        anime = await client.get(anime_id)
-
-        if anime:
-            text = f"<b>{anime.title.romaji}</b> (<code>{anime.title.native}</code>)\n"
-
-            text += f"\n<b>{lang.id}</b>: <code>{anime.id}</code>"
-            if hasattr(anime, "score"):
-                if hasattr(anime.score, "average"):
-                    text += f"\n<b>{lang.score}</b>: (<b>{lang.average} = <code>{anime.score.average}</code></b>)"
-            text += f"\n<b>{lang.status}</b>: <code>{anime.status}</code>"
-            if hasattr(anime, "genres"):
-                text += (
-                    f"\n<b>{lang.genres}</b>: <code>{', '.join(anime.genres)}</code>"
-                )
-            if hasattr(anime, "studios"):
-                text += (
-                    f"\n<b>{lang.studios}</b>: <code>{', '.join(anime.studios)}</code>"
-                )
-            text += f"\n<b>{lang.format}</b>: <code>{anime.format}</code>"
-            if hasattr(anime, "duration"):
-                text += f"\n<b>{lang.duration}</b>: <code>{anime.duration}m</code>"
-            if not anime.format.lower() == "movie" and hasattr(anime, "episodes"):
-                text += f"\n<b>{lang.episode}s</b>: <code>{anime.episodes}</code>"
-
-            keyboard = [(lang.read_more_button, f"anime more {anime.id}")]
-
-            if is_private:
-                keyboard.append(
-                    await get_favorite_button(lang, union.from_user, "anime", anime.id)
-                )
-
-                episodes = await Episodes.filter(anime=anime.id)
-                episodes = sorted(episodes, key=lambda episode: episode.number)
-
-                if len(episodes) > 0:
-                    if hasattr(anime, "format") and anime.format.lower() == "movie":
-                        keyboard.append((lang.watch_button, f"movie {anime.id}"))
-                    else:
-                        season = episodes[0].season
-                        keyboard.append(
-                            (lang.watch_button, f"episodes {anime.id} {season} 1")
-                        )
-
-                if not (await filters.collaborator(bot, union) or bot.is_sudo(user)):
-                    keyboard.append(
-                        (
-                            lang.request_episodes_button,
-                            f"request episodes question {anime_id}",
-                        )
-                    )
-
-            if not anime.format.lower() == "movie":
-                recipient = user.id if is_private else chat.id
-                recipient_type = "user" if is_private else "group"
-                notify = await Notify.filter(
-                    recipient=recipient,
-                    recipient_type=recipient_type,
-                    item=anime.id,
-                    type="anime",
-                )
-                if len(notify) > 0:
-                    keyboard.append(
-                        (
-                            f"🔕 {lang.notify_episodes}",
-                            f"notify chat {anime.id} {recipient} {recipient_type}",
-                        )
-                    )
-                else:
-                    keyboard.append(
-                        (
-                            f"🔔 {lang.notify_episodes}",
-                            f"notify chat {anime.id} {recipient} {recipient_type}",
-                        )
-                    )
-
-            if is_private:
-                if await filters.collaborator(bot, union) or bot.is_sudo(user):
-                    keyboard.append((lang.manage_button, f"manage anime {anime.id}"))
-
-            photo = f"https://img.anili.st/media/{anime.id}"
-
-            keyboard = array_chunk(keyboard, 2)
-
-            if not is_callback:
-                await union.reply_photo(
-                    photo=photo,
-                    caption=text,
-                    reply_markup=ikb(keyboard),
-                )
-            else:
-                if union.message.photo:
-                    await union.edit_message_text(
-                        text,
-                        reply_markup=ikb(keyboard),
-                    )
-                else:
-                    await union.message.reply_photo(
-                        photo=photo,
-                        caption=text,
-                        reply_markup=ikb(keyboard),
-                    )
+        if not query.isdecimal():
+            result = (await client.search(query, "anime", 1))[0]
+            anime_id = result.id
         else:
-            await union.reply_text(
-                lang.not_found(type="anime", key="id", value=anime_id)
+            anime_id = int(query)
+
+        anime = await client.get(anime_id, "anime")
+
+        if anime is None:
+            return
+
+        user_db = await Users.get(id=user.id)
+        language = user_db.language_anime
+
+        episodes = await Episodes.filter(anime=anime.id)
+        episodes = sorted(episodes, key=lambda episode: episode.number)
+
+        text = f"<b>{anime.title.romaji}</b> (<code>{anime.title.native}</code>)\n"
+        text += f"\n<b>ID</b>: <code>{anime.id}</code>"
+        if hasattr(anime, "score"):
+            if hasattr(anime.score, "average"):
+                text += f"\n<b>{lang.score}</b>: <code>{anime.score.average}</code>"
+        text += f"\n<b>{lang.status}</b>: <code>{anime.status}</code>"
+        text += f"\n<b>{lang.genres}</b>: <code>{', '.join(anime.genres)}</code>"
+        if hasattr(anime, "studios"):
+            text += f"\n<b>{lang.studios}</b>: <code>{', '.join(anime.studios)}</code>"
+        text += f"\n<b>{lang.format}</b>: <code>{anime.format}</code>"
+        if hasattr(anime, "duration"):
+            text += f"\n<b>{lang.duration}</b>: <code>{anime.duration}m</code>"
+        if not anime.format.lower() == "movie" and hasattr(anime, "episodes"):
+            text += f"\n<b>{lang.episode}s</b>: <code>{anime.episodes}</code>"
+        if not anime.status.lower() == "not_yet_released":
+            text += f"\n<b>{lang.start_date}</b>: <code>{anime.start_date.day if hasattr(anime.start_date, 'day') else 0}/{anime.start_date.month if hasattr(anime.start_date, 'month') else 0}/{anime.start_date.year if hasattr(anime.start_date, 'year') else 0}</code>"
+        if not anime.status.lower() in ["not_yet_released", "releasing"]:
+            text += f"\n<b>{lang.end_date}</b>: <code>{anime.end_date.day if hasattr(anime.end_date, 'day') else 0}/{anime.end_date.month if hasattr(anime.end_date, 'month') else 0}/{anime.end_date.year if hasattr(anime.end_date, 'year') else 0}</code>"
+
+        buttons = [
+            (lang.view_more_button, f"anime more {anime.id} {user.id}"),
+        ]
+
+        if is_private:
+            buttons.append(await get_favorite_button(lang, user, "anime", anime.id))
+
+        if len(episodes) > 0:
+            if is_private:
+                if anime.format.lower() == "movie":
+                    buttons.append((lang.watch_button, f"episode {anime.id} 0 1"))
+                else:
+                    buttons.append(
+                        (
+                            lang.watch_button,
+                            f"episodes {anime.id} {episodes[0].season} 1",
+                        )
+                    )
+            else:
+                buttons.append(
+                    (
+                        lang.watch_button,
+                        f"https://t.me/{bot.me.username}/?start=anime_{anime.id}",
+                        "url",
+                    )
+                )
+
+        buttons.append(
+            await get_notify_button(
+                lang, user if is_private else chat, "anime", anime.id
+            )
+        )
+
+        if is_private and is_collaborator:
+            buttons.append(
+                (
+                    lang.manage_button,
+                    f"manage anime {anime.id} 0 {language} 1",
+                )
+            )
+
+        if is_private and not anime.status.lower() == "not_yet_released":
+            button = (
+                lang.request_content_button,
+                f"request episodes {anime.id} {language}",
+            )
+            if anime.status.lower() == "releasing":
+                buttons.append(button)
+            elif hasattr(anime, "episodes"):
+                if len(episodes) < anime.episodes:
+                    buttons.append(button)
+
+        keyboard = array_chunk(buttons, 2)
+
+        if bool(message.photo) and not bool(message.via_bot):
+            await message.edit_text(
+                text,
+                reply_markup=ikb(keyboard),
+            )
+        else:
+            await message.reply_photo(
+                f"https://img.anili.st/media/{anime.id}",
+                caption=text,
+                reply_markup=ikb(keyboard),
             )
 
 
-@Amime.on_callback_query(filters.regex(r"anime more (?P<id>\d+)"))
-async def view_anime_more_callback(bot: Amime, callback: CallbackQuery):
-    anime_id = int(callback.matches[0]["id"])
+@Amime.on_callback_query(filters.regex(r"^anime more (\d+) (\d+)"))
+async def anime_view_more(bot: Amime, callback: CallbackQuery):
     message = callback.message
+    chat = message.chat
     user = callback.from_user
     lang = callback._lang
 
-    if not (
-        (
-            await filters.group(bot, message)
-            and await filters.administrator(bot, callback)
-        )
-        or await filters.private(bot, message)
-    ):
+    anime_id = int(callback.matches[0].group(1))
+    user_id = int(callback.matches[0].group(2))
+
+    if user_id != user.id:
         return
 
-    keyboard = [
-        [
-            (lang.description_button, f"anime description {anime_id} 1"),
-            (lang.characters_button, f"anime characters {anime_id}"),
-        ],
-        [(lang.studios_button, f"anime studios {anime_id}")],
-    ]
+    async with anilist.AsyncClient() as client:
+        anime = await client.get(anime_id, "anime")
 
-    keyboard.append([(lang.back_button, f"anime {anime_id}")])
+        buttons = [
+            (lang.description_button, f"anime description {anime_id} {user_id} 1"),
+            (lang.characters_button, f"anime characters {anime_id} {user_id}"),
+            (lang.studios_button, f"anime studios {anime_id} {user_id}"),
+        ]
 
-    await callback.edit_message_text(
-        lang.anime_more,
-        reply_markup=ikb(keyboard),
-    )
+        if hasattr(anime, "trailer"):
+            if hasattr(anime.trailer, "url"):
+                buttons.append((lang.trailer_button, anime.trailer.url, "url"))
+
+        buttons.append(("🐢 Anilist", anime.url, "url"))
+
+        keyboard = array_chunk(buttons, 2)
+
+        keyboard.append([(lang.back_button, f"anime {anime_id} {user_id}")])
+
+        await message.edit_text(
+            lang.view_more_text,
+            reply_markup=ikb(keyboard),
+        )
 
 
-@Amime.on_callback_query(filters.regex(r"anime description (?P<id>\d+) (?P<page>\d+)"))
-async def view_anime_description_callback(bot: Amime, callback: CallbackQuery):
-    anime_id = int(callback.matches[0]["id"])
-    page = int(callback.matches[0]["page"])
+@Amime.on_callback_query(filters.regex(r"anime description (\d+) (\d+) (\d+)"))
+async def anime_view_description(bot: Amime, callback: CallbackQuery):
     message = callback.message
+    chat = message.chat
+    user = callback.from_user
     lang = callback._lang
 
-    if not (
-        (
-            await filters.group(bot, message)
-            and await filters.administrator(bot, callback)
-        )
-        or await filters.private(bot, message)
-    ):
+    anime_id = int(callback.matches[0].group(1))
+    user_id = int(callback.matches[0].group(2))
+    page = int(callback.matches[0].group(3))
+
+    if user_id != user.id:
         return
 
-    anime = await anilist.AsyncClient().get(anime_id)
+    async with anilist.AsyncClient() as client:
+        anime = await client.get(anime_id, "anime")
 
-    description = anime.description
-    amount = 1024
-    page = 1 if page <= 0 else page
-    offset = (page - 1) * amount
-    stop = offset + amount
-    pages = math.ceil(len(description) / amount)
-    description = description[offset - (3 if page > 1 else 0) : stop]
+        description = anime.description
+        amount = 1024
+        page = 1 if page <= 0 else page
+        offset = (page - 1) * amount
+        stop = offset + amount
+        pages = math.ceil(len(description) / amount)
+        description = description[offset - (3 if page > 1 else 0) : stop]
 
-    keyboard = []
+        page_buttons = []
+        if page > 1:
+            page_buttons.append(
+                ("⬅️", f"anime description {anime_id} {user_id} {page - 1}")
+            )
+        if not page == pages:
+            description = description[: len(description) - 3] + "..."
+            page_buttons.append(
+                ("➡️", f"anime description {anime_id} {user_id} {page + 1}")
+            )
 
-    page_buttons = []
-    if page > 1:
-        page_buttons.append(("⬅️", f"anime description {anime_id} {page - 1}"))
-    if not page == pages:
-        description = description[: len(description) - 3] + "..."
-        page_buttons.append(("➡️", f"anime description {anime_id} {page + 1}"))
+        keyboard = []
+        if len(page_buttons) > 0:
+            keyboard.append(page_buttons)
 
-    if len(page_buttons) > 0:
-        keyboard.append(page_buttons)
+        keyboard.append([(lang.back_button, f"anime more {anime_id} {user_id}")])
 
-    keyboard.append([(lang.back_button, f"anime more {anime_id}")])
-
-    await callback.edit_message_text(
-        description,
-        reply_markup=ikb(keyboard),
-    )
+        await message.edit_text(
+            description,
+            reply_markup=ikb(keyboard),
+        )
 
 
-@Amime.on_callback_query(filters.regex(r"anime characters (?P<id>\d+)"))
-async def view_anime_characters_callback(bot: Amime, callback: CallbackQuery):
+@Amime.on_callback_query(filters.regex(r"^anime characters (\d+) (\d+)"))
+async def anime_view_characters(bot: Amime, callback: CallbackQuery):
     message = callback.message
+    chat = message.chat
+    user = callback.from_user
     lang = callback._lang
 
-    if not (
-        (
-            await filters.group(bot, message)
-            and await filters.administrator(bot, callback)
-        )
-        or await filters.private(bot, message)
-    ):
+    anime_id = int(callback.matches[0].group(1))
+    user_id = int(callback.matches[0].group(2))
+
+    if user_id != user.id:
         return
 
-    await callback.answer(lang.function_in_progress, show_alert=True)
+    async with anilist.AsyncClient() as client:
+        anime = await client.get(anime_id, "anime")
+
+        keyboard = [
+            [
+                (lang.back_button, f"anime more {anime_id} {user_id}"),
+            ],
+        ]
+
+        text = lang.characters_text
+
+        characters = sorted(anime.characters, key=lambda character: character.id)
+        for character in characters:
+            text += f"\n• <code>{character.id}</code> - <a href='https://t.me/{bot.me.username}/?start=character_{character.id}'>{character.name.full}</a> (<i>{character.role}</i>)"
+
+        await message.edit_text(
+            text,
+            reply_markup=ikb(keyboard),
+        )
 
 
-@Amime.on_callback_query(filters.regex(r"anime studios (?P<id>\d+)"))
-async def view_anime_studios_callback(bot: Amime, callback: CallbackQuery):
+@Amime.on_callback_query(filters.regex(r"^anime studios (\d+) (\d+)"))
+async def anime_view_studios(bot: Amime, callback: CallbackQuery):
     message = callback.message
+    chat = message.chat
+    user = callback.from_user
     lang = callback._lang
 
-    if not (
-        (
-            await filters.group(bot, message)
-            and await filters.administrator(bot, callback)
-        )
-        or await filters.private(bot, message)
-    ):
+    anime_id = int(callback.matches[0].group(1))
+    user_id = int(callback.matches[0].group(2))
+
+    if user_id != user.id:
         return
 
-    await callback.answer(lang.function_in_progress, show_alert=True)
-
-
-@Amime.on_callback_query(
-    filters.regex(
-        r"^notify chat (?P<id>\d+) (?P<recipient>(\-)?\d+) (?P<recipient_type>group|user)"
-    )
-)
-async def notify_chat_callback(bot: Amime, callback: CallbackQuery):
-    anime_id = int(callback.matches[0]["id"])
-    recipient = int(callback.matches[0]["recipient"])
-    recipient_type = callback.matches[0]["recipient_type"]
-    lang = callback._lang
-
-    if recipient_type == "group":
-        if not await filters.administrator(bot, callback):
-            return
-
-    notify = await Notify.filter(
-        recipient=recipient,
-        recipient_type=recipient_type,
-        item=anime_id,
-        type="anime",
-    )
-    if len(notify) > 0:
-        notify = notify[0]
-        await notify.delete()
-        await callback.answer(lang.episode_notifications_off, show_alert=True)
-    else:
-        await Notify.create(
-            recipient=recipient,
-            recipient_type=recipient_type,
-            item=anime_id,
-            type="anime",
-        )
-        await callback.answer(lang.episode_notifications_on, show_alert=True)
-
-    await view_anime(bot, callback)
+    await callback.answer(lang.unfinished_function_alert, show_alert=True)

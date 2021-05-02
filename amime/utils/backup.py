@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2021 Amano Team
+# Copyright (c) 2021 Andriel Rodrigues for Amano Team
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -21,11 +21,11 @@
 # SOFTWARE.
 
 import datetime
-import traceback
 
 from pyrogram import Client
 
-from .. import log
+from amime import log
+from amime.config import CHATS
 
 
 async def save_in_telegram(bot: Client):
@@ -35,7 +35,7 @@ async def save_in_telegram(bot: Client):
 
     try:
         if await bot.send_document(
-            bot.backup_chat.id,
+            CHATS["backup"],
             "amime/database/database.sqlite",
             caption=f"<b>Database BACKUP</b>\n\n<b>Date</b>: <code>{date}</code>",
         ):
@@ -43,5 +43,4 @@ async def save_in_telegram(bot: Client):
         else:
             log.warning("It was not possible to save the database in Telegram.")
     except:
-        log.error("Error saving the database in Telegram.")
-        traceback.print_exc()
+        log.error("Error saving the database in Telegram.", exc_info=True)

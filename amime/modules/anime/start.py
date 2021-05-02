@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2021 Amano Team
+# Copyright (c) 2021 Andriel Rodrigues for Amano Team
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -25,40 +25,35 @@ from pyrogram.types import CallbackQuery, Message
 from pyromod.helpers import ikb
 from typing import Union
 
-from ..amime import Amime
-from ..database import Chats
+from amime.amime import Amime
 
 
-@Amime.on_message(filters.cmd(r"settings") & filters.private)
-async def settings_private_message(bot: Amime, message: Message):
-    await settings_union(bot, message)
-
-
-@Amime.on_message(filters.cmd(r"settings") & filters.group & filters.administrator)
-async def settings_group_message(bot: Amime, message: Message):
-    await settings_union(bot, message)
-
-
-@Amime.on_callback_query(filters.regex(r"^settings"))
-async def settings_callback(bot: Amime, callback: CallbackQuery):
-    await settings_union(bot, callback)
-
-
-async def settings_union(bot: Amime, union: Union[CallbackQuery, Message]):
+@Amime.on_message(filters.cmd(r"anime$") & filters.private)
+@Amime.on_callback_query(filters.regex(r"^anime$"))
+async def anime_start(bot: Amime, union: Union[CallbackQuery, Message]):
     is_callback = isinstance(union, CallbackQuery)
-    is_private = await filters.private(bot, union.message if is_callback else union)
     message = union.message if is_callback else union
-    chat = message.chat
+    user = union.from_user
     lang = union._lang
 
     keyboard = [
-        [(lang.language_button, f"language {'bot' if is_private else 'group'}")]
+        [
+            (lang.suggestions_button, "suggestions anime 1"),
+            (lang.categories_button, "categories anime 1"),
+        ],
+        [
+            (lang.upcoming_button, "upcoming anime 1"),
+            (lang.favorites_button, "favorites anime 1"),
+        ],
+        [
+            (lang.search_button, "!a ", "switch_inline_query_current_chat"),
+        ],
     ]
 
-    if is_callback and is_private:
+    if is_callback:
         keyboard.append([(lang.back_button, "start")])
 
-    await (union.edit_message_text if is_callback else union.reply_text)(
-        lang.settings_private if is_private else lang.settings_group,
+    await (message.edit_text if is_callback else message.reply_text)(
+        lang.anime_text,
         reply_markup=ikb(keyboard),
     )

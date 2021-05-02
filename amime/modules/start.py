@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2021 Amano Team
+# Copyright (c) 2021 Andriel Rodrigues for Amano Team
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,27 +20,55 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+import re
+
 from pyrogram import filters
 from pyrogram.types import CallbackQuery, Message
 from pyromod.helpers import ikb
 from typing import Union
 
-from ..amime import Amime
-from ..database import Chats, Users
-from .help import help_union, help_module_union
-from .anime.view import view_anime
-from .manga.view import view_manga
+from amime.amime import Amime
+from amime.modules.anime.view import anime_view
+from amime.modules.character.view import character_view
+from amime.modules.manga.view import manga_view
 
 
 @Amime.on_message(filters.cmd(r"start$"))
-async def start_message(bot: Amime, message: Message):
-    lang = message._lang
+@Amime.on_callback_query(filters.regex(r"^start$"))
+async def start(bot: Amime, union: Union[CallbackQuery, Message]):
+    is_callback = isinstance(union, CallbackQuery)
+    message = union.message if is_callback else union
+    user = union.from_user
+    lang = union._lang
 
     if await filters.private(bot, message):
-        await start_union(bot, message)
+        await (message.edit_text if is_callback else message.reply_text)(
+            lang.start_text_2.format(
+                user_mention=user.mention(),
+                bot_name=bot.me.first_name,
+            ),
+            reply_markup=ikb(
+                [
+                    [
+                        (lang.about_button, "about"),
+                        (lang.language_button, "language"),
+                    ],
+                    [
+                        (lang.anime_button, "anime"),
+                        (lang.manga_button, "manga"),
+                    ],
+                    [
+                        (lang.donate_button, "donate"),
+                    ],
+                ]
+            ),
+        )
     else:
         await message.reply_text(
-            lang.start_in_pm,
+            lang.start_text.format(
+                user_mention=user.mention(),
+                bot_name=bot.me.first_name,
+            ),
             reply_markup=ikb(
                 [
                     [
@@ -55,70 +83,19 @@ async def start_message(bot: Amime, message: Message):
         )
 
 
-@Amime.on_callback_query(filters.regex(r"^start$"))
-async def start_callback(bot: Amime, callback: CallbackQuery):
-    await start_union(bot, callback)
+@Amime.on_message(
+    filters.cmd(r"start (?P<content_type>anime|character|manga)_(\d+)")
+    & filters.private
+)
+async def view(bot: Amime, message: Message):
+    content_type = message.matches[0]["content_type"]
 
-
-async def start_union(bot: Amime, union: Union[CallbackQuery, Message]):
-    is_callback = isinstance(union, CallbackQuery)
-    lang = union._lang
-
-    keyboard = [
-        [(lang.help_button, "help"), (lang.about_button, "about")],
-        [(lang.favorites_button, "favorites"), (lang.settings_button, "settings")],
-        [
-            (lang.group_button, "https://t.me/AmimeWatchGroup", "url"),
-            (lang.channel_button, "https://t.me/AmimeWatch", "url"),
-        ],
-        [(lang.search_button, "!a ", "switch_inline_query_current_chat")],
-    ]
-    user = union.from_user
-
-    await (union.edit_message_text if is_callback else union.reply_text)(
-        lang.start.format(
-            mention=user.mention(),
-            bot_name=bot.me.first_name,
-            anilist="<a href='https://anilist.co'>Anilist</a>",
-        ),
-        reply_markup=ikb(keyboard),
-        disable_web_page_preview=True,
-    )
-
-
-@Amime.on_message(filters.cmd(r"start help$") & filters.private)
-async def start_help_message(bot: Amime, message: Message):
-    await help_union(bot, message)
-
-
-@Amime.on_message(filters.cmd(r"start help_(?P<module>.+)") & filters.private)
-async def start_help_module_message(bot: Amime, message: Message):
-    await help_module_union(bot, message)
-
-
-@Amime.on_message(filters.new_chat_members & filters.group)
-async def new_members_message(bot: Amime, message: Message):
-    chat = message.chat
-    members = message.new_chat_members
-    for member in members:
-        if member.id == bot.me.id and member.username == bot.me.username:
-            if len(await Chats.filter(id=chat.id)) == 0:
-                await Chats.create(
-                    id=chat.id,
-                    title=chat.title,
-                    username=chat.username or "",
-                    language="en",
-                )
-
-
-@Amime.on_message(filters.cmd(r"start (?P<type>anime|manga)_(?P<id>\d+)"))
-async def view_content(bot: Amime, message: Message):
-    content_type = message.matches[0]["type"]
-    content_id = int(message.matches[0]["id"])
-
-    message.matches = [{"id": content_id}]
+    matches = re.search(r"(\s)?(\d+)", message.text)
+    message.matches = [matches]
 
     if content_type == "anime":
-        await view_anime(bot, message)
+        await anime_view(bot, message)
+    elif content_type == "character":
+        await character_view(bot, message)
     else:
-        await view_manga(bot, message)
+        await manga_view(bot, message)

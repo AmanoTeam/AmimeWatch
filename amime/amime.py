@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2021 Amano Team
+# Copyright (c) 2021 Andriel Rodrigues for Amano Team
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -22,40 +22,35 @@
 
 import asyncio
 import aioschedule as schedule
+import datetime
 import pyromod.listen
-
-from datetime import datetime
 
 from pyrogram import Client
 from pyrogram import __version__
 from pyrogram.raw.all import layer
 from pyrogram.types import User
 
-from . import log
-from .utils import backup, langs, modules
+from amime import log
+from amime.config import SUDO_USERS
+from amime.utils import backup, filters, langs, modules, video_queue
 
 
 class Amime(Client):
-    SUDO_USERS = [1155717290, 918317361]  # @AndrielFR and @Hitalo
-    BACKUP_ID = -1001339690483
-    STAFF_ID = -1001382912209
-    VIDEOS_ID = -1001343429763
-    REQUESTS_ID = -1001176439164
-    CHANNEL_ID = -1001354975349
-
     def __init__(self):
         name = self.__class__.__name__.lower()
 
         super().__init__(
             name,
             config_file=f"{name}.ini",
-            workers=16,
+            parse_mode="html",
             workdir=".",
         )
 
-        self.sudos = Amime.SUDO_USERS
+        self.sudos = SUDO_USERS
 
-        self.start_datetime = datetime.utcnow()
+        self.start_datetime = datetime.datetime.now().replace(
+            tzinfo=datetime.timezone.utc
+        )
 
     async def start(self):
         await super().start()
@@ -66,13 +61,9 @@ class Amime(Client):
         )
 
         langs.load()
+        filters.load(self)
         modules.load(self)
-
-        self.backup_chat = await self.get_chat(Amime.BACKUP_ID)
-        self.staff_chat = await self.get_chat(Amime.STAFF_ID)
-        self.videos_chat = await self.get_chat(Amime.VIDEOS_ID)
-        self.requests_chat = await self.get_chat(Amime.REQUESTS_ID)
-        self.channel_id = Amime.CHANNEL_ID
+        self.video_queue = video_queue.VideoQueue(self)
 
         schedule.every(1).hour.do(backup.save_in_telegram, bot=self)
 

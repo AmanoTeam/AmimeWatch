@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2021 Amano Team
+# Copyright (c) 2021 Andriel Rodrigues for Amano Team
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -94,6 +94,7 @@ class Requests(Model):
     item = fields.IntField()
     type = fields.CharField(max_length=7)
     datetime = fields.DatetimeField()
+    done = fields.BooleanField(default=False)
 
 
 class Users(Model):

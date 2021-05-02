@@ -219,13 +219,12 @@ async def anime_episode(bot: Amime, callback: CallbackQuery):
         EPISODES[str(user.id)][str(anime_id)] = {}
         episode = EPISODES[str(user.id)][str(anime_id)]
 
-        number = (
-            sorted(
-                await Episodes.filter(anime=anime_id, season=season, language=language),
-                key=lambda episode: episode.number,
-            )[-1].number
-            + 1
-        )
+        episodes = await Episodes.filter(anime=anime_id, season=season, language=language)
+        episodes = sorted(episodes, key=lambda episode: episode.number)
+        if len(episodes) > 0:
+            number = episodes[-1].number + 1
+        else:
+            number = 1
 
     async with anilist.AsyncClient() as client:
         anime = await client.get(anime_id, "anime")

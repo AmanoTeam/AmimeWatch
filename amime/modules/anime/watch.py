@@ -103,22 +103,33 @@ async def anime_episode(bot: Amime, callback: CallbackQuery):
             ):
                 keyboard.append([previous_button, next_button])
 
-            keyboard.extend(
+            keyboard.append(
                 [
+                    (
+                        lang.report_button,
+                        f"report episode {anime_id} {season} {number} -1",
+                    )
+                ]
+            )
+
+            if anime.format.lower() == "movie":
+                keyboard.append(
                     [
                         (
-                            lang.report_button,
-                            f"report episode {anime_id} {season} {number} -1",
+                            lang.back_button,
+                            f"anime {anime_id} {user.id}",
                         )
-                    ],
+                    ]
+                )
+            else:
+                keyboard.append(
                     [
                         (
                             lang.back_button,
                             f"episodes {anime_id} {season} {math.ceil(len(episodes) / (5 * 3))}",
                         )
-                    ],
-                ]
-            )
+                    ]
+                )
 
             await callback.edit_message_media(
                 InputMediaVideo(

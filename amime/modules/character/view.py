@@ -20,29 +20,57 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+from typing import Union
+
 import anilist
 from pyrogram import filters
-from pyrogram.types import Message
+from pyrogram.types import CallbackQuery, Message
 from pyromod.helpers import ikb
 
 from amime.amime import Amime
 
 
 @Amime.on_message(filters.cmd(r"character (.+)"))
-async def character_view(bot: Amime, message: Message):
+@Amime.on_callback_query(filters.regex(r"^character (\d+)\s?(\d+)?"))
+async def character_view(bot: Amime, union: Union[CallbackQuery, Message]):
+    is_callback = isinstance(union, CallbackQuery)
+    message = union.message if is_callback else union
     chat = message.chat
-    user = message.from_user
-    lang = message._lang
+    user = union.from_user
+    lang = union._lang
 
-    query = message.matches[0].group(2)
+    if is_callback:
+        query = union.matches[0].group(1)
+
+        user_id = union.matches[0].group(2)
+
+        if user_id is not None:
+            user_id = int(user_id.lstrip())
+
+            if user_id != user.id:
+                return
+    else:
+        query = union.matches[0].group(2)
 
     if not bool(query):
         return
 
     async with anilist.AsyncClient() as client:
         if not query.isdecimal():
-            result = (await client.search(query, "character", 1))[0]
-            character_id = result.id
+            results = await client.search(query, "character", 10)
+            if len(results) == 1:
+                character_id = results[0].id
+            else:
+                keyboard = []
+                for result in results:
+                    keyboard.append([(result.name.full, f"character {result.id}")])
+                await message.reply_text(
+                    lang.search_results_text(
+                        query=query,
+                    ),
+                    reply_markup=ikb(keyboard),
+                )
+                return
         else:
             character_id = int(query)
 

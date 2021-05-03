@@ -66,8 +66,20 @@ async def anime_view(bot: Amime, union: Union[CallbackQuery, Message]):
 
     async with anilist.AsyncClient() as client:
         if not query.isdecimal():
-            result = (await client.search(query, "anime", 1))[0]
-            anime_id = result.id
+            results = await client.search(query, "anime", 10)
+            if len(results) == 1:
+                anime_id = results[0].id
+            else:
+                keyboard = []
+                for result in results:
+                    keyboard.append([(result.title.romaji, f"anime {result.id}")])
+                await message.reply_text(
+                    lang.search_results_text(
+                        query=query,
+                    ),
+                    reply_markup=ikb(keyboard),
+                )
+                return
         else:
             anime_id = int(query)
 

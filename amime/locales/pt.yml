@@ -382,6 +382,9 @@ add_in_batch_button:
 no_found_episodes_text: |
     Oops! Não encontrei nenhum episódio, se for um equívoco, informe aos responsáveis.
 
+search_results_text: |
+    Resultados da pesquisa: <b>{query}</b>
+
 
 # Alerts
 added_to_favorites_alert:

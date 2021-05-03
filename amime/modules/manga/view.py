@@ -34,7 +34,7 @@ from amime.modules.notify import get_notify_button
 
 
 @Amime.on_message(filters.cmd(r"manga (.+)"))
-@Amime.on_callback_query(filters.regex(r"^manga (\d+)\s?(\d+)"))
+@Amime.on_callback_query(filters.regex(r"^manga (\d+)\s?(\d+)?"))
 async def manga_view(bot: Amime, union: Union[CallbackQuery, Message]):
     is_callback = isinstance(union, CallbackQuery)
     message = union.message if is_callback else union
@@ -62,8 +62,20 @@ async def manga_view(bot: Amime, union: Union[CallbackQuery, Message]):
 
     async with anilist.AsyncClient() as client:
         if not query.isdecimal():
-            result = (await client.search(query, "manga", 1))[0]
-            manga_id = result.id
+            results = await client.search(query, "manga", 10)
+            if len(results) == 1:
+                manga_id = results[0].id
+            else:
+                keyboard = []
+                for result in results:
+                    keyboard.append([(result.title.romaji, f"manga {result.id}")])
+                await message.reply_text(
+                    lang.search_results_text(
+                        query=query,
+                    ),
+                    reply_markup=ikb(keyboard),
+                )
+                return
         else:
             manga_id = int(query)
 

@@ -681,7 +681,7 @@ async def anime_episode_batch(bot: Amime, callback: CallbackQuery):
             break
 
         if bool(msg.video):
-            VIDEOS[str(user.id)][str(anime_id)].append((msg.video, msg.caption))
+            VIDEOS[str(user.id)][str(anime_id)].append(msg)
 
 
 @Amime.on_callback_query(
@@ -732,7 +732,9 @@ async def anime_episode_batch_confirm(bot: Amime, callback: CallbackQuery):
         return
 
     numbers_added = []
-    for video, caption in videos:
+    for msg in videos:
+        video, caption = msg.video, msg.caption
+
         if len(caption) == 0:
             continue
 
@@ -784,6 +786,11 @@ async def anime_episode_batch_confirm(bot: Amime, callback: CallbackQuery):
         )
 
         await bot.video_queue.add(id, video)
+
+        try:
+            await msg.delete()
+        except BaseException:
+            pass
 
     del VIDEOS[str(user.id)][str(anime_id)]
 

@@ -219,7 +219,9 @@ async def anime_episode(bot: Amime, callback: CallbackQuery):
         EPISODES[str(user.id)][str(anime_id)] = {}
         episode = EPISODES[str(user.id)][str(anime_id)]
 
-        episodes = await Episodes.filter(anime=anime_id, season=season, language=language)
+        episodes = await Episodes.filter(
+            anime=anime_id, season=season, language=language
+        )
         episodes = sorted(episodes, key=lambda episode: episode.number)
         if len(episodes) > 0:
             number = episodes[-1].number + 1

@@ -22,6 +22,7 @@
 
 import anilist
 import asyncio
+import concurrent.futures
 import os
 
 from pyrogram.types import Document, Video
@@ -45,8 +46,11 @@ class VideoQueue(object):
         self.queue.put_nowait(item)
 
         if not self.running():
+            pool = concurrent.futures.ThreadPoolExecutor(
+                max_workers=self.bot.workers - 4
+            )
             future = asyncio.get_event_loop().run_in_executor(
-                None, asyncio.ensure_future(self.next()), id
+                pool, asyncio.ensure_future(self.next()), id
             )
             await asyncio.gather(future, return_exceptions=True)
 
@@ -82,7 +86,7 @@ class VideoQueue(object):
 
                     if self.queue.empty() is False:
                         await self.next()
-                        return
+                    return
 
                 path = await self.bot.download_media(video)
 

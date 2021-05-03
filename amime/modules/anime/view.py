@@ -20,13 +20,13 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import anilist
 import math
+from typing import Union
 
+import anilist
 from pyrogram import filters
 from pyrogram.types import CallbackQuery, InputMediaPhoto, Message
 from pyromod.helpers import array_chunk, ikb
-from typing import Union
 
 from amime.amime import Amime
 from amime.database import Episodes, Users

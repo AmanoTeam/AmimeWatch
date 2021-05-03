@@ -20,13 +20,14 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+from typing import Dict, Union
+
 from pyrogram import filters
 from pyrogram.types import CallbackQuery, Message
 from pyromod.helpers import ikb
-from typing import Dict, Union
 
 from amime.amime import Amime
-from amime.config import GROUPS, CHANNELS
+from amime.config import CHANNELS, GROUPS
 
 
 @Amime.on_message(filters.cmd(r"about$"))

@@ -21,14 +21,13 @@
 # SOFTWARE.
 
 import anilist
-
 from pyrogram import filters
 from pyrogram.types import CallbackQuery, InputMediaPhoto
 from pyromod.helpers import array_chunk, ikb
 from pyromod.nav import Pagination
 
 from amime.amime import Amime
-from amime.database import Episodes, Viewed, Users, Watched
+from amime.database import Episodes, Users, Viewed, Watched
 
 
 @Amime.on_callback_query(filters.regex(r"^episodes (\d+) (\d+) (\d+)"))

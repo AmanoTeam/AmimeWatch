@@ -20,10 +20,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+from typing import Dict, List, Tuple, Union
+
 from pyrogram import filters
 from pyrogram.types import CallbackQuery, Message
 from pyromod.helpers import array_chunk, ikb
-from typing import Dict, List, Tuple, Union
 
 from amime.amime import Amime
 from amime.database import Chats, Collaborators, Episodes, Users

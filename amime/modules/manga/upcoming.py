@@ -22,7 +22,6 @@
 
 import anilist
 import httpx
-
 from anilist.types import Manga
 from pyrogram import filters
 from pyrogram.types import CallbackQuery

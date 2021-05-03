@@ -20,14 +20,14 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import anilist
 import asyncio
 import concurrent.futures
-import ffmpeg
 import os
-
-from pyrogram.types import Document, Video
 from typing import Union
+
+import anilist
+import ffmpeg
+from pyrogram.types import Document, Video
 
 from amime.config import CHATS
 from amime.database import Episodes

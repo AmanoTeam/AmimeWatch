@@ -21,10 +21,10 @@
 # SOFTWARE.
 
 import re
+from typing import Callable, Union
 
 from pyrogram import filters
 from pyrogram.types import CallbackQuery, Message
-from typing import Callable, Union
 
 from amime.database import Users
 

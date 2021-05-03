@@ -22,12 +22,11 @@
 
 import glob
 import re
-import yaml
-
-from langs import Langs
-
-from pyrogram.types import CallbackQuery, Message, InlineQuery
 from typing import Dict
+
+import yaml
+from langs import Langs
+from pyrogram.types import CallbackQuery, InlineQuery, Message
 
 from amime import log
 

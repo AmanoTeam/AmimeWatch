@@ -20,21 +20,20 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import anilist
 import asyncio
 import datetime
 import random
 import re
 
+import anilist
 from pyrogram import filters
-from pyrogram.types import CallbackQuery, InputMediaPhoto, InputMediaVideo, Video
 from pyrogram.errors import ListenerCanceled, QueryIdInvalid
+from pyrogram.types import CallbackQuery, InputMediaPhoto, InputMediaVideo, Video
 from pyromod.helpers import array_chunk, ikb
 from pyromod.nav import Pagination
 
 from amime.amime import Amime
 from amime.database import Episodes, Notifications, Users
-
 
 EPISODES = {}
 VIDEOS = {}

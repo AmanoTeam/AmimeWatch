@@ -21,10 +21,9 @@
 # SOFTWARE.
 
 import anilist
-
 from pyrogram import filters
-from pyrogram.types import CallbackQuery
 from pyrogram.errors import ChannelInvalid, ChatWriteForbidden, PeerIdInvalid
+from pyrogram.types import CallbackQuery
 from pyromod.helpers import ikb
 
 from amime.amime import Amime

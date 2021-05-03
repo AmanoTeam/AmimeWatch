@@ -22,15 +22,15 @@
 
 import asyncio
 import io
-import meval
 import os
-import traceback
 import sys
+import traceback
+from typing import Dict
 
+import meval
 from pyrogram import filters
 from pyrogram.types import CallbackQuery, Message
 from pyromod.helpers import ikb
-from typing import Dict
 
 from amime.amime import Amime
 

@@ -20,16 +20,16 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import anilist
 import math
+from typing import Tuple
 
+import anilist
 from pyrogram import filters
 from pyrogram.types import CallbackQuery, InputMediaVideo, User
 from pyromod.helpers import bki, ikb
-from typing import Tuple
 
 from amime.amime import Amime
-from amime.database import Episodes, Viewed, Users, Watched
+from amime.database import Episodes, Users, Viewed, Watched
 
 
 @Amime.on_callback_query(filters.regex(r"^episode (\d+) (\d+) (\d+)"))

@@ -21,7 +21,6 @@
 # SOFTWARE.
 
 import anilist
-
 from pyrogram import filters
 from pyrogram.types import Message
 from pyromod.helpers import ikb

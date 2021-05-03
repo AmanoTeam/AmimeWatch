@@ -21,11 +21,11 @@
 # SOFTWARE.
 
 import re
+from typing import Union
 
 from pyrogram import filters
 from pyrogram.types import CallbackQuery, Message
 from pyromod.helpers import ikb
-from typing import Union
 
 from amime.amime import Amime
 from amime.modules.anime.view import anime_view

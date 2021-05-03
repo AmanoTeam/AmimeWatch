@@ -44,9 +44,9 @@ async def manga_view(bot: Amime, union: Union[CallbackQuery, Message]):
 
     is_private = await filters.private(bot, message)
 
-    if is_callback:
-        query = union.matches[0].group(1)
+    query = union.matches[0].group(1)
 
+    if is_callback:
         user_id = union.matches[0].group(2)
         if user_id is not None:
             user_id = int(user_id)
@@ -57,8 +57,6 @@ async def manga_view(bot: Amime, union: Union[CallbackQuery, Message]):
         is_search = union.matches[0].group(3)
         if bool(is_search):
             await message.delete()
-    else:
-        query = union.matches[0].group(2)
 
     if not bool(query):
         return

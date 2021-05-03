@@ -31,7 +31,7 @@ from pyrogram.types import User
 
 from amime import log
 from amime.config import SUDO_USERS
-from amime.utils import backup, filters, langs, modules, video_queue
+from amime.utils import backup, langs, modules, video_queue
 
 
 class Amime(Client):
@@ -60,7 +60,6 @@ class Amime(Client):
         )
 
         langs.load()
-        filters.load(self)
         modules.load(self)
         self.video_queue = video_queue.VideoQueue(self)
 

@@ -24,6 +24,8 @@ import logging
 
 from rich.logging import RichHandler
 
+from amime.utils import filters
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(message)s",

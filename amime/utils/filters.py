@@ -26,47 +26,65 @@ from typing import Callable, Union
 from pyrogram import filters
 from pyrogram.types import CallbackQuery, Message
 
+from amime.config import PREFIXES
 from amime.database import Users
 
 
-def load(bot):
-    def filter_cmd(pattern: str, *args, **kwargs) -> Callable:
-        prefixes = ["!", "/"]
-        prefix = f"[{re.escape(''.join(prefixes))}]"
-        pattern_splited = pattern.split()
-        command = pattern_splited[0] + f"((?i)@{bot.me.username})?"
-        if "$" in command:
-            command = command.replace("$", "")
-            command += "$"
-        if len(pattern_splited) > 1:
-            command += " "
-        pattern = command + " ".join(pattern_splited[1:])
-        return filters.regex(r"^" + prefix + pattern, *args, **kwargs)
+def filter_cmd(pattern: str, flags: int = 0) -> Callable:
+    pattern = r"^" + f"[{re.escape(''.join(PREFIXES))}]" + pattern
 
-    async def filter_sudo(_, bot, union: Union[CallbackQuery, Message]) -> Callable:
-        user = union.from_user
-        if not user:
-            return False
-        return bot.is_sudo(user)
+    async def func(flt, bot, message: Message):
+        value = message.text or message.caption
 
-    async def filter_collaborator(_, bot, union: Union[CallbackQuery, Message]) -> bool:
-        user = union.from_user
-        if not user:
-            return False
-        return (await Users.get(id=user.id)).is_collaborator
+        if bool(value):
+            command = value.split()[0]
+            if "@" in command:
+                b = command.split("@")[1]
+                if b.lower() == bot.me.username.lower():
+                    value = (
+                        command.split("@")[0]
+                        + (" " if len(value.split()) > 1 else "")
+                        + " ".join(value.split()[1:])
+                    )
+                else:
+                    return False
 
-    async def filter_administrator(
-        _, bot, union: Union[CallbackQuery, Message]
-    ) -> bool:
-        is_callback = isinstance(union, CallbackQuery)
-        message = union.message if is_callback else union
-        chat = message.chat
-        user = union.from_user
+            message.matches = list(flt.p.finditer(value)) or None
 
-        member = await bot.get_chat_member(chat.id, user.id)
-        return member.status in ["administrator", "creator"]
+        return bool(message.matches)
 
-    filters.cmd = filter_cmd
-    filters.sudo = filters.create(filter_sudo, "FilterSudo")
-    filters.administrator = filters.create(filter_administrator, "FilterAdministrator")
-    filters.collaborator = filters.create(filter_collaborator, "FilterCollaborator")
+    return filters.create(
+        func,
+        "CommandFilter",
+        p=re.compile(pattern, flags),
+    )
+
+
+async def filter_sudo(_, bot, union: Union[CallbackQuery, Message]) -> Callable:
+    user = union.from_user
+    if not user:
+        return False
+    return bot.is_sudo(user)
+
+
+async def filter_collaborator(_, bot, union: Union[CallbackQuery, Message]) -> bool:
+    user = union.from_user
+    if not user:
+        return False
+    return (await Users.get(id=user.id)).is_collaborator
+
+
+async def filter_administrator(_, bot, union: Union[CallbackQuery, Message]) -> bool:
+    is_callback = isinstance(union, CallbackQuery)
+    message = union.message if is_callback else union
+    chat = message.chat
+    user = union.from_user
+
+    member = await bot.get_chat_member(chat.id, user.id)
+    return member.status in ["administrator", "creator"]
+
+
+filters.cmd = filter_cmd
+filters.sudo = filters.create(filter_sudo, "FilterSudo")
+filters.administrator = filters.create(filter_administrator, "FilterAdministrator")
+filters.collaborator = filters.create(filter_collaborator, "FilterCollaborator")

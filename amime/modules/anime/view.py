@@ -35,7 +35,7 @@ from amime.modules.notify import get_notify_button
 
 
 @Amime.on_message(filters.cmd(r"anime (.+)"))
-@Amime.on_callback_query(filters.regex(r"^anime (\d+)\s?(\d+)?"))
+@Amime.on_callback_query(filters.regex(r"^anime (\d+)\s?(\d+)?\s?(\d+)?"))
 async def anime_view(bot: Amime, union: Union[CallbackQuery, Message]):
     is_callback = isinstance(union, CallbackQuery)
     message = union.message if is_callback else union
@@ -52,12 +52,15 @@ async def anime_view(bot: Amime, union: Union[CallbackQuery, Message]):
         query = union.matches[0].group(1)
 
         user_id = union.matches[0].group(2)
-
         if user_id is not None:
             user_id = int(user_id)
 
             if user_id != user.id:
                 return
+
+        is_search = union.matches[0].group(3)
+        if bool(is_search):
+            await message.delete()
     else:
         query = union.matches[0].group(2)
 
@@ -72,7 +75,9 @@ async def anime_view(bot: Amime, union: Union[CallbackQuery, Message]):
             else:
                 keyboard = []
                 for result in results:
-                    keyboard.append([(result.title.romaji, f"anime {result.id}")])
+                    keyboard.append(
+                        [(result.title.romaji, f"anime {result.id} {user.id} 1")]
+                    )
                 await message.reply_text(
                     lang.search_results_text(
                         query=query,

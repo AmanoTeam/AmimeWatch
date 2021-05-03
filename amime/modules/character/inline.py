@@ -33,7 +33,7 @@ from amime.amime import Amime
 
 @Amime.on_inline_query(filters.regex(r"^!c (?P<query>.+)"))
 async def character_inline(bot: Amime, inline_query: InlineQuery):
-    query = inline_query.matches[0]["query"]
+    query = inline_query.matches[0]["query"].strip()
     lang = inline_query._lang
 
     results: List[InlineQueryResultPhoto] = []

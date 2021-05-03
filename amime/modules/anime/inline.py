@@ -31,10 +31,13 @@ from typing import Dict, List
 from amime.amime import Amime
 
 
-@Amime.on_inline_query(filters.regex(r"^!a (?P<query>.+)"))
+@Amime.on_inline_query(filters.regex(r"^(?P<query>.+)"))
 async def anime_inline(bot: Amime, inline_query: InlineQuery):
-    query = inline_query.matches[0]["query"]
+    query = inline_query.matches[0]["query"].strip()
     lang = inline_query._lang
+
+    if query.startswith("!"):
+        inline_query.continue_propagation()
 
     results: List[InlineQueryResultPhoto] = []
 

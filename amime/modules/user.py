@@ -72,7 +72,7 @@ async def user_view(bot: Amime, message: Message):
     await message.reply_text(text, **kwargs)
 
 
-@Amime.on_callback_query(filters.regex(r"^user collaborator (\d+)"))
+@Amime.on_callback_query(filters.regex(r"^user collaborator (\d+)") & filters.sudo)
 async def user_collaborator(bot: Amime, callback: CallbackQuery):
     message = callback.message
     lang = callback._lang
@@ -97,7 +97,9 @@ async def user_collaborator(bot: Amime, callback: CallbackQuery):
     )
 
 
-@Amime.on_callback_query(filters.regex(r"^user collaborator edit (\d+) (\w+)"))
+@Amime.on_callback_query(
+    filters.regex(r"^user collaborator edit (\d+) (\w+)") & filters.sudo
+)
 async def user_collaborator_edit(bot: Amime, callback: CallbackQuery):
     message = callback.message
     lang = callback._lang

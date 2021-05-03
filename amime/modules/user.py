@@ -22,6 +22,7 @@
 
 from pyrogram import filters
 from pyrogram.types import CallbackQuery, Message
+from pyrogram.errors import PeerIdInvalid, UsernameInvalid, UsernameNotOccupied
 from pyromod.helpers import array_chunk, ikb
 from typing import Dict
 
@@ -40,7 +41,11 @@ async def user_view(bot: Amime, message: Message):
     query = text.split()
 
     if len(query) > 1:
-        user = await bot.get_users(query[1])
+        try:
+            user = await bot.get_users(query[1])
+        except (PeerIdInvalid, UsernameInvalid, UsernameNotOccupied):
+            await message.reply_text(lang.invalid_user + ".")
+            return
     elif bool(reply):
         user = reply.from_user
     else:

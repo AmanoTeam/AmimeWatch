@@ -32,6 +32,8 @@ from amime.database import Users
 
 def filter_cmd(pattern: str, flags: int = 0) -> Callable:
     pattern = r"^" + f"[{re.escape(''.join(PREFIXES))}]" + pattern
+    if not pattern.endswith(("$", " ")):
+        pattern += "(?:\s|$)"
 
     async def func(flt, bot, message: Message):
         value = message.text or message.caption
@@ -55,7 +57,7 @@ def filter_cmd(pattern: str, flags: int = 0) -> Callable:
 
     return filters.create(
         func,
-        "CommandFilter",
+        "CommandHandler",
         p=re.compile(pattern, flags),
     )
 

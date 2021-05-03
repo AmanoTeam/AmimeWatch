@@ -23,6 +23,7 @@
 import anilist
 import asyncio
 import concurrent.futures
+import ffmpeg
 import os
 
 from pyrogram.types import Document, Video
@@ -92,14 +93,25 @@ class VideoQueue(object):
 
             anime = await anilist.AsyncClient().get(episode.anime, "anime")
 
-            thumb = (
-                await self.bot.download_media(video.thumbs[0])
-                if len(video.thumbs) > 0
-                else None
-            )
+            extension = path.split(".")[-1]
 
             try:
-                extension = path.split(".")[-1]
+                thumb = path.replace(f".{extension}", ".jpg")
+                (
+                    ffmpeg.input(path, ss=1.0)
+                    .filter("scale", 260, -1)
+                    .output(thumb, vframes=1)
+                    .overwrite_output()
+                    .run(capture_stdout=True)
+                )
+            except ffmpeg.Error as e:
+                thumb = (
+                    await self.bot.download_media(video.thumbs[0])
+                    if len(video.thumbs) > 0
+                    else None
+                )
+
+            try:
                 video = (
                     await self.bot.send_video(
                         CHATS["videos"],

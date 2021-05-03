@@ -364,6 +364,24 @@ notify_users_button:
 collaborator_button:
     👷‍♀️ Collaborator
 
+add_in_batch_text: |
+    Send me all episodes with the caption in the following format: <b>Number | Title</b>
+    Ex:
+        <b>1 | Uzumaki Naruto Arriving</b>
+    
+    After that, use the <b>{confirm_button}</b> button.
+    
+    Note: <i>only the episode number is required</i>.
+
+add_in_batch_videos_text: |
+    <b>{count}</b> videos were detected, starting batch addition...
+
+add_in_batch_button:
+    🔢 Add in batch
+
+no_found_episodes_text: |
+    Oops! I did not find any episode, if it is a mistake, inform those responsible.
+
 
 # Alerts
 added_to_favorites_alert:
@@ -411,3 +429,6 @@ requested_in_last_24h_alert: |
 
 notified_users_alert:
     Users have been successfully notified!
+
+only_1_episode_not_allowed_alert:
+    Only batches over 1 episode are allowed.

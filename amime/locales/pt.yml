@@ -364,6 +364,24 @@ notify_users_button:
 collaborator_button:
     👷‍♀️ Colaborador
 
+add_in_batch_text: |
+    Envie-me todos os episódios com a legenda no seguinte formato: <code>Número | Título</code>
+    <b>Ex</b>:
+        <code>1 | Uzumaki Naruto Chegando</code>
+    
+    Após isso, use o botão <b>{confirm_button}</b>.
+    
+    Nota: <i>apenas o número do episódio é obrigatório</i>.
+
+add_in_batch_videos_text: |
+    <b>{count}</b> vídeos foram detectados, iniciando adição em lotes...
+
+add_in_batch_button:
+    🔢 Adicionar em lote
+
+no_found_episodes_text: |
+    Oops! Não encontrei nenhum episódio, se for um equívoco, informe aos responsáveis.
+
 
 # Alerts
 added_to_favorites_alert:
@@ -411,3 +429,6 @@ requested_in_last_24h_alert: |
 
 notified_users_alert:
     Os usuários foram notificados com sucesso!
+
+only_1_episode_not_allowed_alert:
+    Só é permitido o envio em lote acima de 1 episódio.

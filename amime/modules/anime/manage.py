@@ -28,7 +28,7 @@ import re
 
 from pyrogram import filters
 from pyrogram.types import CallbackQuery, InputMediaPhoto, InputMediaVideo, Video
-from pyrogram.errors import QueryIdInvalid
+from pyrogram.errors import ListenerCanceled, QueryIdInvalid
 from pyromod.helpers import array_chunk, ikb
 from pyromod.nav import Pagination
 
@@ -37,6 +37,7 @@ from amime.database import Episodes, Notifications, Users
 
 
 EPISODES = {}
+VIDEOS = {}
 
 
 @Amime.on_callback_query(filters.regex(r"^manage anime (\d+) (\d+) (\w+) (\d+)"))
@@ -50,6 +51,8 @@ async def anime_manage(bot: Amime, callback: CallbackQuery):
     season = int(callback.matches[0].group(2))
     language = callback.matches[0].group(3)
     page = int(callback.matches[0].group(4))
+
+    chat.cancel_listener()
 
     buttons = [
         (
@@ -85,6 +88,13 @@ async def anime_manage(bot: Amime, callback: CallbackQuery):
             callback.matches = [matches]
             await anime_manage(bot, callback)
             return
+
+    buttons.append(
+        (
+            lang.add_in_batch_button,
+            f"manage episode batch {anime_id} {season} {language} {page}",
+        )
+    )
 
     notifications = await Notifications.filter(
         item=anime_id,
@@ -625,5 +635,150 @@ async def anime_episode_delete(bot: Amime, callback: CallbackQuery):
         r"(\d+) (\d+) (\w+) (\d+)", f"{anime_id} {season} {language} {page}"
     )
     callback.matches = [matches]
+
+    await anime_manage(bot, callback)
+
+
+@Amime.on_callback_query(
+    filters.regex(r"^manage episode batch (\d+) (\d+) (\w+) (\d+)")
+)
+async def anime_episode_batch(bot: Amime, callback: CallbackQuery):
+    message = callback.message
+    chat = message.chat
+    user = callback.from_user
+    lang = callback._lang
+
+    anime_id = int(callback.matches[0].group(1))
+    season = int(callback.matches[0].group(2))
+    language = callback.matches[0].group(3)
+    page = int(callback.matches[0].group(4))
+
+    keyboard = [
+        [
+            (
+                lang.confirm_button,
+                f"manage episode batch confirm {anime_id} {season} {language} {page}",
+            ),
+            (lang.back_button, f"manage anime {anime_id} {season} {language} {page}"),
+        ]
+    ]
+
+    await message.edit_text(
+        lang.add_in_batch_text(
+            confirm_button=lang.confirm_button,
+        ),
+        reply_markup=ikb(keyboard),
+    )
+
+    if str(user.id) not in VIDEOS.keys():
+        VIDEOS[str(user.id)] = {}
+    if str(anime_id) not in VIDEOS[str(user.id)].keys():
+        VIDEOS[str(user.id)][str(anime_id)] = []
+
+    while True:
+        try:
+            msg = await chat.listen(filters.video)
+        except ListenerCanceled:
+            break
+
+        if bool(msg.video):
+            VIDEOS[str(user.id)][str(anime_id)].append((msg.video, msg.caption))
+
+
+@Amime.on_callback_query(
+    filters.regex(r"^manage episode batch confirm (\d+) (\d+) (\w+) (\d+)")
+)
+async def anime_episode_batch_confirm(bot: Amime, callback: CallbackQuery):
+    message = callback.message
+    chat = message.chat
+    user = callback.from_user
+    lang = callback._lang
+
+    anime_id = int(callback.matches[0].group(1))
+    season = int(callback.matches[0].group(2))
+    language = callback.matches[0].group(3)
+    page = int(callback.matches[0].group(4))
+
+    chat.cancel_listener()
+
+    videos = VIDEOS[str(user.id)][str(anime_id)]
+
+    if len(videos) == 1:
+        await callback.answer(lang.only_1_episode_not_allowed_alert, show_alert=True)
+
+        del VIDEOS[str(user.id)][str(anime_id)]
+
+        await anime_manage(bot, callback)
+        return
+    elif len(videos) > 0:
+        await message.edit_text(
+            lang.add_in_batch_videos_text(
+                count=len(videos),
+            ),
+        )
+    else:
+        await message.edit_text(
+            lang.no_found_episodes_text,
+            reply_markup=ikb(
+                [
+                    [
+                        (
+                            lang.back_button,
+                            f"manage episode batch {anime_id} {season} {language} {page}",
+                        )
+                    ]
+                ]
+            ),
+        )
+        return
+
+    numbers_added = []
+    for video, caption in videos:
+        if len(caption) == 0:
+            continue
+
+        name, number, unified_until = (None,) * 3
+
+        query = caption.split("|")
+
+        query[0] = query[0].split()[0]
+        if "-" in query[0]:
+            number, unified_until = query[0].split("-")
+        elif query[0].isdecimal():
+            number = query[0]
+
+        if number in numbers_added or bool(
+            await Episodes.get_or_none(
+                anime=anime_id,
+                season=season,
+                number=number,
+                language=language,
+            )
+        ):
+            continue
+        numbers_added.append(number)
+
+        if len(query) > 1:
+            name = query[1].strip()
+
+        episode = await Episodes.create(
+            anime=anime_id,
+            file_id=video.file_id,
+            name=name or "",
+            added_by=user.id,
+            season=season,
+            number=number,
+            duration=video.duration // 60,
+            language=language,
+            unified_until=unified_until or "0",
+        )
+
+        id = episode.id
+
+        await bot.video_queue.add(id, video)
+
+    del VIDEOS[str(user.id)][str(anime_id)]
+
+    await callback.answer(lang.confirm_save_episode_alert, show_alert=True)
 
     await anime_manage(bot, callback)

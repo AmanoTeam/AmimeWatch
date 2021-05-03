@@ -419,8 +419,8 @@ async def anime_episode_edit(bot: Amime, callback: CallbackQuery):
             answer = await chat.listen(filters.video | filters.document)
 
             if bool(answer.video):
-                duration = answer.video.duration // 60
-                if duration <= 2:
+                duration = answer.video.duration
+                if duration <= 30:
                     try:
                         await callback.answer(
                             lang.very_short_video_alert, show_alert=True
@@ -433,7 +433,7 @@ async def anime_episode_edit(bot: Amime, callback: CallbackQuery):
                         continue
 
                 episode["video"] = answer.video
-                episode["duration"] = duration
+                episode["duration"] = duration // 60
             elif bool(answer.document):
                 episode["video"] = answer.document
 
@@ -471,7 +471,9 @@ async def anime_episode_edit(bot: Amime, callback: CallbackQuery):
                                 lang.episode_already_exists_alert, show_alert=True
                             )
                         except QueryIdInvalid:
-                            sent = await answer.reply_text(lang.very_short_video_alert)
+                            sent = await answer.reply_text(
+                                lang.episode_already_exists_alert
+                            )
                             await asycio.sleep(3)
                             await sent.delete()
                         finally:
@@ -553,7 +555,7 @@ async def anime_episode_save(bot: Amime, callback: CallbackQuery):
             datetime=now_date,
         )
 
-    if "update_video" in episode.keys() and episode["update_video"] is True:
+    if episode["update_video"] is True:
         await bot.video_queue.add(id, video)
 
     del EPISODES[str(user.id)][str(anime_id)]

@@ -313,8 +313,8 @@ add_button:
 del_button:
     ✖️ Excluir
 
-del_all_button:
-    ✖️ Excluir tudo
+del_season_button:
+    ✖️ Excluir temporada
 
 confirm_text: |
     Para continuar, confirme usando o botão abaixo.

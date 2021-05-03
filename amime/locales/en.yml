@@ -313,8 +313,8 @@ add_button:
 del_button:
     ✖️ Delete
 
-del_all_button:
-    ✖️ Delete all
+del_season_button:
+    ✖️ Delete season
 
 confirm_text: |
     Para continuar, confirme usando o botão abaixo.

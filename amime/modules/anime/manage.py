@@ -75,7 +75,7 @@ async def anime_manage(bot: Amime, callback: CallbackQuery):
     if len(episodes) >= 2:
         buttons.append(
             (
-                lang.del_all_button,
+                lang.del_season_button,
                 f"manage episode delete {anime_id} {season} -1 {language} {page}",
             )
         )

@@ -99,7 +99,7 @@ class VideoQueue(object):
                 thumb = path.replace(f".{extension}", ".jpg")
                 (
                     ffmpeg.input(path, ss=10.0)
-                    .filter("scale", 260, -1)
+                    .filter("scale", 290, -1)
                     .output(thumb, vframes=1)
                     .overwrite_output()
                     .run(capture_stdout=True)

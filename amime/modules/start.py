@@ -90,7 +90,7 @@ async def start(bot: Amime, union: Union[CallbackQuery, Message]):
 async def view(bot: Amime, message: Message):
     content_type = message.matches[0]["content_type"]
 
-    matches = re.search(r"(\s)?(\d+)", message.text)
+    matches = re.search(r"(\d+)", message.text)
     message.matches = [matches]
 
     if content_type == "anime":

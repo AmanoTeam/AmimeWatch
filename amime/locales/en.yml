@@ -178,6 +178,12 @@ date:
 invalid_user:
     Invalid user
 
+episodes_viewed:
+    Seen episodes
+
+episodes_watched:
+    Watched episodes
+
 
 # Texts & buttons
 

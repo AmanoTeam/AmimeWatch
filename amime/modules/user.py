@@ -27,7 +27,7 @@ from pyromod.helpers import array_chunk, ikb
 from typing import Dict
 
 from amime.amime import Amime
-from amime.database import Collaborators, Episodes, Users
+from amime.database import Collaborators, Episodes, Users, Viewed, Watched
 
 
 @Amime.on_message(filters.cmd(r"user"))
@@ -61,6 +61,10 @@ async def user_view(bot: Amime, message: Message):
     text += f"\n<b>{lang.user_informations}</b>:"
     text += f"\n    <b>{lang.language}</b>: <code>{lang.strings[user_db.language_bot]['LANGUAGE_NAME']}</code>"
     text += f"\n    <b>{lang.collaborator}</b>: <code>{lang.yes if is_collaborator else lang.no}</code>"
+    vieweds = await Viewed.filter(user=user.id, type="anime")
+    text += f"\n    <b>{lang.episodes_viewed}</b>: <code>{len(vieweds)}</code>"
+    watcheds = await Watched.filter(user=user.id)
+    text += f"\n    <b>{lang.episodes_watched}</b>: <code>{len(watcheds)}</code>"
     if is_collaborator:
         text += f"\n    <b>{lang.episodes_added}</b>: <code>{len(episodes)}</code>"
 

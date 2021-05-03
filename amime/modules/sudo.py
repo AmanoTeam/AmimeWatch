@@ -21,7 +21,10 @@
 # SOFTWARE.
 
 import asyncio
+import io
+import meval
 import os
+import traceback
 import sys
 
 from pyrogram import filters
@@ -124,3 +127,105 @@ async def reboot_message(bot: Amime, message: Message):
 async def shutdown_message(bot: Amime, message: Message):
     await message.reply_text("Turning off...")
     sys.exit(0)
+
+
+@Amime.on_message(filters.cmd("(sh(eel)?|term(inal)?) ") & filters.sudo)
+async def terminal_message(bot: Amime, message: Message):
+    command = message.text.split()[0]
+    code = message.text[len(command) + 1 :]
+    sent = await message.reply_text("Running...")
+
+    proc = await asyncio.create_subprocess_shell(
+        code,
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.STDOUT,
+    )
+    stdout = (await proc.communicate())[0]
+
+    lines = stdout.decode().splitlines()
+    output = "".join(f"<code>{line}</code>\n" for line in lines)
+    output_message = f"<b>Input\n&gt;</b> <code>{code}</code>\n\n"
+    if len(output) > 0:
+        if len(output) > (4096 - len(output_message)):
+            document = io.BytesIO(
+                (output.replace("<code>", "").replace("</code>", "")).encode()
+            )
+            document.name = "output.txt"
+            await bot.send_document(chat_id=message.chat.id, document=document)
+        else:
+            output_message += f"<b>Output\n&gt;</b> {output}"
+
+    await sent.edit_text(output_message)
+
+
+@Amime.on_message(filters.cmd("ev(al)? ") & filters.sudo)
+async def eval_message(bot: Amime, message: Message):
+    command = message.text.split()[0]
+    eval_code = message.text[len(command) + 1 :]
+    sent = await message.reply_text("Running...")
+
+    try:
+        stdout = await meval.meval(eval_code, globals(), **locals())
+    except BaseException:
+        error = traceback.format_exc()
+        await sent.edit_text(
+            f"An error occurred while running the code:\n<code>{error}</code>"
+        )
+        return
+
+    output_message = f"<b>Input\n&gt;</b> <code>{eval_code}</code>\n\n"
+
+    if stdout is not None:
+        lines = str(stdout).splitlines()
+        output = "".join(f"<code>{line}</code>\n" for line in lines)
+
+        if len(output) > 0:
+            if len(output) > (4096 - len(output_message)):
+                document = io.BytesIO(
+                    (output.replace("<code>", "").replace("</code>", "")).encode()
+                )
+                document.name = "output.txt"
+                await bot.send_document(chat_id=message.chat.id, document=document)
+            else:
+                output_message += f"<b>Output\n&gt;</b> {output}"
+
+    await sent.edit_text(output_message)
+
+
+@Amime.on_message(filters.cmd("ex(ec(ute)?)? ") & filters.sudo)
+async def execute_message(bot: Amime, message: Message):
+    command = message.text.split()[0]
+    code = message.text[len(command) + 1 :]
+    sent = await message.reply_text("Running...")
+
+    function = "async def _aexec_(bot: Amime, message: Message):"
+    for line in code.splitlines():
+        function += f"\n    {line}"
+    exec(function)
+
+    try:
+        stdout = await locals()["_aexec_"](bot, message)
+    except BaseException:
+        error = traceback.format_exc()
+        await sent.edit_text(
+            f"An error occurred while running the code:\n<code>{error}</code>"
+        )
+        return
+
+    output_message = f"<b>Input\n&gt;</b> <code>{code}</code>\n\n"
+
+    if stdout is not None:
+        lines = str(stdout).splitlines()
+        output = "".join(f"<code>{line}</code>\n" for line in lines)
+
+        if len(output) > 0:
+            if len(output) > (4096 - len(output_message)):
+                document = io.BytesIO(
+                    (output.replace("<code>", "").replace("</code>", "")).encode()
+                )
+                document.name = "output.txt"
+                await bot.send_document(chat_id=message.chat.id, document=document)
+            else:
+                output_message += f"<b>Output\n&gt;</b> {output}"
+
+    await sent.edit_text(output_message)

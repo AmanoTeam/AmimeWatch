@@ -77,9 +77,14 @@ async def anime_scan(bot: Amime, message: Message):
         f.close()
 
     async with httpx.AsyncClient(http2=True) as client:
-        response = await client.post(
-            "https://trace.moe/api/search", data=dict(image=file), timeout=None
-        )
+        try:
+            response = await client.post(
+                "https://trace.moe/api/search", data=dict(image=file), timeout=20.0
+            )
+        except httpx.TimeoutException:
+            await sent.edit_text(lang.timed_out_text)
+            return
+
         results = response.json()["docs"]
         if isinstance(results, str) or results is None:
             await sent.edit(lang.no_results_text)

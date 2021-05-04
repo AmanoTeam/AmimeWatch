@@ -409,6 +409,9 @@ video_too_long_text: |
 day_releases_text: |
     Below are today's releases.
 
+timed_out_text: |
+    Timeout exceeded.
+
 
 # Alerts
 added_to_favorites_alert:

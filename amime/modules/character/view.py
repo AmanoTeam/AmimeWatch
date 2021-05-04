@@ -39,6 +39,8 @@ async def character_view(bot: Amime, union: Union[CallbackQuery, Message]):
     user = union.from_user
     lang = union._lang
 
+    is_private = await filters.private(bot, message)
+
     query = union.matches[0].group(1)
 
     if is_callback:
@@ -50,7 +52,7 @@ async def character_view(bot: Amime, union: Union[CallbackQuery, Message]):
                 return
 
         is_search = union.matches[0].group(3)
-        if bool(is_search):
+        if bool(is_search) and not is_private:
             await message.delete()
 
     if not bool(query):

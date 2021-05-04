@@ -26,7 +26,7 @@ import os
 import httpx
 import pendulum
 from pyrogram import filters
-from pyrogram.types import InputMediaPhoto, Message
+from pyrogram.types import InputMediaPhoto, Message, Video
 from pyromod.helpers import ikb
 
 from amime.amime import Amime
@@ -52,6 +52,16 @@ async def anime_scan(bot: Amime, message: Message):
         return
 
     media = reply.photo or reply.sticker or reply.animation or reply.video
+
+    if (
+        isinstance(media, Video)
+        and bool(media.duration)
+        and ((media.duration) > (1 * 60 + 30))
+    ):
+        await message.reply_text(
+            lang.video_too_long_text,
+        )
+        return
 
     sent = await message.reply_photo(
         "https://i.imgur.com/m0N2pFc.jpg", caption=lang.scanning_media_text

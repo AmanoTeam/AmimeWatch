@@ -403,6 +403,9 @@ scanning_media_text: |
 no_results_text: |
     Nenhum resultado foi encontrado.
 
+video_too_long_text: |
+    O vídeo é muito longo.
+
 
 # Alerts
 added_to_favorites_alert:

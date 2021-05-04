@@ -38,6 +38,9 @@ async def anime_scan(bot: Amime, message: Message):
     chat = message.chat
     lang = message._lang
 
+    if reply.from_user.id == bot.me.id:
+        return
+
     if not reply.media:
         await message.reply_text(lang.media_not_found_text)
         return

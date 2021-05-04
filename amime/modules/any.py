@@ -31,6 +31,8 @@ from amime.database import Chats, Users
 async def set_language_message(bot: Amime, message: Message):
     chat = message.chat
     user = message.from_user
+    if not user:
+        return
     lang = message._lang
     code: str = ""
     user_code = user.language_code or "en"
@@ -71,6 +73,8 @@ async def set_language_callback(bot: Amime, callback: CallbackQuery):
     message = callback.message
     chat = message.chat
     user = callback.from_user
+    if not user:
+        return
     lang = callback._lang
     code: str = ""
     user_code = user.language_code or "en"
@@ -109,6 +113,8 @@ async def set_language_callback(bot: Amime, callback: CallbackQuery):
 @Amime.on_inline_query(group=-1)
 async def set_language_inline_query(bot: Amime, inline_query: InlineQuery):
     user = inline_query.from_user
+    if not user:
+        return
     lang = inline_query._lang
     code: str = ""
     user_code = user.language_code or "en"

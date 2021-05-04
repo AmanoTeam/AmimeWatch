@@ -104,3 +104,18 @@ async def stats_view(bot: Amime, message: Message):
     text += f"\n    <b>UPTime</b>: <code>{humanize.precisedelta(date)}</code>"
 
     await message.reply_text(text)
+
+
+@Amime.on_message(filters.cmd(r"today$"))
+async def today_releases_view(bot: Amime, message: Message):
+    lang = message._lang
+
+    text = lang.day_releases_text
+
+    animes = bot.day_releases
+
+    for key, value in animes.items():
+        if len(value) > 0:
+            text += f"\n<code>{key}</code> - <b>{value[0]}</b> - <code>{value[1].strftime('%H:%M:%S')}</code>"
+
+    await message.reply_text(text)

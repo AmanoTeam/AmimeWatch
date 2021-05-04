@@ -406,6 +406,9 @@ no_results_text: |
 video_too_long_text: |
     The video is too long.
 
+day_releases_text: |
+    Below are today's releases.
+
 
 # Alerts
 added_to_favorites_alert:

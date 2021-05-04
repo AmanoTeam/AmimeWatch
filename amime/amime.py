@@ -31,7 +31,7 @@ from pyrogram.types import User
 
 from amime import log
 from amime.config import SUDO_USERS
-from amime.utils import backup, langs, modules, video_queue
+from amime.utils import backup, day_releases, langs, modules, video_queue
 
 
 class Amime(Client):
@@ -63,11 +63,16 @@ class Amime(Client):
         modules.load(self)
         self.video_queue = video_queue.VideoQueue(self)
 
+        self.day_releases = None
+        await day_releases.load(self)
+
         schedule.every(1).hour.do(backup.save_in_telegram, bot=self)
+        schedule.every(1).hour.do(day_releases.reload, bot=self)
+        schedule.every().day.at("00:00").do(day_releases.load, bot=self)
 
         while True:
             await schedule.run_pending()
-            await asyncio.sleep(0.1)
+            await asyncio.sleep(1)
 
     async def stop(self, *args):
         await super().stop()

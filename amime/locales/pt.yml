@@ -184,6 +184,12 @@ episodes_viewed:
 episodes_watched:
     Episódios assistidos
 
+similarity:
+    Similaridade
+
+at:
+    Em
+
 
 # Texts & buttons
 
@@ -384,6 +390,18 @@ no_found_episodes_text: |
 
 search_results_text: |
     Resultados da pesquisa: <b>{query}</b>
+
+media_not_found_text: |
+    Nenhuma mídia foi encontrada nesta mensagem.
+
+unsupported_media_format_text: |
+    Formato de mídia não suportado! A mídia deve ser um dos seguintes formatos: <b>foto, animação ou vídeo</b>.
+
+scanning_media_text: |
+    Escaneando mídia...
+
+no_results_text: |
+    Nenhum resultado foi encontrado.
 
 
 # Alerts

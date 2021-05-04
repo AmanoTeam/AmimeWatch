@@ -184,6 +184,12 @@ episodes_viewed:
 episodes_watched:
     Watched episodes
 
+similarity:
+    Similarity
+
+at:
+    At
+
 
 # Texts & buttons
 
@@ -384,6 +390,18 @@ no_found_episodes_text: |
 
 search_results_text: |
     Search results: <b>{query}</b>
+
+media_not_found_text: |
+    No media was found in this message.
+
+unsupported_media_format_text: |
+    Unsupported media format! The media must be one of the following formats: <b>photo, animation or video</b>.
+
+scanning_media_text: |
+    Scanning media...
+
+no_results_text: |
+    No results were found.
 
 
 # Alerts

@@ -26,7 +26,7 @@ import os
 import httpx
 import pendulum
 from pyrogram import filters
-from pyrogram.types import InputMediaPhoto, Message, Video
+from pyrogram.types import Document, InputMediaPhoto, Message, Video
 from pyromod.helpers import ikb
 
 from amime.amime import Amime
@@ -49,7 +49,7 @@ async def anime_scan(bot: Amime, message: Message):
         reply.photo or reply.sticker or reply.animation or reply.document or reply.video
     )
 
-    if isinstance(media, document) or isinstance(media, Video):
+    if isinstance(media, Document) or isinstance(media, Video):
         if bool(media.thumbs) and len(media.thumbs) > 0:
             media = media.thumbs[0]
         else:
@@ -72,6 +72,15 @@ async def anime_scan(bot: Amime, message: Message):
             )
         except httpx.TimeoutException:
             await sent.edit_text(lang.timed_out_text)
+            return
+
+        if response.status_code == 200:
+            pass
+        elif response.status_code == 429:
+            await sent.edit_text(lang.api_overuse_text)
+            return
+        else:
+            await sent.edit_text(lang.api_down_text)
             return
 
         results = response.json()["docs"]

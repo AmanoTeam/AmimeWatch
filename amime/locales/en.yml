@@ -409,6 +409,12 @@ day_releases_text: |
 timed_out_text: |
     Timeout exceeded.
 
+api_down_text: |
+    The API is unavailable, please try again later.
+
+api_overuse_text: |
+    Excessive use of the API, please try again later.
+
 
 # Alerts
 added_to_favorites_alert:

@@ -123,7 +123,7 @@ async def request_episodes_confirm(bot: Amime, callback: CallbackQuery):
 
     await callback.answer(lang.request_sent_alert, show_alert=True)
 
-    matches = re.match(r"(\d+) (\d+)", f"{anime_id} {user.id}")
+    matches = re.match(r"(\d+) (\d+)\s?(\d+)?", f"{anime_id} {user.id}")
     callback.matches = [matches]
 
     await anime_view(bot, callback)

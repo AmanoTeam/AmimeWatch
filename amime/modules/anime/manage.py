@@ -320,7 +320,7 @@ async def anime_episode(bot: Amime, callback: CallbackQuery):
         text += f"\n<b>{lang.language}</b>: <code>{lang.strings[language]['LANGUAGE_NAME']}</code>"
 
         if "notes" in episode.keys() and len(episode["notes"]) > 0:
-            text += f"\n\n<b>{lang.notes}</b>: <i>{episode['notes']}</i>"
+            text += f"\n<b>{lang.notes}</b>: <i>{episode['notes']}</i>"
             buttons.append(
                 (
                     f"✏️ {lang.notes}",

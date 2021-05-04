@@ -89,7 +89,7 @@ async def anime_episode(bot: Amime, callback: CallbackQuery):
                     text += f"\n<b>{lang.added_by}</b>: <b>{episode.added_by}</b>"
 
             if len(episode.notes) > 0:
-                text += f"\n\n<b>{lang.notes}</b>: <i>{episode.notes}</i>"
+                text += f"\n<b>{lang.notes}</b>: <i>{episode.notes}</i>"
 
             viewed = await Viewed.filter(item=episode.id, type="anime")
             text += f"\n\n<b>{len(viewed)} {lang.views.lower()}</b>"

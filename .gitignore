@@ -8,4 +8,4 @@ config.py
 __pycache__/
 
 # Videos saved
-*/downloads/*
+downloads/

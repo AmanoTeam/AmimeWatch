@@ -110,11 +110,14 @@ async def stats_view(bot: Amime, message: Message):
 async def today_releases_view(bot: Amime, message: Message):
     lang = message._lang
 
-    text = lang.day_releases_text
+    now = datetime.datetime.now().replace(tzinfo=datetime.timezone.utc)
+    text = lang.day_releases_text + " - <code>" + now.strftime("%H:%M:%S") + "</code>"
 
     animes = bot.day_releases
 
-    for key, value in animes.items():
+    keys = sorted([*animes.keys()])
+    for key in keys:
+        value = animes[key]
         if len(value) > 0:
             text += f"\n<code>{key}</code> - <b>{value[0]}</b> - <code>{value[1].strftime('%H:%M:%S')}</code>"
 

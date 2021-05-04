@@ -397,17 +397,11 @@ search_results_text: |
 media_not_found_text: |
     No media was found in this message.
 
-unsupported_media_format_text: |
-    Unsupported media format! The media must be one of the following formats: <b>photo, animation or video</b>.
-
 scanning_media_text: |
     Scanning media...
 
 no_results_text: |
     No results were found.
-
-video_too_long_text: |
-    The video is too long.
 
 day_releases_text: |
     Below are today's releases. - <code>{date}</code>

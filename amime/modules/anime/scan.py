@@ -45,26 +45,15 @@ async def anime_scan(bot: Amime, message: Message):
         await message.reply_text(lang.media_not_found_text)
         return
 
-    if not (
-        bool(reply.photo)
-        or bool(reply.sticker)
-        or bool(reply.animation)
-        or bool(reply.video)
-    ):
-        await message.reply_text(lang.unsupported_media_format_text)
-        return
+    media = (
+        reply.photo or reply.sticker or reply.animation or reply.document or reply.video
+    )
 
-    media = reply.photo or reply.sticker or reply.animation or reply.video
-
-    if (
-        isinstance(media, Video)
-        and bool(media.duration)
-        and ((media.duration) > (1 * 60 + 30))
-    ):
-        await message.reply_text(
-            lang.video_too_long_text,
-        )
-        return
+    if isinstance(media, document) or isinstance(media, Video):
+        if bool(media.thumbs) and len(media.thumbs) > 0:
+            media = media.thumbs[0]
+        else:
+            return
 
     sent = await message.reply_photo(
         "https://i.imgur.com/m0N2pFc.jpg", caption=lang.scanning_media_text

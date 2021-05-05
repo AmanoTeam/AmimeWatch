@@ -103,7 +103,8 @@ async def anime_view(bot: Amime, union: Union[CallbackQuery, Message]):
             if hasattr(anime.score, "average"):
                 text += f"\n<b>{lang.score}</b>: <code>{anime.score.average}</code>"
         text += f"\n<b>{lang.status}</b>: <code>{anime.status}</code>"
-        text += f"\n<b>{lang.genres}</b>: <code>{', '.join(anime.genres)}</code>"
+        if hasattr(anime, "genres"):
+            text += f"\n<b>{lang.genres}</b>: <code>{', '.join(anime.genres)}</code>"
         if hasattr(anime, "studios"):
             text += f"\n<b>{lang.studios}</b>: <code>{', '.join(anime.studios)}</code>"
         text += f"\n<b>{lang.format}</b>: <code>{anime.format}</code>"

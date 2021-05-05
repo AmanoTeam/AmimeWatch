@@ -104,7 +104,8 @@ async def manga_view(bot: Amime, union: Union[CallbackQuery, Message]):
             if hasattr(manga.score, "average"):
                 text += f"\n<b>{lang.score}</b>: <code>{manga.score.average}</code>"
         text += f"\n<b>{lang.status}</b>: <code>{manga.status}</code>"
-        text += f"\n<b>{lang.genres}</b>: <code>{', '.join(manga.genres)}</code>"
+        if hasattr(manga, "genres"):
+            text += f"\n<b>{lang.genres}</b>: <code>{', '.join(manga.genres)}</code>"
         if hasattr(manga, "volumes"):
             text += f"\n<b>{lang.volume}s</b>: <code>{manga.volumes}</code>"
         if hasattr(manga, "chapters"):

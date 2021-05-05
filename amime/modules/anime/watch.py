@@ -129,7 +129,7 @@ async def anime_episode(bot: Amime, callback: CallbackQuery):
                     [
                         (
                             lang.back_button,
-                            f"episodes {anime_id} {season} {math.ceil(len(episodes) / (5 * 3))}",
+                            f"episodes {anime_id} {season} {math.ceil(number / (5 * 3))}",
                         )
                     ]
                 )

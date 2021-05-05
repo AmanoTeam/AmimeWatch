@@ -24,11 +24,14 @@ from pyrogram import filters
 from pyrogram.types import Animation, Document, Message, Photo, Sticker, Video
 
 from amime.amime import Amime
+from amime.config import CHATS
 from amime.database import Chats, Users
 
 
 @Amime.on_message(
-    filters.cmd(r"alert (\w+) (\w+)") & (filters.collaborator | filters.sudo)
+    filters.cmd(r"alert (\w+) (\w+)")
+    & (filters.collaborator | filters.sudo)
+    & filters.chat(CHATS["staff"])
 )
 async def alert(bot: Amime, message: Message):
     reply = message.reply_to_message

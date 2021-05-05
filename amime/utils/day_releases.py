@@ -60,12 +60,13 @@ async def load(bot):
 
             if anime.status.lower() == "releasing":
                 if hasattr(anime, "next_airing"):
+                    number = anime.next_airing.episode
                     date = datetime.datetime.fromtimestamp(
                         anime.next_airing.at
                     ).replace(tzinfo=datetime.timezone.utc)
 
                     if date.day == now.day:
-                        animes[episode.anime] = [anime.title.romaji, date]
+                        animes[episode.anime] = [anime.title.romaji, number, date]
                         continue
 
             del animes[episode.anime]
@@ -81,7 +82,12 @@ async def reload(bot):
     now = datetime.datetime.now().replace(tzinfo=datetime.timezone.utc)
 
     for key, value in animes.items():
-        if (now - value[1]).seconds < 0:
+        if (now - value[2]).seconds < 0:
+            await bot.send_message(
+                CHATS["staff"],
+                f"Episode <code>{value[1]}</code> of <b>{value[0]}</b> (<code>{key}</code>) has just been released. <code>{now.strftime('%H:%M:%S')}</code>",
+            )
+
             del animes[key]
 
     bot.day_releases = animes

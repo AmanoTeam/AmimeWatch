@@ -119,6 +119,6 @@ async def today_releases_view(bot: Amime, message: Message):
     for key in keys:
         value = animes[key]
         if len(value) > 0:
-            text += f"\n<a href='https://t.me/{bot.me.username}/?start=anime_{key}'>{key}</a> - <b>{value[0]}</b> - <code>{value[1].strftime('%H:%M:%S')}</code>"
+            text += f"\n<a href='https://t.me/{bot.me.username}/?start=anime_{key}'>{key}</a> - <b>{value[0]}</b> (<i>{value[1]}</i>) - <code>{value[2].strftime('%H:%M:%S')}</code>"
 
     await message.reply_text(text, disable_web_page_preview=True)

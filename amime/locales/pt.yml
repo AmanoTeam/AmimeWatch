@@ -404,7 +404,7 @@ no_results_text: |
     Nenhum resultado foi encontrado.
 
 day_releases_text: |
-    Abaixo estão os lançamentos de hoje. - <code>{date}</code>
+    Próximos episódios. - <code>{date}</code>
 
 timed_out_text: |
     Tempo limite execedido.

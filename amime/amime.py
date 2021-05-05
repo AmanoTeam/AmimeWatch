@@ -67,7 +67,7 @@ class Amime(Client):
         await day_releases.load(self)
 
         schedule.every(1).hour.do(backup.save_in_telegram, bot=self)
-        schedule.every(1).hour.do(day_releases.reload, bot=self)
+        schedule.every(30).minutes.do(day_releases.reload, bot=self)
         schedule.every().day.at("00:00").do(day_releases.load, bot=self)
 
         while True:

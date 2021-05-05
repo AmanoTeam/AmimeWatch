@@ -82,7 +82,11 @@ async def reload(bot):
     now = datetime.datetime.now().replace(tzinfo=datetime.timezone.utc)
 
     for key, value in animes.items():
-        if (now - value[2]).seconds < 0:
+        if (
+            now.hour >= value[2].hour
+            and now.minute >= value[2].minute
+            and now.second >= value[2].second
+        ):
             await bot.send_message(
                 CHATS["staff"],
                 f"Episode <code>{value[1]}</code> of <b>{value[0]}</b> (<code>{key}</code>) has just been released. <code>{now.strftime('%H:%M:%S')}</code>",

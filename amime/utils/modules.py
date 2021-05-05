@@ -31,8 +31,6 @@ modules: List[ModuleType] = []
 
 
 def load(bot):
-    global modules
-
     files = glob.glob(f"amime/modules/**/*.py", recursive=True)
     files = sorted(files, key=lambda file: file.split("/")[2])
 
@@ -59,8 +57,6 @@ def load(bot):
 
 
 def reload(bot):
-    global modules
-
     for index, module in enumerate(modules):
         functions = [*filter(callable, module.__dict__.values())]
         functions = [*filter(lambda function: hasattr(function, "handlers"), functions)]

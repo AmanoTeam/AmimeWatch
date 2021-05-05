@@ -49,7 +49,7 @@ async def anime_scan(bot: Amime, message: Message):
         reply.photo or reply.sticker or reply.animation or reply.document or reply.video
     )
 
-    if isinstance(media, Document) or isinstance(media, Video):
+    if isinstance(media, (Document, Video)):
         if bool(media.thumbs) and len(media.thumbs) > 0:
             media = media.thumbs[0]
         else:

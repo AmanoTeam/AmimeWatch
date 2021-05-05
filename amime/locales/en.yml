@@ -415,6 +415,18 @@ api_down_text: |
 api_overuse_text: |
     Excessive use of the API, please try again later.
 
+empty_message_text: |
+    The message cannot be empty.
+
+no_chat_found_text: |
+    No chat was found, check if everything is right.
+
+sending_alert_text: |
+    The alert is being sent, please wait...
+
+alert_sent_text: |
+    The alert was successfully sent to <code>{success}</code> chats and failed to send in <code>{failed}</code> chats.
+
 
 # Alerts
 added_to_favorites_alert:

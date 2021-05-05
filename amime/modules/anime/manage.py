@@ -748,6 +748,9 @@ async def anime_episode_batch_confirm(bot: Amime, callback: CallbackQuery):
         elif query[0].isdecimal():
             number = query[0]
 
+        if number is None:
+            continue
+
         if number in numbers_added or bool(
             await Episodes.get_or_none(
                 anime=anime_id,

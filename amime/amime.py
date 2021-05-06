@@ -66,17 +66,17 @@ class Amime(Client):
         self.video_queue = video_queue.VideoQueue(self)
 
         self.day_releases = None
-        
+
         if self.test_mode:
             await asyncio.sleep(10)
             sys.exit(0)
         else:
             await day_releases.load(self)
-    
+
             schedule.every(1).hour.do(backup.save_in_telegram, bot=self)
             schedule.every(15).minutes.do(day_releases.reload, bot=self)
             schedule.every().day.at("00:00").do(day_releases.load, bot=self)
-    
+
             while True:
                 await schedule.run_pending()
                 await asyncio.sleep(1)

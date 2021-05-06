@@ -1,5 +1,4 @@
 aioschedule==0.5.2
-ffmpeg-python==0.2.0
 httpx[http2]==0.17.1
 humanize==3.5.0
 langs==0.1.1

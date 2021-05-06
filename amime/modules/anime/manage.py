@@ -28,7 +28,13 @@ import re
 import anilist
 from pyrogram import filters
 from pyrogram.errors import ListenerCanceled, QueryIdInvalid
-from pyrogram.types import CallbackQuery, InputMediaPhoto, InputMediaVideo, Video
+from pyrogram.types import (
+    CallbackQuery,
+    Document,
+    InputMediaPhoto,
+    InputMediaVideo,
+    Video,
+)
 from pyromod.helpers import array_chunk, ikb
 from pyromod.nav import Pagination
 
@@ -541,7 +547,9 @@ async def anime_episode_save(bot: Amime, callback: CallbackQuery):
 
     video = episode["video"]
 
-    if isinstance(episode["video"], Video):
+    if isinstance(episode["video"], Document):
+        episode["file_id"] = ""
+    elif isinstance(episode["video"], Video):
         episode["file_id"] = episode["video"].file_id
     del episode["video"]
 

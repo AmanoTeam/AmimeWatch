@@ -23,10 +23,10 @@
 import asyncio
 import concurrent.futures
 import os
+import re
 from typing import Union
 
 import anilist
-import ffmpeg
 from pyrogram.types import Document, Video
 
 from amime.config import CHATS
@@ -63,75 +63,11 @@ class VideoQueue(object):
 
         episode = await Episodes.get(id=id)
 
-        if isinstance(video, Video):
-            path = await self.bot.download_media(video)
-            attempts = 0
-            while not bool(path):
-                attempts += 1
-                if attempts >= 3:
-                    text = "<b>Error processing an episode</b>\n"
-                    text += "\n<b>Anime</b>:"
-                    text += f"\n    <b>ID</b>: <code>{episode.anime}</code>"
-                    text += "\n\n<b>Episode</b>:"
-                    if episode.season > 0:
-                        text += f"\n    <b>Season</b>: <code>{episode.season}</code>"
-                    text += f"\n    <b>Number</b>: <code>{episode.number}</code>"
-                    text += "\n\n<b>Error</b>:"
-                    text += "\n    <b>AttemptsError</b>:"
-                    text += "\n        <i>The number of download attempts has been exhausted.</i>"
-
-                    await self.bot.send_message(
-                        CHATS["staff"],
-                        text,
-                    )
-
-                    if self.queue.empty() is False:
-                        await self.next()
-                    return
-
-                path = await self.bot.download_media(video)
-
-            anime = await anilist.AsyncClient().get(episode.anime, "anime")
-            while anime is None:
-                anime = await anilist.AsyncClient().get(episode.anime, "anime")
-                await asyncio.sleep(5)
-
-            extension = path.split(".")[-1]
-
-            try:
-                thumb = path.replace(f".{extension}", ".jpg")
-                (
-                    ffmpeg.input(path, ss=20.0)
-                    .filter("scale", 320, -1)
-                    .output(thumb, vframes=1)
-                    .overwrite_output()
-                    .run()
-                )
-            except ffmpeg.Error as e:
-                thumb = (
-                    await self.bot.download_media(video.thumbs[0])
-                    if len(video.thumbs) > 0
-                    else None
-                )
-
-            try:
-                video = (
-                    await self.bot.send_video(
-                        CHATS["videos"],
-                        path,
-                        f"<b>{anime.title.romaji} </b> - {episode.season} - {episode.number}",
-                        duration=video.duration,
-                        width=video.width,
-                        height=video.height,
-                        thumb=thumb,
-                        file_name=f"@{self.bot.me.username} - {anime.title.romaji} - {episode.season} - {episode.number}.{extension}",
-                        supports_streaming=True,
-                    )
-                ).video
-
-                episode.update_from_dict({"file_id": video.file_id})
-                await episode.save()
-            except BaseException as excep:
+        path = await self.bot.download_media(video)
+        attempts = 0
+        while not bool(path):
+            attempts += 1
+            if attempts >= 3:
                 text = "<b>Error processing an episode</b>\n"
                 text += "\n<b>Anime</b>:"
                 text += f"\n    <b>ID</b>: <code>{episode.anime}</code>"
@@ -140,16 +76,113 @@ class VideoQueue(object):
                     text += f"\n    <b>Season</b>: <code>{episode.season}</code>"
                 text += f"\n    <b>Number</b>: <code>{episode.number}</code>"
                 text += "\n\n<b>Error</b>:"
-                text += f"\n    <b>{excep.__class__.__name__}</b>:"
-                text += f"\n        <i>{excep}</i>"
+                text += "\n    <b>AttemptsError</b>:"
+                text += "\n        <i>The number of download attempts has been exhausted.</i>"
 
                 await self.bot.send_message(
                     CHATS["staff"],
                     text,
                 )
 
-            os.remove(path)
-            os.remove(thumb)
+                if self.queue.empty() is False:
+                    await self.next()
+                return
+
+            path = await self.bot.download_media(video)
+
+        extension = os.path.splitext(path)[1][1:].strip()
+
+        anime = await anilist.AsyncClient().get(episode.anime, "anime")
+        while anime is None:
+            anime = await anilist.AsyncClient().get(episode.anime, "anime")
+            await asyncio.sleep(5)
+
+        if isinstance(video, Document):
+            if extension == "mkv":
+                new_path = path.replace(".mkv", ".mp4")
+                proc = await asyncio.create_subprocess_shell(
+                    f'ffmpeg -i "{path}" -codec copy "{new_path}" -y',
+                    stdout=asyncio.subprocess.PIPE,
+                    stderr=asyncio.subprocess.STDOUT,
+                )
+                await proc.communicate()
+
+                os.remove(path)
+                path = new_path
+                extension = "mp4"
+
+                proc = await asyncio.create_subprocess_shell(
+                    f'ffmpeg -i "{path}" -hide_banner',
+                    stdout=asyncio.subprocess.PIPE,
+                    stderr=asyncio.subprocess.STDOUT,
+                )
+                stdout = (await proc.communicate())[0]
+
+                lines = stdout.decode().lower().splitlines()
+                for line in lines:
+                    if (time := re.search("(\d+):(\d+):(\d+)", line)) :
+                        hours, minutes, seconds = time.groups()
+                        duration = (
+                            (int(hours) * 60 * 60) + (int(minutes) * 60) + int(seconds)
+                        )
+                        video.duration = duration
+                    elif (resolution := re.search("(\d+)x(\d+)", line)) :
+                        width, height = resolution.groups()
+                        video.width = int(width)
+                        video.height = int(height)
+
+        thumb = path.replace(f".{extension}", ".jpg")
+        proc = await asyncio.create_subprocess_shell(
+            f'ffmpeg -ss 00:00:20 -i "{path}" -vf scale=320:-1 -vframes 1 -q:v 2 "{thumb}" -y',
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.STDOUT,
+        )
+        await proc.communicate()
+
+        if not os.path.exists(thumb):
+            thumb = (
+                await self.bot.download_media(video.thumbs[0])
+                if bool(video.thumbs) and len(video.thumbs) > 0
+                else None
+            )
+
+        try:
+            video = (
+                await self.bot.send_video(
+                    CHATS["videos"],
+                    path,
+                    f"<b>{anime.title.romaji} </b> - {episode.season} - {episode.number}",
+                    duration=video.duration,
+                    width=video.width,
+                    height=video.height,
+                    thumb=thumb,
+                    file_name=f"@{self.bot.me.username} - {anime.title.romaji} - {episode.season} - {episode.number}.{extension}",
+                    supports_streaming=True,
+                )
+            ).video
+            duration = video.duration // 60
+
+            episode.update_from_dict({"file_id": video.file_id, "duration": duration})
+            await episode.save()
+        except BaseException as excep:
+            text = "<b>Error processing an episode</b>\n"
+            text += "\n<b>Anime</b>:"
+            text += f"\n    <b>ID</b>: <code>{episode.anime}</code>"
+            text += "\n\n<b>Episode</b>:"
+            if episode.season > 0:
+                text += f"\n    <b>Season</b>: <code>{episode.season}</code>"
+            text += f"\n    <b>Number</b>: <code>{episode.number}</code>"
+            text += "\n\n<b>Error</b>:"
+            text += f"\n    <b>{excep.__class__.__name__}</b>:"
+            text += f"\n        <i>{excep}</i>"
+
+            await self.bot.send_message(
+                CHATS["staff"],
+                text,
+            )
+
+        os.remove(path)
+        os.remove(thumb)
 
         if self.queue.empty() is False:
             await self.next()

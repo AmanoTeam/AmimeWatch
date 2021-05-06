@@ -1,0 +1,19 @@
+version: 2
+updates:
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      time: "12:00"
+      interval: "weekly"
+      timezone: "America/Sao_Paulo"
+    open-pull-requests-limit: 10
+    commit-message:
+      prefix: "pip prod"
+      prefix-development: "pip dev"
+      include: "scope"
+    ignore:
+      - dependency-name: "pyrogram"
+    labels:
+      - "pip dependencies"
+    pull-request-branch-name:
+      separator: "/"

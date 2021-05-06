@@ -48,7 +48,7 @@ async def anime_episodes(bot: Amime, callback: CallbackQuery):
         [
             (
                 f"{lang.language_button}: {lang.strings[language]['LANGUAGE_NAME']}",
-                f"episodes language {anime_id} {season} {page}",
+                f"episodes language {anime_id} {season} {language} {page}",
             ),
         ],
     ]

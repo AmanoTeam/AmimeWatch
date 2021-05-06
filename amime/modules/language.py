@@ -150,7 +150,7 @@ async def language_manage(bot: Amime, callback: CallbackQuery):
     )
 
 
-@Amime.on_callback_query(filters.regex(r"^episodes language (\d+) (\d+) (\d+)"))
+@Amime.on_callback_query(filters.regex(r"^episodes language (\d+) (\d+) (\w+) (\d+)"))
 async def language_episodes(bot: Amime, callback: CallbackQuery):
     message = callback.message
     user = callback.from_user
@@ -158,12 +158,15 @@ async def language_episodes(bot: Amime, callback: CallbackQuery):
 
     anime_id = int(callback.matches[0].group(1))
     season = int(callback.matches[0].group(2))
-    page = int(callback.matches[0].group(3))
+    language = callback.matches[0].group(3)
+    page = int(callback.matches[0].group(4))
 
     user_db = await Users.get(id=user.id)
-    language = user_db.language_anime
+    if not user_db.language_anime == language:
+        user_db.update_from_dict({"language_anime": language})
+        await user_db.save()
 
-    episodes = await Episodes.filter(anime=anime_id, language=language)
+    episodes = await Episodes.filter(anime=anime_id)
     episodes = sorted(episodes, key=lambda episode: episode.number)
 
     languages = []
@@ -179,7 +182,7 @@ async def language_episodes(bot: Amime, callback: CallbackQuery):
         data = (
             "noop"
             if _language == language
-            else f"manage anime language {anime_id} {season} {_language} 1"
+            else f"episodes language {anime_id} {season} {_language} 1"
         )
         buttons.append((text, data))
 

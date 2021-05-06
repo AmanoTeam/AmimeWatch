@@ -108,6 +108,7 @@ class VideoQueue(object):
 
         if isinstance(video, Document):
             if extension == "mkv":
+                codec = None
                 softsubbed = False
 
                 proc = await asyncio.create_subprocess_shell(
@@ -126,14 +127,17 @@ class VideoQueue(object):
                         duration += int(minutes) * 60
                         duration += int(seconds)
                         video.duration = duration
-                    elif (resolution := re.search(r"(\d+)x(\d+)", line)) :
+                    if (resolution := re.search(r"(\d+)x(\d+)", line)) :
                         width, height = resolution.groups()
                         video.width = int(width)
                         video.height = int(height)
-                    elif (subtitle := re.search(r"\((\w+)\): subtitle: (\w+)", line)) :
+                    if (codec := re.search(r"video: (\w+)", line)) :
+                        codec = codec.group(1)
+                    if (subtitle := re.search(r"\((\w+)\): subtitle: (\w+)", line)) :
                         softsubbed = True
 
                 new_path = path.replace(".mkv", ".mp4")
+                crf = "-crf 18 " if codec == "hevc" else ""
                 if softsubbed:
                     bitrate = (
                         "2M"
@@ -143,13 +147,13 @@ class VideoQueue(object):
                         else "550k"
                     )
                     proc = await asyncio.create_subprocess_shell(
-                        f'ffmpeg -i "{path}" -vf subtitles="{path}":si=0:force_style="FontName=Trebuchet MS Bold" -c:v libx264 -pix_fmt yuv420p -b:v {bitrate} -c:a aac -map 0:v -map 0:a:0 "{new_path}" -y',
+                        f'ffmpeg -i "{path}" -vf subtitles="{path}":si=0:force_style="FontName=Trebuchet MS Bold" -c:v libx264 {crf}-pix_fmt yuv420p -b:v {bitrate} -c:a aac -map 0:v -map 0:a:0 "{new_path}" -y',
                         stdout=asyncio.subprocess.PIPE,
                         stderr=asyncio.subprocess.STDOUT,
                     )
                 else:
                     proc = await asyncio.create_subprocess_shell(
-                        f'ffmpeg -i "{path}" -c copy "{new_path}" -y',
+                        f'ffmpeg -i "{path}" -c copy {crf}"{new_path}" -y',
                         stdout=asyncio.subprocess.PIPE,
                         stderr=asyncio.subprocess.STDOUT,
                     )

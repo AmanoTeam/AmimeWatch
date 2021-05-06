@@ -54,9 +54,9 @@ async def load(bot):
             bot.day_releases = animes
 
             anime = await client.get(episode.anime, "anime")
-            if anime is None:
-                del animes[episode.anime]
-                continue
+            while anime is None:
+                anime = await client.get(episode.anime, "anime")
+                await asyncio.sleep(5)
 
             if anime.status.lower() == "releasing":
                 if hasattr(anime, "next_airing"):

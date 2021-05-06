@@ -17,6 +17,8 @@ RUN apt-get install -y --no-install-recommends \
     ffmpeg \
     git \
     g++ \
+    libuv1 \
+    libuv1-dev \
     neofetch
 
 # Copy the bot

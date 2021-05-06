@@ -24,6 +24,7 @@ import re
 from typing import Dict, List
 
 import anilist
+import asyncio
 from pyrogram import filters
 from pyrogram.types import InlineQuery, InlineQueryResultPhoto
 from pyromod.helpers import ikb
@@ -40,6 +41,9 @@ async def manga_inline(bot: Amime, inline_query: InlineQuery):
 
     async with anilist.AsyncClient() as client:
         search_results = await client.search(query, "manga", 10)
+        while search_results is None:
+            search_results = await client.search(query, "manga", 10)
+            await asyncio.sleep(5)
 
         for result in search_results:
             manga = await client.get(result.id, "manga")

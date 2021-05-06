@@ -38,6 +38,7 @@ async def anime_upcoming(bot: Amime, callback: CallbackQuery):
     message = callback.message
     lang = callback._lang
 
+    keyboard = []
     async with httpx.AsyncClient(http2=True) as client:
         response = await client.post(
             url="https://graphql.anilist.co",
@@ -84,7 +85,6 @@ async def anime_upcoming(bot: Amime, callback: CallbackQuery):
 
             lines = layout.create(page, lines=8)
 
-            keyboard = []
             if len(lines) > 0:
                 keyboard += lines
 

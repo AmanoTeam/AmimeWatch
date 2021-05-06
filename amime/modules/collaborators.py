@@ -73,6 +73,9 @@ async def alert(bot: Amime, message: Message):
         success = []
         failed = []
         for chat in chats:
+            if chat in CHATS.values():
+                continue
+
             try:
                 if media is not None:
                     if isinstance(media, Animation):

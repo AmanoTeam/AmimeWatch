@@ -20,21 +20,26 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import logging
+import sys
 
-from rich.logging import RichHandler
+from loguru import logger as log
 
 from amime.utils import filters
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(message)s",
-    datefmt="[%X]",
-    handlers=[RichHandler(rich_tracebacks=True)],
+log.remove()
+log.add(
+    "logs/{time}.log",
+    format="{time:YYYY-MM-DD at HH:mm:ss} | {level} | {message}",
+    rotation="00:00",
+    retention="30 days",
+)
+log.add(
+    sys.stdout,
+    colorize=True,
+    format="<blue>[{time:HH:mm:ss}]</blue> <level>{message}</level>",
+    level="INFO",
 )
 
 # To avoid some pyrogram annoying log
-logging.getLogger("pyrogram.syncer").setLevel(logging.WARNING)
-logging.getLogger("pyrogram.client").setLevel(logging.WARNING)
-
-log = logging.getLogger("amime")
+log.disable("pyrogram.syncer")
+log.disable("pyrogram.client")

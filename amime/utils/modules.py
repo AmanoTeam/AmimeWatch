@@ -41,7 +41,7 @@ def load(bot):
             )
             modules.append(module)
         except BaseException:
-            log.error(f"Failed to import the module: {file_name}", exc_info=True)
+            log.critical(f"Failed to import the module: {file_name}")
             continue
 
         functions = [*filter(callable, module.__dict__.values())]

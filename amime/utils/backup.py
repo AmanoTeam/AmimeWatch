@@ -42,5 +42,5 @@ async def save_in_telegram(bot: Client):
             log.warning("Database saved in Telegram successfully!")
         else:
             log.warning("It was not possible to save the database in Telegram.")
-    except:
-        log.error("Error saving the database in Telegram.", exc_info=True)
+    except BaseException:
+        log.exception("Error saving the database in Telegram.")

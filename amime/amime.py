@@ -57,8 +57,9 @@ class Amime(Client):
         await super().start()
 
         self.me = await self.get_me()
-        log.info(
-            f"AmimeWatch running with Pyrogram v{__version__} (Layer {layer}) started on @{self.me.username}. Hi."
+        log.success(
+            f"AmimeWatch running with Pyrogram v{__version__} (Layer {layer}) started on @{self.me.username}. Hi.",
+            style="braces",
         )
 
         langs.load()

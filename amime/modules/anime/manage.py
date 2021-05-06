@@ -38,6 +38,7 @@ from pyrogram.types import (
 from pyromod.helpers import array_chunk, ikb
 from pyromod.nav import Pagination
 
+from amime import log
 from amime.amime import Amime
 from amime.database import Episodes, Notifications, Users
 
@@ -250,6 +251,10 @@ async def anime_episode(bot: Amime, callback: CallbackQuery):
 
         if anime is None:
             return
+
+        log.debug(
+            f"{user.first_name} is editing/adding episode {number} of the anime {anime_id} ({language})"
+        )
 
         text = lang.manage_episode_text
         text += f"\n<b>{anime.title.romaji}</b> (<code>{anime.title.native}</code>)\n"
@@ -538,6 +543,10 @@ async def anime_episode_save(bot: Amime, callback: CallbackQuery):
 
     episode = EPISODES[str(user.id)][str(anime_id)]
 
+    log.debug(
+        f"{user.first_name} edited/saved episode {episode['number']} of the anime {anime_id} ({language})"
+    )
+
     episode["anime"] = anime_id
     episode["season"] = season
     episode["language"] = language
@@ -623,12 +632,20 @@ async def anime_episode_delete(bot: Amime, callback: CallbackQuery):
         episodes = await Episodes.filter(
             anime=anime_id, season=season, language=language
         )
+
+        log.debug(
+            f"{user.first_name} deleted season {season} of the anime {anime_id} ({language})"
+        )
     else:
         episodes = [
             await Episodes.get(
                 anime=anime_id, season=season, number=number, language=language
             )
         ]
+
+        log.debug(
+            f"{user.first_name} deleted episode {number} of the anime {anime_id} ({language})"
+        )
 
     for episode in episodes:
         notification = await Notifications.get_or_none(
@@ -808,6 +825,10 @@ async def anime_episode_batch_confirm(bot: Amime, callback: CallbackQuery):
             await msg.delete()
         except BaseException:
             pass
+
+    log.debug(
+        f"{user.first_name} added {len(videos)} episodes on the anime {anime_id} ({language})"
+    )
 
     del VIDEOS[str(user.id)][str(anime_id)]
 

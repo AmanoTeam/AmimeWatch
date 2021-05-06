@@ -427,6 +427,12 @@ sending_alert_text: |
 alert_sent_text: |
     The alert was successfully sent to <code>{success}</code> chats and failed to send in <code>{failed}</code> chats.
 
+how_to_use_text: |
+    Watch the animation above and see how to use me.
+
+how_to_use_button:
+    ❓ How to use?
+
 
 # Alerts
 added_to_favorites_alert:

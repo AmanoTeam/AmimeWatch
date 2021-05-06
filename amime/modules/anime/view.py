@@ -164,7 +164,12 @@ async def anime_view(bot: Amime, union: Union[CallbackQuery, Message]):
                 f"request episodes {anime.id} {language}",
             )
             if anime.status.lower() == "releasing":
-                buttons.append(button)
+                if hasattr(anime, "next_airing"):
+                    next_episode = anime.next_airing.episode
+                    if not len(episodes) == (next_episode - 1):
+                        buttons.append(button)
+                else:
+                    buttons.append(button)
             elif hasattr(anime, "episodes"):
                 if len(episodes) < anime.episodes:
                     buttons.append(button)

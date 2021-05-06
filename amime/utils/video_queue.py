@@ -121,9 +121,10 @@ class VideoQueue(object):
                 for line in lines:
                     if (time := re.search(r"(\d+):(\d+):(\d+)", line)) :
                         hours, minutes, seconds = time.groups()
-                        duration = (
-                            (int(hours) * 60 * 60) + (int(minutes) * 60) + int(seconds)
-                        )
+                        duration = 0
+                        duration += int(hours) * 60 * 60
+                        duration += int(minutes) * 60
+                        duration += int(seconds)
                         video.duration = duration
                     elif (resolution := re.search(r"(\d+)x(\d+)", line)) :
                         width, height = resolution.groups()

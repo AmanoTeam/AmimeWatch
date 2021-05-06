@@ -20,7 +20,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+import asyncio
+
 from pyrogram import filters
+from pyrogram.errors import FloodWait
 from pyrogram.types import Animation, Document, Message, Photo, Sticker, Video
 
 from amime.amime import Amime
@@ -97,7 +100,9 @@ async def alert(bot: Amime, message: Message):
                 await bot.send_message(chat, text)
 
                 success.append(chat)
-            except BaseException:
+            except FloodWait as e:
+                await asyncio.sleep(e.x)
+            else:
                 failed.append(chat)
 
         await sent.edit_text(

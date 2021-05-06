@@ -21,6 +21,7 @@
 # SOFTWARE.
 
 import os
+import sys
 
 from pyrogram import idle
 from tortoise import run_async
@@ -34,7 +35,8 @@ async def main():
 
     await connect_database()
 
-    amime = Amime()
+    test_mode = "--mode=test" in sys.argv
+    amime = Amime(test_mode)
     await amime.start()
     await idle()
 

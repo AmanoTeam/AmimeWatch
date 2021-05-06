@@ -22,6 +22,7 @@
 
 import asyncio
 import datetime
+import sys
 
 import aioschedule as schedule
 import pyromod.listen
@@ -35,7 +36,7 @@ from amime.utils import backup, day_releases, langs, modules, video_queue
 
 
 class Amime(Client):
-    def __init__(self):
+    def __init__(self, test_mode: bool = False):
         name = self.__class__.__name__.lower()
 
         super().__init__(
@@ -43,6 +44,7 @@ class Amime(Client):
             config_file=f"{name}.ini",
             parse_mode="html",
             workdir=".",
+            test_mode=test_mode,
         )
 
         self.sudos = SUDO_USERS
@@ -64,15 +66,20 @@ class Amime(Client):
         self.video_queue = video_queue.VideoQueue(self)
 
         self.day_releases = None
-        await day_releases.load(self)
-
-        schedule.every(1).hour.do(backup.save_in_telegram, bot=self)
-        schedule.every(15).minutes.do(day_releases.reload, bot=self)
-        schedule.every().day.at("00:00").do(day_releases.load, bot=self)
-
-        while True:
-            await schedule.run_pending()
-            await asyncio.sleep(1)
+        
+        if self.test_mode:
+            await asyncio.sleep(10)
+            sys.exit(0)
+        else:
+            await day_releases.load(self)
+    
+            schedule.every(1).hour.do(backup.save_in_telegram, bot=self)
+            schedule.every(15).minutes.do(day_releases.reload, bot=self)
+            schedule.every().day.at("00:00").do(day_releases.load, bot=self)
+    
+            while True:
+                await schedule.run_pending()
+                await asyncio.sleep(1)
 
     async def stop(self, *args):
         await super().stop()

@@ -92,6 +92,9 @@ class VideoQueue(object):
                 path = await self.bot.download_media(video)
 
             anime = await anilist.AsyncClient().get(episode.anime, "anime")
+            while anime is None:
+                anime = await anilist.AsyncClient().get(episode.anime, "anime")
+                await asyncio.sleep(5)
 
             extension = path.split(".")[-1]
 

@@ -27,8 +27,8 @@ COPY . /app
 # Set the workdir
 WORKDIR /app
 
-# Set the volume
-VOLUME ["/app/database"]
+# Set the volumes
+VOLUME ["/app/database", "/app/logs"]
 
 # Install requirements
 RUN pip install -U setuptools wheel && \

@@ -8,4 +8,7 @@ apt-get install -y --no-install-recommends docker.io
 docker build -t amime .
 
 # RUN
-docker run -d -it --name amime -v database:/app/database amime
+docker run -d -it --name amime \
+    -v database:/app/database \
+    -v logs:/app/logs \
+    amime

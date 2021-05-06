@@ -57,7 +57,9 @@ async def anime_manage(bot: Amime, callback: CallbackQuery):
     language = callback.matches[0].group(3)
     page = int(callback.matches[0].group(4))
 
-    chat.cancel_listener()
+    if str(user.id) in VIDEOS.keys() and str(anime_id) in VIDEOS[str(user.id)].keys():
+        chat.cancel_listener()
+        del VIDEOS[str(user.id)][str(anime_id)]
 
     buttons = [
         (

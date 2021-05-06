@@ -23,6 +23,7 @@
 import asyncio
 import concurrent.futures
 import os
+import random
 import re
 from typing import Union
 
@@ -63,7 +64,13 @@ class VideoQueue(object):
 
         episode = await Episodes.get(id=id)
 
-        path = await self.bot.download_media(video)
+        directory = f"./downloads/{random.randint(0, 9999)}/"
+        while os.path.exists(directory):
+            directory = f"./downloads/{random.randint(0, 9999)}/"
+
+        path = await self.bot.download_media(
+            video, file_name=directory + video.file_name
+        )
         attempts = 0
         while not bool(path):
             attempts += 1
@@ -88,7 +95,9 @@ class VideoQueue(object):
                     await self.next()
                 return
 
-            path = await self.bot.download_media(video)
+            path = await self.bot.download_media(
+                video, file_name=directory + video.file_name
+            )
 
         extension = os.path.splitext(path)[1][1:].strip()
 
@@ -99,17 +108,7 @@ class VideoQueue(object):
 
         if isinstance(video, Document):
             if extension == "mkv":
-                new_path = path.replace(".mkv", ".mp4")
-                proc = await asyncio.create_subprocess_shell(
-                    f'ffmpeg -i "{path}" -codec copy "{new_path}" -y',
-                    stdout=asyncio.subprocess.PIPE,
-                    stderr=asyncio.subprocess.STDOUT,
-                )
-                await proc.communicate()
-
-                os.remove(path)
-                path = new_path
-                extension = "mp4"
+                softsubbed = False
 
                 proc = await asyncio.create_subprocess_shell(
                     f'ffmpeg -i "{path}" -hide_banner',
@@ -120,16 +119,44 @@ class VideoQueue(object):
 
                 lines = stdout.decode().lower().splitlines()
                 for line in lines:
-                    if (time := re.search("(\d+):(\d+):(\d+)", line)) :
+                    if (time := re.search(r"(\d+):(\d+):(\d+)", line)) :
                         hours, minutes, seconds = time.groups()
                         duration = (
                             (int(hours) * 60 * 60) + (int(minutes) * 60) + int(seconds)
                         )
                         video.duration = duration
-                    elif (resolution := re.search("(\d+)x(\d+)", line)) :
+                    elif (resolution := re.search(r"(\d+)x(\d+)", line)) :
                         width, height = resolution.groups()
                         video.width = int(width)
                         video.height = int(height)
+                    elif (subtitle := re.search(r"\((\w+)\): subtitle: (\w+)", line)) :
+                        softsubbed = True
+
+                new_path = path.replace(".mkv", ".mp4")
+                if softsubbed:
+                    bitrate = (
+                        "2M"
+                        if (video.width >= 1920 and video.height >= 1080)
+                        else "950k"
+                        if (video.width >= 1280 and video.height >= 720)
+                        else "550k"
+                    )
+                    proc = await asyncio.create_subprocess_shell(
+                        f'ffmpeg -i "{path}" -vf subtitles="{path}":si=0:force_style="FontName=Trebuchet MS Bold" -c:v libx264 -pix_fmt yuv420p -b:v {bitrate} -c:a aac -map 0:v -map 0:a:0 "{new_path}" -y',
+                        stdout=asyncio.subprocess.PIPE,
+                        stderr=asyncio.subprocess.STDOUT,
+                    )
+                else:
+                    proc = await asyncio.create_subprocess_shell(
+                        f'ffmpeg -i "{path}" -c copy "{new_path}" -y',
+                        stdout=asyncio.subprocess.PIPE,
+                        stderr=asyncio.subprocess.STDOUT,
+                    )
+                await proc.communicate()
+
+                os.remove(path)
+                path = new_path
+                extension = "mp4"
 
         thumb = path.replace(f".{extension}", ".jpg")
         proc = await asyncio.create_subprocess_shell(

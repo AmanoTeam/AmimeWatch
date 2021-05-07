@@ -111,9 +111,6 @@ async def user_collaborator(bot: Amime, callback: CallbackQuery):
     filters.regex(r"^user collaborator edit (\d+) (\w+)") & filters.sudo
 )
 async def user_collaborator_edit(bot: Amime, callback: CallbackQuery):
-    message = callback.message
-    lang = callback._lang
-
     user_id = int(callback.matches[0].group(1))
     language = callback.matches[0].group(2)
 

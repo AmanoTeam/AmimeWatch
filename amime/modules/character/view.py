@@ -35,7 +35,6 @@ from amime.amime import Amime
 async def character_view(bot: Amime, union: Union[CallbackQuery, Message]):
     is_callback = isinstance(union, CallbackQuery)
     message = union.message if is_callback else union
-    chat = message.chat
     user = union.from_user
     lang = union._lang
 

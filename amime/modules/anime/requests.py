@@ -47,10 +47,10 @@ async def request_episodes(bot: Amime, callback: CallbackQuery):
     for code, obj in lang.strings.items():
         text, data = (
             (f"✅ {obj['LANGUAGE_NAME']}", "noop")
-            if obj["LANGUAGE_CODE"] == language
+            if code == language
             else (
                 obj["LANGUAGE_NAME"],
-                f"request episodes {anime_id} {obj['LANGUAGE_CODE']}",
+                f"request episodes {anime_id} {code}",
             )
         )
         buttons.append((text, data))
@@ -72,7 +72,6 @@ async def request_episodes(bot: Amime, callback: CallbackQuery):
 
 @Amime.on_callback_query(filters.regex(r"^request episodes confirm (\d+) (\w+)"))
 async def request_episodes_confirm(bot: Amime, callback: CallbackQuery):
-    message = callback.message
     user = callback.from_user
     lang = callback._lang
 

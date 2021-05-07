@@ -35,8 +35,6 @@ from amime.modules.anime.manage import anime_manage
 @Amime.on_callback_query(filters.regex(r"^notify episodes (\d+) (\d+) (\w+) (\d+)"))
 async def notify_episodes(bot: Amime, callback: CallbackQuery):
     message = callback.message
-    chat = message.chat
-    user = callback.from_user
     lang = callback._lang
 
     anime_id = int(callback.matches[0].group(1))

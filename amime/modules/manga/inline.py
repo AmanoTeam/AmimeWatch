@@ -22,7 +22,7 @@
 
 import asyncio
 import re
-from typing import Dict, List
+from typing import List
 
 import anilist
 from pyrogram import filters

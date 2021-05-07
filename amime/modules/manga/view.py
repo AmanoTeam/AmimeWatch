@@ -146,7 +146,6 @@ async def manga_view(bot: Amime, union: Union[CallbackQuery, Message]):
 @Amime.on_callback_query(filters.regex(r"^manga more (\d+) (\d+)"))
 async def manga_view_more(bot: Amime, callback: CallbackQuery):
     message = callback.message
-    chat = message.chat
     user = callback.from_user
     lang = callback._lang
 

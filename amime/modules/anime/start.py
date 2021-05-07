@@ -34,7 +34,6 @@ from amime.amime import Amime
 async def anime_start(bot: Amime, union: Union[CallbackQuery, Message]):
     is_callback = isinstance(union, CallbackQuery)
     message = union.message if is_callback else union
-    user = union.from_user
     lang = union._lang
 
     keyboard = [

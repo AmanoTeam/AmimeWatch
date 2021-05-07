@@ -113,7 +113,7 @@ async def language_manage(bot: Amime, callback: CallbackQuery):
     lang = callback._lang
 
     content_type = callback.matches[0]["content_type"]
-    anime_id = int(callback.matches[0].group(2))
+    content_id = int(callback.matches[0].group(2))
     season = int(callback.matches[0].group(3))
     language = callback.matches[0].group(4)
     page = int(callback.matches[0].group(5))
@@ -134,14 +134,19 @@ async def language_manage(bot: Amime, callback: CallbackQuery):
         data = (
             "noop"
             if _language == language
-            else f"manage anime language {anime_id} {season} {_language} 1"
+            else f"manage {content_type} language {content_id} {season} {_language} 1"
         )
         buttons.append((text, data))
 
     keyboard = array_chunk(buttons, 2)
 
     keyboard.append(
-        [(lang.back_button, f"manage anime {anime_id} {season} {language} {page}")]
+        [
+            (
+                lang.back_button,
+                f"manage {content_type} {content_id} {season} {language} {page}",
+            )
+        ]
     )
 
     await message.edit_text(

@@ -132,7 +132,7 @@ class VideoQueue(object):
                         video.height = int(height)
                     if (codec := re.search(r"video: (\w+)", line)) :
                         codec = codec.group(1)
-                    if (subtitle := re.search(r"\((\w+)\): subtitle: (\w+)", line)) :
+                    if re.search(r"\((\w+)\): subtitle: (\w+)", line):
                         softsubbed = True
 
                 new_path = path.replace(".mkv", ".mp4")

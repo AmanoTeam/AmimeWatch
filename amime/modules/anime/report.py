@@ -163,7 +163,6 @@ async def report_episode_edit_notes(bot: Amime, callback: CallbackQuery):
 )
 async def report_episode_confirm(bot: Amime, callback: CallbackQuery):
     message = callback.message
-    chat = message.chat
     user = callback.from_user
     lang = callback._lang
 

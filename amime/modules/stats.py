@@ -91,7 +91,7 @@ async def stats_view(bot: Amime, message: Message):
         text += f"\n        <b>{language.upper()}</b>: <code>{len(users)}</code>"
     text += f"\n    <b>Loaded languages</b>: <code>{len(lang.strings.keys())}</code>"
 
-    text += f"\n\n<b>System</b>"
+    text += "\n\n<b>System</b>"
     uname = platform.uname()
     text += f"\n    <b>OS</b>: <code>{uname.system}</code>"
     text += f"\n    <b>Node</b>: <code>{uname.node}</code>"

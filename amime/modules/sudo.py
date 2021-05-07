@@ -51,8 +51,8 @@ async def upgrade_message(bot: Amime, message: Message):
         if len(stdout) > 0:
             changelog = "<b>Changelog</b>:\n"
             commits = parse_commits(stdout)
-            for hash, commit in commits.items():
-                changelog += f"  - [<code>{hash[:7]}</code>] {commit['title']}\n"
+            for c_hash, commit in commits.items():
+                changelog += f"  - [<code>{c_hash[:7]}</code>] {commit['title']}\n"
             changelog += f"\n<b>New commits count</b>: <code>{len(commits)}</code>."
 
             keyboard = [[("🆕 Upgrade", "upgrade")]]

@@ -22,7 +22,6 @@
 
 import asyncio
 import datetime
-import random
 import re
 
 import anilist
@@ -40,7 +39,7 @@ from pyromod.nav import Pagination
 
 from amime import log
 from amime.amime import Amime
-from amime.database import Episodes, Notifications, Users
+from amime.database import Episodes, Notifications
 
 EPISODES = {}
 VIDEOS = {}
@@ -151,8 +150,6 @@ async def anime_manage(bot: Amime, callback: CallbackQuery):
 @Amime.on_callback_query(filters.regex(r"^manage anime season (\d+) (\d+) (\w+) (\d+)"))
 async def anime_season(bot: Amime, callback: CallbackQuery):
     message = callback.message
-    chat = message.chat
-    user = callback.from_user
     lang = callback._lang
 
     anime_id = int(callback.matches[0].group(1))
@@ -447,11 +444,11 @@ async def anime_episode_edit(bot: Amime, callback: CallbackQuery):
                         await callback.answer(
                             lang.very_short_video_alert, show_alert=True
                         )
+                        continue
                     except QueryIdInvalid:
                         sent = await answer.reply_text(lang.very_short_video_alert)
-                        await asycio.sleep(3)
+                        await asyncio.sleep(3)
                         await sent.delete()
-                    finally:
                         continue
 
                 episode["video"] = answer.video
@@ -807,7 +804,7 @@ async def anime_episode_batch_confirm(bot: Amime, callback: CallbackQuery):
             language=language,
             unified_until=unified_until or "0",
         )
-        id = episode.id
+        video_id = episode.id
 
         now_date = datetime.datetime.now().replace(tzinfo=datetime.timezone.utc)
         await Notifications.create(
@@ -819,7 +816,7 @@ async def anime_episode_batch_confirm(bot: Amime, callback: CallbackQuery):
             datetime=now_date,
         )
 
-        await bot.video_queue.add(id, video)
+        await bot.video_queue.add(video_id, video)
 
         try:
             await msg.delete()

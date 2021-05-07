@@ -35,7 +35,6 @@ from amime.amime import Amime
 @Amime.on_message(filters.cmd(r"scan$") & filters.reply)
 async def anime_scan(bot: Amime, message: Message):
     reply = message.reply_to_message
-    chat = message.chat
     lang = message._lang
 
     if reply.from_user.id == bot.me.id:

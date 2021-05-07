@@ -31,7 +31,7 @@ modules: List[ModuleType] = []
 
 
 def load(bot):
-    files = glob.glob(f"amime/modules/**/*.py", recursive=True)
+    files = glob.glob("amime/modules/**/*.py", recursive=True)
     files = sorted(files, key=lambda file: file.split("/")[2])
 
     for file_name in files:

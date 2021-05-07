@@ -35,7 +35,6 @@ from amime.config import CHANNELS, GROUPS
 async def about(bot: Amime, union: Union[CallbackQuery, Message]):
     is_callback = isinstance(union, CallbackQuery)
     message = union.message if is_callback else union
-    user = union.from_user
     lang = union._lang
 
     kwargs: Dict = {}

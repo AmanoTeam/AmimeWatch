@@ -43,6 +43,7 @@ class Amime(Client):
             name,
             config_file=f"{name}.ini",
             parse_mode="html",
+            workers=24,
             workdir=".",
             test_mode=test_mode,
         )

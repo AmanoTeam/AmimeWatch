@@ -27,7 +27,7 @@ from pyrogram.errors import FloodWait
 from pyrogram.types import Animation, Document, Message, Photo, Sticker, Video
 
 from amime.amime import Amime
-from amime.config import CHATS
+from amime.config import CHANNELS, CHATS
 from amime.database import Chats, Users
 
 
@@ -76,7 +76,7 @@ async def alert(bot: Amime, message: Message):
         success = []
         failed = []
         for chat in chats:
-            if chat in CHATS.values():
+            if chat in CHATS.values() or chat in CHANNELS.values():
                 continue
 
             try:

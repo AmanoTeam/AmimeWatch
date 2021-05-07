@@ -25,6 +25,7 @@ import concurrent.futures
 import os
 import random
 import re
+import shutil
 from typing import Union
 
 import anilist
@@ -68,9 +69,7 @@ class VideoQueue(object):
         while os.path.exists(directory):
             directory = f"./downloads/{random.randint(0, 9999)}/"
 
-        path = await self.bot.download_media(
-            video, file_name=directory + video.file_name
-        )
+        path = await self.bot.download_media(video, file_name=directory)
         attempts = 0
         while not bool(path):
             attempts += 1
@@ -213,8 +212,7 @@ class VideoQueue(object):
                 text,
             )
 
-        os.remove(path)
-        os.remove(thumb)
+        shutil.rmtree(directory, ignore_errors=True)
 
         if self.queue.empty() is False:
             await self.next()

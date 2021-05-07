@@ -102,7 +102,7 @@ async def alert(bot: Amime, message: Message):
                 success.append(chat)
             except FloodWait as e:
                 await asyncio.sleep(e.x)
-            else:
+            except BaseException:
                 failed.append(chat)
 
         await sent.edit_text(

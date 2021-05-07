@@ -2,12 +2,16 @@
 
 > A bot dedicated to Otakus made in Python using the [Pyrogram](//github.com/pyrogram/pyrogram) framework.
 
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![GitHub contributors](https://img.shields.io/github/contributors/AmanoTeam/AmimeWatch.svg)](https://GitHub.com/AmanoTeam/AmimeWatch/graphs/contributors/)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/ce5d204fd63d483894620d7f409f3a1c)](https://www.codacy.com/gh/AmanoTeam/AmimeWatch/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=AmanoTeam/AmimeWatch&amp;utm_campaign=Badge_Grade)
+
 This repository contains the source code of [@AmimeWatchBot](//t.me/amimewatchbot) and the instructions for running a
 copy yourself.
 
 ## Requirements
 
-- Python 3.6 or higher.
+- Python 3.8 or higher.
 - A [Telegram API key](//docs.pyrogram.org/intro/setup#api-keys).
 - A [Telegram bot token](//t.me/botfather).
 

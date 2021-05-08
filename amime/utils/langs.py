@@ -21,6 +21,7 @@
 # SOFTWARE.
 
 import glob
+import logging
 import re
 from typing import Dict
 
@@ -28,7 +29,7 @@ import yaml
 from langs import Langs
 from pyrogram.types import CallbackQuery, InlineQuery, Message
 
-from amime import log
+logger = logging.getLogger(__name__)
 
 
 def load():
@@ -46,4 +47,6 @@ def load():
     Message._lang = lang
     InlineQuery._lang = lang
 
-    log.info(f"{len(langs)} language{'s' if len(langs) != 1 else ''} have been loaded.")
+    logger.info(
+        "%s language%s have been loaded.", len(langs), "s" if len(langs) != 1 else ""
+    )

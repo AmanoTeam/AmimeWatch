@@ -21,17 +21,19 @@
 # SOFTWARE.
 
 import datetime
+import logging
 
 from pyrogram import Client
 
-from amime import log
 from amime.config import CHATS
+
+logger = logging.getLogger(__name__)
 
 
 async def save_in_telegram(bot: Client):
     date = datetime.datetime.now().strftime("%H:%M:%S - %d/%m/%Y")
 
-    log.warning("Saving the database in Telegram...")
+    logger.warning("Saving the database in Telegram...")
 
     try:
         if await bot.send_document(
@@ -39,8 +41,8 @@ async def save_in_telegram(bot: Client):
             "amime/database/database.sqlite",
             caption=f"<b>Database BACKUP</b>\n\n<b>Date</b>: <code>{date}</code>",
         ):
-            log.warning("Database saved in Telegram successfully!")
+            logger.warning("Database saved in Telegram successfully!")
         else:
-            log.warning("It was not possible to save the database in Telegram.")
+            logger.warning("It was not possible to save the database in Telegram.")
     except BaseException:
-        log.exception("Error saving the database in Telegram.")
+        logger.error("Error saving the database in Telegram.", exc_info=True)

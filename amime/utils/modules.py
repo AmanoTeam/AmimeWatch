@@ -22,10 +22,12 @@
 
 import glob
 import importlib
+import logging
 from types import ModuleType
 from typing import List
 
-from amime import log
+logger = logging.getLogger(__name__)
+
 
 modules: List[ModuleType] = []
 
@@ -41,7 +43,7 @@ def load(bot):
             )
             modules.append(module)
         except BaseException:
-            log.critical(f"Failed to import the module: {file_name}")
+            logger.critical("Failed to import the module: %s", file_name, exc_info=True)
             continue
 
         functions = [*filter(callable, module.__dict__.values())]
@@ -51,8 +53,10 @@ def load(bot):
             for handler in function.handlers:
                 bot.add_handler(*handler)
 
-    log.info(
-        f"{len(modules)} module{'s' if len(modules) != 1 else ''} imported successfully!"
+    logger.info(
+        "%s module%s imported successfully!",
+        len(modules),
+        "s" if len(modules) != 1 else "",
     )
 
 
@@ -75,6 +79,8 @@ def reload(bot):
             for handler in function.handlers:
                 bot.add_handler(*handler)
 
-    log.info(
-        f"{len(modules)} module{'s' if len(modules) != 1 else ''} reloaded successfully!"
+    logger.info(
+        "%s module%s imported successfully!",
+        len(modules),
+        "s" if len(modules) != 1 else "",
     )

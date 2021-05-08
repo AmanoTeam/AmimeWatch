@@ -22,6 +22,7 @@
 
 import asyncio
 import datetime
+import logging
 import sys
 
 import aioschedule as schedule
@@ -30,9 +31,20 @@ from pyrogram import Client, __version__
 from pyrogram.raw.all import layer
 from pyrogram.types import User
 
-from amime import log
 from amime.config import SUDO_USERS
-from amime.utils import backup, day_releases, langs, modules, video_queue
+from amime.utils import backup, day_releases, filters, langs, modules, video_queue
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(name)s.%(funcName)s | %(levelname)s | %(message)s",
+    datefmt="[%X]",
+)
+
+# To avoid some pyrogram annoying log
+logging.getLogger("pyrogram.syncer").setLevel(logging.WARNING)
+logging.getLogger("pyrogram.client").setLevel(logging.WARNING)
+
+logger = logging.getLogger(__name__)
 
 
 class Amime(Client):
@@ -58,9 +70,11 @@ class Amime(Client):
         await super().start()
 
         self.me = await self.get_me()
-        log.success(
-            f"AmimeWatch running with Pyrogram v{__version__} (Layer {layer}) started on @{self.me.username}. Hi.",
-            style="braces",
+        logger.info(
+            "AmimeWatch running with Pyrogram v%s (Layer %s) started on @%s. Hi.",
+            __version__,
+            layer,
+            self.me.username,
         )
 
         langs.load()
@@ -85,7 +99,7 @@ class Amime(Client):
 
     async def stop(self, *args):
         await super().stop()
-        log.warning("AmimeWatch stopped. Bye.")
+        logger.warning("AmimeWatch stopped. Bye.")
 
     def is_sudo(self, user: User) -> bool:
         return user.id in self.sudos

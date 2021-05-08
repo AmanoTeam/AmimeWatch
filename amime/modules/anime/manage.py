@@ -22,6 +22,7 @@
 
 import asyncio
 import datetime
+import logging
 import re
 
 import anilist
@@ -37,9 +38,11 @@ from pyrogram.types import (
 from pyromod.helpers import array_chunk, ikb
 from pyromod.nav import Pagination
 
-from amime import log
 from amime.amime import Amime
 from amime.database import Episodes, Notifications
+
+logger = logging.getLogger(__name__)
+
 
 EPISODES = {}
 VIDEOS = {}
@@ -249,8 +252,12 @@ async def anime_episode(bot: Amime, callback: CallbackQuery):
         if anime is None:
             return
 
-        log.debug(
-            f"{user.first_name} is editing/adding episode {number} of the anime {anime_id} ({language})"
+        logger.debug(
+            "%s is editing/adding episode %s of the anime %s (%s)",
+            user.first_name,
+            number,
+            anime_id,
+            language,
         )
 
         text = lang.manage_episode_text
@@ -540,8 +547,12 @@ async def anime_episode_save(bot: Amime, callback: CallbackQuery):
 
     episode = EPISODES[str(user.id)][str(anime_id)]
 
-    log.debug(
-        f"{user.first_name} edited/saved episode {episode['number']} of the anime {anime_id} ({language})"
+    logger.debug(
+        "%s is edited/saved episode %s of the anime %s (%s)",
+        user.first_name,
+        episode["number"],
+        anime_id,
+        language,
     )
 
     episode["anime"] = anime_id
@@ -630,8 +641,12 @@ async def anime_episode_delete(bot: Amime, callback: CallbackQuery):
             anime=anime_id, season=season, language=language
         )
 
-        log.debug(
-            f"{user.first_name} deleted season {season} of the anime {anime_id} ({language})"
+        logger.debug(
+            "%s deleted season %s of the anime %s (%s)",
+            user.first_name,
+            season,
+            anime_id,
+            language,
         )
     else:
         episodes = [
@@ -640,8 +655,12 @@ async def anime_episode_delete(bot: Amime, callback: CallbackQuery):
             )
         ]
 
-        log.debug(
-            f"{user.first_name} deleted episode {number} of the anime {anime_id} ({language})"
+        logger.debug(
+            "%s deleted episode %s of the anime %s (%s)",
+            user.first_name,
+            number,
+            anime_id,
+            language,
         )
 
     for episode in episodes:
@@ -823,8 +842,12 @@ async def anime_episode_batch_confirm(bot: Amime, callback: CallbackQuery):
         except BaseException:
             pass
 
-    log.debug(
-        f"{user.first_name} added {len(videos)} episodes on the anime {anime_id} ({language})"
+    logger.debug(
+        "%s added %s episodes on the anime %s (%s)",
+        user.first_name,
+        len(videos),
+        anime_id,
+        language,
     )
 
     del VIDEOS[str(user.id)][str(anime_id)]

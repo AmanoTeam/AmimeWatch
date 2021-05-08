@@ -98,7 +98,7 @@ class Amime(Client):
                 await asyncio.sleep(1)
 
     async def stop(self, *args):
-        await super().stop()
+        await super().stop(*args)
         logger.warning("AmimeWatch stopped. Bye.")
 
     def is_sudo(self, user: User) -> bool:

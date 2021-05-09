@@ -1,3 +1,4 @@
+"""AmimeWatch database."""
 # MIT License
 #
 # Copyright (c) 2021 Andriel Rodrigues for Amano Team
@@ -20,4 +21,116 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from .database import *
+import os
+
+from tortoise import Tortoise, fields
+from tortoise.models import Model
+
+
+class Chats(Model):
+    id = fields.IntField(pk=True)
+    title = fields.TextField()
+    username = fields.CharField(max_length=32)
+    language = fields.CharField(max_length=6, default="en")
+
+
+class Collaborators(Model):
+    id = fields.IntField(pk=True)
+    user = fields.IntField()
+    language = fields.CharField(max_length=6, default="en")
+
+
+class Episodes(Model):
+    id = fields.IntField(pk=True)
+    anime = fields.IntField()
+    file_id = fields.TextField()
+    name = fields.TextField(default="")
+    added_by = fields.TextField(default="")
+    notes = fields.TextField(default="")
+    season = fields.IntField(default=0)
+    number = fields.IntField()
+    duration = fields.IntField(default=24)
+    language = fields.CharField(max_length=6, default="ja")
+    unified_until = fields.IntField(default=0)
+
+
+class Favorites(Model):
+    id = fields.IntField(pk=True)
+    user = fields.IntField()
+    item = fields.IntField()
+    type = fields.CharField(max_length=7)
+
+
+class Notifications(Model):
+    id = fields.IntField(pk=True)
+    item = fields.IntField()
+    type = fields.CharField(max_length=7)
+    season = fields.IntField()
+    number = fields.IntField()
+    language = fields.CharField(max_length=6, default="en")
+    datetime = fields.DatetimeField()
+
+
+class Notify(Model):
+    id = fields.IntField(pk=True)
+    recipient = fields.IntField()
+    recipient_type = fields.CharField(max_length=5)
+    item = fields.IntField()
+    type = fields.CharField(max_length=7)
+    language = fields.CharField(max_length=6, default="en")
+
+
+class Reports(Model):
+    id = fields.IntField(pk=True)
+    user = fields.IntField()
+    item = fields.IntField()
+    type = fields.CharField(max_length=7)
+    notes = fields.TextField(default="")
+    datetime = fields.DatetimeField()
+
+
+class Requests(Model):
+    id = fields.IntField(pk=True)
+    user = fields.IntField()
+    item = fields.IntField()
+    type = fields.CharField(max_length=7)
+    datetime = fields.DatetimeField()
+    done = fields.BooleanField(default=False)
+
+
+class Users(Model):
+    id = fields.IntField(pk=True)
+    name = fields.TextField()
+    username = fields.CharField(max_length=32)
+    language_bot = fields.CharField(max_length=6, default="en")
+    language_anime = fields.CharField(max_length=6, default="en")
+    is_collaborator = fields.BooleanField(default=False)
+
+
+class Viewed(Model):
+    id = fields.IntField(pk=True)
+    user = fields.IntField()
+    item = fields.IntField()
+    type = fields.CharField(max_length=7)
+
+
+class Watched(Model):
+    id = fields.IntField(pk=True)
+    user = fields.IntField()
+    episode = fields.IntField()
+
+
+async def connect_database():
+    await Tortoise.init(
+        {
+            "connections": {
+                "bot_db": os.getenv(
+                    "DATABASE_URL", "sqlite://amime/database/database.sqlite"
+                )
+            },
+            "apps": {"bot": {"models": [__name__], "default_connection": "bot_db"}},
+        }
+    )
+
+    # Generate the schema
+    await Tortoise.generate_schemas()

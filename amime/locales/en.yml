@@ -400,6 +400,9 @@ media_not_found_text: |
 scanning_media_text: |
     Scanning media...
 
+searching_media_text: |
+    Searching media...
+
 no_results_text: |
     No results were found.
 

@@ -84,7 +84,7 @@ async def anime_scan(bot: Amime, message: Message):
 
         results = response.json()["docs"]
         if isinstance(results, str) or results is None:
-            await sent.edit(lang.no_results_text)
+            await sent.edit_text(lang.no_results_text)
             return
 
         result = results[0]

@@ -34,7 +34,15 @@ modules: List[ModuleType] = []
 
 def load(bot):
     files = glob.glob("amime/modules/**/*.py", recursive=True)
-    files = sorted(files, key=lambda file: file.split("/")[2])
+    main_dir = sorted(
+        [*filter(lambda file: len(file.split("/")) == 3, files)],
+        key=lambda file: file.split("/")[2],
+    )
+    sub_dirs = sorted(
+        [*filter(lambda file: len(file.split("/")) >= 4, files)],
+        key=lambda file: file.split("/")[3],
+    )
+    files = main_dir + sub_dirs
 
     for file_name in files:
         try:

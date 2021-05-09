@@ -1,8 +1,9 @@
-# Personal files
+# Personal
 *.session*
 *.ini
 *.sqlite*
 config.py
+venv/
 
 # Byte-compiled
 __pycache__/

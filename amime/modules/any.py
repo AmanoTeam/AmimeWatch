@@ -136,3 +136,8 @@ async def set_language_inline_query(bot: Amime, inline_query: InlineQuery):
         )
     )[0].language_bot
     inline_query._lang = lang.get_language(code)
+
+
+@Amime.on_message(filters.edited)
+async def edited(bot: Amime, message: Message):
+    message.stop_propagation()

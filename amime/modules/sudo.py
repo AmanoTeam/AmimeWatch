@@ -21,6 +21,7 @@
 # SOFTWARE.
 
 import asyncio
+import datetime
 import io
 import os
 import sys
@@ -33,9 +34,10 @@ from pyrogram.types import CallbackQuery, Message
 from pyromod.helpers import ikb
 
 from amime.amime import Amime
+from amime.utils import modules
 
 
-@Amime.on_message(filters.cmd(r"up(grad|dat)e") & filters.sudo)
+@Amime.on_message(filters.cmd(r"up(grad|dat)e$") & filters.sudo)
 async def upgrade_message(bot: Amime, message: Message):
     sent = await message.reply_text("Checking for updates...")
 
@@ -90,7 +92,7 @@ def parse_commits(log: str) -> Dict:
     return commits
 
 
-@Amime.on_callback_query(filters.regex(r"^upgrade") & filters.sudo)
+@Amime.on_callback_query(filters.regex(r"^upgrade$") & filters.sudo)
 async def upgrade_callback(bot: Amime, callback: CallbackQuery):
     await callback.edit_message_reply_markup({})
     sent = await callback.message.reply_text("Upgrading...")
@@ -229,3 +231,14 @@ async def execute_message(bot: Amime, message: Message):
                 output_message += f"<b>Output\n&gt;</b> {output}"
 
     await sent.edit_text(output_message)
+
+
+@Amime.on_message(filters.cmd(r"reload$") & filters.sudo)
+async def reload_message(bot: Amime, message: Message):
+    sent = await message.reply_text("Reloading modules...")
+    first = datetime.datetime.now().replace(tzinfo=datetime.timezone.utc)
+    modules.reload(bot)
+    second = datetime.datetime.now().replace(tzinfo=datetime.timezone.utc)
+    await sent.edit_text(
+        f"Modules reloaded in <code>{(second - first).microseconds / 1000}ms</code>."
+    )

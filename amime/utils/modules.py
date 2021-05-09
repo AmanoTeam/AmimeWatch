@@ -88,7 +88,7 @@ def reload(bot):
                 bot.add_handler(*handler)
 
     logger.info(
-        "%s module%s imported successfully!",
+        "%s module%s reloaded successfully!",
         len(modules),
         "s" if len(modules) != 1 else "",
     )

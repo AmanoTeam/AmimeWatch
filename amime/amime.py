@@ -58,6 +58,7 @@ class Amime(Client):
             workers=24,
             workdir=".",
             test_mode=test_mode,
+            sleep_threshold=180,
         )
 
         self.sudos = SUDO_USERS

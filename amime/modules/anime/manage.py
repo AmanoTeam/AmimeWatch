@@ -218,6 +218,8 @@ async def anime_episode(bot: Amime, callback: CallbackQuery):
     if str(anime_id) not in EPISODES[str(user.id)].keys():
         EPISODES[str(user.id)][str(anime_id)] = {}
 
+    chat.cancel_listener()
+
     episode = EPISODES[str(user.id)][str(anime_id)]
 
     episode_db = await Episodes.get_or_none(
@@ -442,7 +444,10 @@ async def anime_episode_edit(bot: Amime, callback: CallbackQuery):
 
     if item == "video":
         while True:
-            answer = await chat.listen(filters.video | filters.document)
+            try:
+                answer = await chat.listen(filters.video | filters.document)
+            except ListenerCanceled:
+                return
 
             if bool(answer.video):
                 duration = answer.video.duration
@@ -471,7 +476,10 @@ async def anime_episode_edit(bot: Amime, callback: CallbackQuery):
     else:
         if item == "number":
             while True:
-                answer = await chat.listen(filters.text)
+                try:
+                    answer = await chat.listen(filters.text)
+                except ListenerCanceled:
+                    return
 
                 ep = answer.text.split("-")
                 if not int(ep[0]) == number:
@@ -516,7 +524,10 @@ async def anime_episode_edit(bot: Amime, callback: CallbackQuery):
                             pass
                 break
         else:
-            answer = await chat.listen(filters.text)
+            try:
+                answer = await chat.listen(filters.text)
+            except ListenerCanceled:
+                return
 
             episode[item] = answer.text
 

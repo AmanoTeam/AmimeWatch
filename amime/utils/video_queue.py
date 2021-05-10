@@ -63,12 +63,12 @@ class VideoQueue(object):
         item = self.queue.get_nowait()
         id, video = item.values()
 
+        directory = f"./downloads/{random.randint(0, 9999)}/"
+        while os.path.exists(directory):
+            directory = f"./downloads/{random.randint(0, 9999)}/"
+
         try:
             episode = await Episodes.get(id=id)
-
-            directory = f"./downloads/{random.randint(0, 9999)}/"
-            while os.path.exists(directory):
-                directory = f"./downloads/{random.randint(0, 9999)}/"
 
             path = await self.bot.download_media(video, file_name=directory)
             attempts = 0
@@ -195,8 +195,6 @@ class VideoQueue(object):
 
             episode.update_from_dict({"file_id": video.file_id, "duration": duration})
             await episode.save()
-
-            shutil.rmtree(directory, ignore_errors=True)
         except BaseException as excep:
             text = "<b>Error processing an episode</b>\n"
             text += "\n<b>Anime</b>:"
@@ -213,6 +211,8 @@ class VideoQueue(object):
                 CHATS["staff"],
                 text,
             )
+
+        shutil.rmtree(directory, ignore_errors=True)
 
         if self.queue.empty() is False:
             await self.next()

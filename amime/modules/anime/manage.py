@@ -602,7 +602,7 @@ async def anime_episode_save(bot: Amime, callback: CallbackQuery):
             datetime=now_date,
         )
 
-    if episode["update_video"] is True:
+    if "update_video" in episode.keys() and episode["update_video"] is True:
         await bot.video_queue.add(id, video)
 
     del EPISODES[str(user.id)][str(anime_id)]

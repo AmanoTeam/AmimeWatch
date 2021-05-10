@@ -40,9 +40,10 @@ logging.basicConfig(
     datefmt="[%X]",
 )
 
-# To avoid some pyrogram annoying log
+# To avoid some annoying log
 logging.getLogger("pyrogram.syncer").setLevel(logging.WARNING)
 logging.getLogger("pyrogram.client").setLevel(logging.WARNING)
+logging.getLogger("schedule").setLevel(logging.WARNING)
 
 logger = logging.getLogger(__name__)
 

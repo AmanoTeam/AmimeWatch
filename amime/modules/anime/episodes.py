@@ -61,6 +61,7 @@ async def anime_episodes(bot: Amime, callback: CallbackQuery):
 
     episodes = await Episodes.filter(anime=anime_id, season=season, language=language)
     episodes = sorted(episodes, key=lambda episode: episode.number)
+    episodes = [*filter(lambda episode: len(episode.file_id) > 0, episodes)]
 
     episodes_list = []
     for episode in episodes:

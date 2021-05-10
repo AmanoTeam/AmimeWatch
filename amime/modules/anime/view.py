@@ -96,6 +96,7 @@ async def anime_view(bot: Amime, union: Union[CallbackQuery, Message]):
 
         episodes = await Episodes.filter(anime=anime.id)
         episodes = sorted(episodes, key=lambda episode: episode.number)
+        episodes = [*filter(lambda episode: len(episode.file_id) > 0, episodes)]
 
         text = f"<b>{anime.title.romaji}</b> (<code>{anime.title.native}</code>)\n"
         text += f"\n<b>ID</b>: <code>{anime.id}</code>"

@@ -212,7 +212,7 @@ class VideoQueue(object):
                 text,
             )
 
-        shutil.rmtree(directory, ignore_errors=True)
+        shutil.rmtree(f"amime/{directory}", ignore_errors=True)
 
         if self.queue.empty() is False:
             await self.next()

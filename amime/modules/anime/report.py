@@ -177,6 +177,7 @@ async def report_episode_confirm(bot: Amime, callback: CallbackQuery):
 
     user_db = await Users.get(id=user.id)
     language = user_db.language_anime
+    subtitled = user_db.subtitled_anime
 
     is_collaborator = await filters.collaborator(bot, callback) or bot.is_sudo(user)
 
@@ -215,6 +216,7 @@ async def report_episode_confirm(bot: Amime, callback: CallbackQuery):
         if season > 0:
             text += f"\n    <b>Season</b>: <code>{season}</code>"
         text += f"\n    <b>Episode</b>: <code>{number}</code>"
+    text += f"\n    <b>Subtitled</b>: <code>{'yes' if subtitled else 'no'}</code>"
     text += (
         f"\n    <b>Language</b>: <code>{lang.strings[language]['LANGUAGE_NAME']}</code>"
     )

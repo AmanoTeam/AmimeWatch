@@ -51,12 +51,15 @@ async def anime_episode(bot: Amime, callback: CallbackQuery):
 
         user_db = await Users.get(id=user.id)
         language = user_db.language_anime
+        subtitled = user_db.subtitled_anime
 
         episodes = await Episodes.filter(
-            anime=anime_id, season=season, language=language
+            anime=anime_id, season=season, language=language, subtitled=subtitled
         )
         episodes = sorted(episodes, key=lambda episode: episode.number)
-        all_episodes = await Episodes.filter(anime=anime_id, language=language)
+        all_episodes = await Episodes.filter(
+            anime=anime_id, language=language, subtitled=subtitled
+        )
         all_episodes = sorted(all_episodes, key=lambda episode: episode.number)
 
         episode = await Episodes.get_or_none(
@@ -64,6 +67,7 @@ async def anime_episode(bot: Amime, callback: CallbackQuery):
             season=season,
             number=number,
             language=language,
+            subtitled=subtitled,
         )
         if episode is not None:
             await Viewed.get_or_create(user=user.id, item=episode.id, type="anime")

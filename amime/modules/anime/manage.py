@@ -48,7 +48,7 @@ EPISODES = {}
 VIDEOS = {}
 
 
-@Amime.on_callback_query(filters.regex(r"^manage anime (\d+) (\d+) (\w+) (\d+)"))
+@Amime.on_callback_query(filters.regex(r"^manage anime (\d+) (\d+) (\d+) (\w+) (\d+)"))
 async def anime_manage(bot: Amime, callback: CallbackQuery):
     message = callback.message
     chat = message.chat
@@ -57,8 +57,9 @@ async def anime_manage(bot: Amime, callback: CallbackQuery):
 
     anime_id = int(callback.matches[0].group(1))
     season = int(callback.matches[0].group(2))
-    language = callback.matches[0].group(3)
-    page = int(callback.matches[0].group(4))
+    subtitled = bool(int(callback.matches[0].group(3)))
+    language = callback.matches[0].group(4)
+    page = int(callback.matches[0].group(5))
 
     if str(user.id) in VIDEOS.keys() and str(anime_id) in VIDEOS[str(user.id)].keys():
         chat.cancel_listener()
@@ -71,29 +72,36 @@ async def anime_manage(bot: Amime, callback: CallbackQuery):
         ),
         (
             f"{lang.season_button}: {season}",
-            f"manage anime season {anime_id} {season} {language} {page}",
+            f"manage anime season {anime_id} {season} {int(subtitled)} {language} {page}",
+        ),
+        (
+            f"{lang.subtitled_button}: {lang.yes if subtitled else lang.no}",
+            f"manage anime {anime_id} {season} {int(not subtitled)} {language} {page}",
         ),
         (
             lang.add_button,
-            f"manage episode {anime_id} {season} -1 {language} {page}",
+            f"manage episode {anime_id} {season} -1 {int(subtitled)} {language} {page}",
         ),
     ]
 
-    episodes = await Episodes.filter(anime=anime_id, season=season, language=language)
+    episodes = await Episodes.filter(
+        anime=anime_id, season=season, language=language, subtitled=subtitled
+    )
     episodes = sorted(episodes, key=lambda episode: episode.number)
 
     if len(episodes) >= 2:
         buttons.append(
             (
                 lang.del_season_button,
-                f"manage episode delete {anime_id} {season} -1 {language} {page}",
+                f"manage episode delete {anime_id} {season} -1 {int(subtitled)} {language} {page}",
             )
         )
     else:
         if page > 0:
             page -= 1
             matches = re.search(
-                r"(\d+) (\d+) (\w+) (\d+)", f"{anime_id} {season} {language} {page}"
+                r"(\d+) (\d+) (\d+) (\w+) (\d+)",
+                f"{anime_id} {season} {int(subtitled)} {language} {page}",
             )
             callback.matches = [matches]
             await anime_manage(bot, callback)
@@ -102,7 +110,7 @@ async def anime_manage(bot: Amime, callback: CallbackQuery):
     buttons.append(
         (
             lang.add_in_batch_button,
-            f"manage episode batch {anime_id} {season} {language} {page}",
+            f"manage episode batch {anime_id} {season} {int(subtitled)} {language} {page}",
         )
     )
 
@@ -123,9 +131,9 @@ async def anime_manage(bot: Amime, callback: CallbackQuery):
 
     layout = Pagination(
         episodes,
-        item_data=lambda i, pg: f"manage episode {i.anime} {i.season} {i.number} {language} {pg}",
+        item_data=lambda i, pg: f"manage episode {i.anime} {i.season} {i.number} {int(subtitled)} {language} {pg}",
         item_title=lambda i, pg: f"📝 {i.number}",
-        page_data=lambda pg: f"manage anime {anime_id} {season} {language} {pg}",
+        page_data=lambda pg: f"manage anime {anime_id} {season} {int(subtitled)} {language} {pg}",
     )
 
     lines = layout.create(page, lines=5, columns=3)
@@ -150,17 +158,22 @@ async def anime_manage(bot: Amime, callback: CallbackQuery):
         )
 
 
-@Amime.on_callback_query(filters.regex(r"^manage anime season (\d+) (\d+) (\w+) (\d+)"))
+@Amime.on_callback_query(
+    filters.regex(r"^manage anime season (\d+) (\d+) (\d+) (\w+) (\d+)")
+)
 async def anime_season(bot: Amime, callback: CallbackQuery):
     message = callback.message
     lang = callback._lang
 
     anime_id = int(callback.matches[0].group(1))
     season = int(callback.matches[0].group(2))
-    language = callback.matches[0].group(3)
-    page = int(callback.matches[0].group(4))
+    subtitled = bool(int(callback.matches[0].group(3)))
+    language = callback.matches[0].group(4)
+    page = int(callback.matches[0].group(5))
 
-    episodes = await Episodes.filter(anime=anime_id, language=language)
+    episodes = await Episodes.filter(
+        anime=anime_id, language=language, subtitled=subtitled
+    )
     episodes = sorted(episodes, key=lambda episode: episode.number)
 
     seasons = [0]
@@ -173,7 +186,12 @@ async def anime_season(bot: Amime, callback: CallbackQuery):
         seasons.append(season)
 
     keyboard = [
-        [(lang.add_button, f"manage anime {anime_id} {seasons[-1] + 1} {language} 1")],
+        [
+            (
+                lang.add_button,
+                f"manage anime {anime_id} {seasons[-1] + 1} {int(subtitled)} {language} 1",
+            )
+        ],
     ]
 
     buttons = []
@@ -182,14 +200,19 @@ async def anime_season(bot: Amime, callback: CallbackQuery):
         data = (
             "noop"
             if _season == season
-            else f"manage anime season {anime_id} {_season} {language} 1"
+            else f"manage anime season {anime_id} {_season} {int(subtitled)} {language} 1"
         )
         buttons.append((text, data))
 
     keyboard += array_chunk(buttons, 2)
 
     keyboard.append(
-        [(lang.back_button, f"manage anime {anime_id} {season} {language} {page}")]
+        [
+            (
+                lang.back_button,
+                f"manage anime {anime_id} {season} {int(subtitled)} {language} {page}",
+            )
+        ]
     )
 
     await message.edit_text(
@@ -199,7 +222,7 @@ async def anime_season(bot: Amime, callback: CallbackQuery):
 
 
 @Amime.on_callback_query(
-    filters.regex(r"^manage episode (\d+) (\d+) (\-?\d+) (\w+) (\d+)")
+    filters.regex(r"^manage episode (\d+) (\d+) (\-?\d+) (\d+) (\w+) (\d+)")
 )
 async def anime_episode(bot: Amime, callback: CallbackQuery):
     message = callback.message
@@ -210,8 +233,9 @@ async def anime_episode(bot: Amime, callback: CallbackQuery):
     anime_id = int(callback.matches[0].group(1))
     season = int(callback.matches[0].group(2))
     number = int(callback.matches[0].group(3))
-    language = callback.matches[0].group(4)
-    page = int(callback.matches[0].group(5))
+    subtitled = bool(int(callback.matches[0].group(4)))
+    language = callback.matches[0].group(5)
+    page = int(callback.matches[0].group(6))
 
     if str(user.id) not in EPISODES.keys():
         EPISODES[str(user.id)] = {}
@@ -223,7 +247,11 @@ async def anime_episode(bot: Amime, callback: CallbackQuery):
     episode = EPISODES[str(user.id)][str(anime_id)]
 
     episode_db = await Episodes.get_or_none(
-        anime=anime_id, season=season, number=number, language=language
+        anime=anime_id,
+        season=season,
+        number=number,
+        language=language,
+        subtitled=subtitled,
     )
     if episode_db is not None:
         if not ("id" in episode.keys() and episode["id"] == episode_db.id):
@@ -240,13 +268,18 @@ async def anime_episode(bot: Amime, callback: CallbackQuery):
         episode = EPISODES[str(user.id)][str(anime_id)]
 
         episodes = await Episodes.filter(
-            anime=anime_id, season=season, language=language
+            anime=anime_id,
+            season=season,
+            language=language,
+            subtitled=subtitled,
         )
         episodes = sorted(episodes, key=lambda episode: episode.number)
         if len(episodes) > 0:
             number = episodes[-1].number + 1
         else:
             number = 1
+
+    episode["subtitled"] = subtitled
 
     async with anilist.AsyncClient() as client:
         anime = await client.get(anime_id, "anime")
@@ -272,14 +305,14 @@ async def anime_episode(bot: Amime, callback: CallbackQuery):
             buttons.append(
                 (
                     f"✏️ {lang.name}",
-                    f"manage episode edit name {anime_id} {season} {number} {language} {page}",
+                    f"manage episode edit name {anime_id} {season} {number} {int(subtitled)} {language} {page}",
                 )
             )
         else:
             buttons.append(
                 (
                     f"➕ {lang.name}",
-                    f"manage episode edit name {anime_id} {season} {number} {language} {page}",
+                    f"manage episode edit name {anime_id} {season} {number} {int(subtitled)} {language} {page}",
                 )
             )
 
@@ -294,14 +327,14 @@ async def anime_episode(bot: Amime, callback: CallbackQuery):
             buttons.append(
                 (
                     f"✏️ {lang.episode}",
-                    f"manage episode edit number {anime_id} {season} {number} {language} {page}",
+                    f"manage episode edit number {anime_id} {season} {number} {int(subtitled)} {language} {page}",
                 )
             )
         else:
             buttons.append(
                 (
                     f"➕ {lang.episode}",
-                    f"manage episode edit number {anime_id} {season} {number} {language} {page}",
+                    f"manage episode edit number {anime_id} {season} {number} {int(subtitled)} {language} {page}",
                 )
             )
 
@@ -309,14 +342,14 @@ async def anime_episode(bot: Amime, callback: CallbackQuery):
             buttons.append(
                 (
                     f"✏️ {lang.video}",
-                    f"manage episode edit video {anime_id} {season} {number} {language} {page}",
+                    f"manage episode edit video {anime_id} {season} {number} {int(subtitled)} {language} {page}",
                 )
             )
         else:
             buttons.append(
                 (
                     f"➕ {lang.video}",
-                    f"manage episode edit video {anime_id} {season} {number} {language} {page}",
+                    f"manage episode edit video {anime_id} {season} {number} {int(subtitled)} {language} {page}",
                 )
             )
 
@@ -325,14 +358,14 @@ async def anime_episode(bot: Amime, callback: CallbackQuery):
             buttons.append(
                 (
                     f"✏️ {lang.duration}",
-                    f"manage episode edit duration {anime_id} {season} {number} {language} {page}",
+                    f"manage episode edit duration {anime_id} {season} {number} {int(subtitled)} {language} {page}",
                 )
             )
         else:
             buttons.append(
                 (
                     f"➕ {lang.duration}",
-                    f"manage episode edit duration {anime_id} {season} {number} {language} {page}",
+                    f"manage episode edit duration {anime_id} {season} {number} {int(subtitled)} {language} {page}",
                 )
             )
 
@@ -343,14 +376,14 @@ async def anime_episode(bot: Amime, callback: CallbackQuery):
             buttons.append(
                 (
                     f"✏️ {lang.notes}",
-                    f"manage episode edit notes {anime_id} {season} {number} {language} {page}",
+                    f"manage episode edit notes {anime_id} {season} {number} {int(subtitled)} {language} {page}",
                 )
             )
         else:
             buttons.append(
                 (
                     f"➕ {lang.notes}",
-                    f"manage episode edit notes {anime_id} {season} {number} {language} {page}",
+                    f"manage episode edit notes {anime_id} {season} {number} {int(subtitled)} {language} {page}",
                 )
             )
 
@@ -362,7 +395,7 @@ async def anime_episode(bot: Amime, callback: CallbackQuery):
             buttons.append(
                 (
                     lang.confirm_button,
-                    f"manage episode save {anime_id} {season} {language} {page}",
+                    f"manage episode save {anime_id} {season} {int(subtitled)} {language} {page}",
                 )
             )
 
@@ -370,12 +403,15 @@ async def anime_episode(bot: Amime, callback: CallbackQuery):
             buttons.append(
                 (
                     lang.del_button,
-                    f"manage episode delete {anime_id} {season} {number} {language} {page}",
+                    f"manage episode delete {anime_id} {season} {number} {int(subtitled)} {language} {page}",
                 )
             )
 
         buttons.append(
-            (lang.back_button, f"manage anime {anime_id} {season} {language} {page}")
+            (
+                lang.back_button,
+                f"manage anime {anime_id} {season} {int(subtitled)} {language} {page}",
+            )
         )
 
         keyboard += array_chunk(buttons, 2)
@@ -409,7 +445,7 @@ async def anime_episode(bot: Amime, callback: CallbackQuery):
 
 
 @Amime.on_callback_query(
-    filters.regex(r"^manage episode edit (\w+) (\d+) (\d+) (\-?\d+) (\w+) (\d+)")
+    filters.regex(r"^manage episode edit (\w+) (\d+) (\d+) (\-?\d+) (\d+) (\w+) (\d+)")
 )
 async def anime_episode_edit(bot: Amime, callback: CallbackQuery):
     message = callback.message
@@ -421,8 +457,9 @@ async def anime_episode_edit(bot: Amime, callback: CallbackQuery):
     anime_id = int(callback.matches[0].group(2))
     season = int(callback.matches[0].group(3))
     number = int(callback.matches[0].group(4))
-    language = callback.matches[0].group(5)
-    page = int(callback.matches[0].group(6))
+    subtitled = bool(int(callback.matches[0].group(5)))
+    language = callback.matches[0].group(6)
+    page = int(callback.matches[0].group(7))
 
     episode = EPISODES[str(user.id)][str(anime_id)]
 
@@ -430,7 +467,7 @@ async def anime_episode_edit(bot: Amime, callback: CallbackQuery):
         [
             (
                 lang.cancel_button,
-                f"manage episode {anime_id} {season} {number} {language} {page}",
+                f"manage episode {anime_id} {season} {number} {int(subtitled)} {language} {page}",
             ),
         ],
     ]
@@ -539,22 +576,26 @@ async def anime_episode_edit(bot: Amime, callback: CallbackQuery):
     EPISODES[str(user.id)][str(anime_id)] = episode
 
     matches = re.search(
-        r"(\d+) (\d+) (\-?\d+) (\w+) (\d+)",
-        f"{anime_id} {season} {number} {language} {page}",
+        r"(\d+) (\d+) (\-?\d+) (\d+) (\w+) (\d+)",
+        f"{anime_id} {season} {number} {int(subtitled)} {language} {page}",
     )
     callback.matches = [matches]
 
     await anime_episode(bot, callback)
 
 
-@Amime.on_callback_query(filters.regex(r"^manage episode save (\d+) (\d+) (\w+) (\d+)"))
+@Amime.on_callback_query(
+    filters.regex(r"^manage episode save (\d+) (\d+) (\d+) (\w+) (\d+)")
+)
 async def anime_episode_save(bot: Amime, callback: CallbackQuery):
     user = callback.from_user
     lang = callback._lang
 
     anime_id = int(callback.matches[0].group(1))
     season = int(callback.matches[0].group(2))
-    language = callback.matches[0].group(3)
+    subtitled = bool(int(callback.matches[0].group(3)))
+    language = callback.matches[0].group(4)
+    page = int(callback.matches[0].group(5))
 
     episode = EPISODES[str(user.id)][str(anime_id)]
 
@@ -583,6 +624,8 @@ async def anime_episode_save(bot: Amime, callback: CallbackQuery):
         episode["file_id"] = episode["video"].file_id
     del episode["video"]
 
+    number = episode["number"]
+
     if "id" in episode.keys():
         episode_db = await Episodes.get(id=episode["id"])
         del episode["id"]
@@ -597,7 +640,7 @@ async def anime_episode_save(bot: Amime, callback: CallbackQuery):
             item=anime_id,
             type="anime",
             season=season,
-            number=episode["number"],
+            number=number,
             language=language,
             datetime=now_date,
         )
@@ -605,15 +648,21 @@ async def anime_episode_save(bot: Amime, callback: CallbackQuery):
     if "update_video" in episode.keys() and episode["update_video"] is True:
         await bot.video_queue.add(id, video)
 
-    del EPISODES[str(user.id)][str(anime_id)]
-
     await callback.answer(lang.confirm_save_episode_alert, show_alert=True)
+
+    matches = re.search(
+        r"(\d+) (\d+) (\d+) (\w+) (\d+)",
+        f"{anime_id} {season} {int(subtitled)} {language} {page}",
+    )
+    callback.matches = [matches]
 
     await anime_manage(bot, callback)
 
+    del EPISODES[str(user.id)][str(anime_id)]
+
 
 @Amime.on_callback_query(
-    filters.regex(r"^manage episode delete (\d+) (\d+) (\-?\d+) (\w+) (\d+)")
+    filters.regex(r"^manage episode delete (\d+) (\d+) (\-?\d+) (\d+) (\w+) (\d+)")
 )
 async def anime_episode_delete(bot: Amime, callback: CallbackQuery):
     message = callback.message
@@ -623,8 +672,9 @@ async def anime_episode_delete(bot: Amime, callback: CallbackQuery):
     anime_id = int(callback.matches[0].group(1))
     season = int(callback.matches[0].group(2))
     number = int(callback.matches[0].group(3))
-    language = callback.matches[0].group(4)
-    page = int(callback.matches[0].group(5))
+    subtitled = bool(int(callback.matches[0].group(4)))
+    language = callback.matches[0].group(5)
+    page = int(callback.matches[0].group(6))
 
     episodes = []
 
@@ -633,11 +683,11 @@ async def anime_episode_delete(bot: Amime, callback: CallbackQuery):
             [
                 (
                     lang.confirm_button,
-                    f"manage episode delete {anime_id} {season} -2 {language} {page}",
+                    f"manage episode delete {anime_id} {season} -2 {int(subtitled)} {language} {page}",
                 ),
                 (
                     lang.cancel_button,
-                    f"manage anime {anime_id} {season} {language} {page}",
+                    f"manage anime {anime_id} {season} {int(subtitled)} {language} {page}",
                 ),
             ],
         ]
@@ -649,7 +699,10 @@ async def anime_episode_delete(bot: Amime, callback: CallbackQuery):
         return
     elif number == -2:
         episodes = await Episodes.filter(
-            anime=anime_id, season=season, language=language
+            anime=anime_id,
+            season=season,
+            language=language,
+            subtitled=subtitled,
         )
 
         logger.debug(
@@ -662,7 +715,11 @@ async def anime_episode_delete(bot: Amime, callback: CallbackQuery):
     else:
         episodes = [
             await Episodes.get(
-                anime=anime_id, season=season, number=number, language=language
+                anime=anime_id,
+                season=season,
+                number=number,
+                language=language,
+                subtitled=subtitled,
             )
         ]
 
@@ -685,7 +742,8 @@ async def anime_episode_delete(bot: Amime, callback: CallbackQuery):
     await callback.answer(lang.confirm_delete_episode_alert, show_alert=True)
 
     matches = re.search(
-        r"(\d+) (\d+) (\w+) (\d+)", f"{anime_id} {season} {language} {page}"
+        r"(\d+) (\d+) (\d+) (\w+) (\d+)",
+        f"{anime_id} {season} {int(subtitled)} {language} {page}",
     )
     callback.matches = [matches]
 
@@ -693,7 +751,7 @@ async def anime_episode_delete(bot: Amime, callback: CallbackQuery):
 
 
 @Amime.on_callback_query(
-    filters.regex(r"^manage episode batch (\d+) (\d+) (\w+) (\d+)")
+    filters.regex(r"^manage episode batch (\d+) (\d+) (\d+) (\w+) (\d+)")
 )
 async def anime_episode_batch(bot: Amime, callback: CallbackQuery):
     message = callback.message
@@ -703,16 +761,20 @@ async def anime_episode_batch(bot: Amime, callback: CallbackQuery):
 
     anime_id = int(callback.matches[0].group(1))
     season = int(callback.matches[0].group(2))
-    language = callback.matches[0].group(3)
-    page = int(callback.matches[0].group(4))
+    subtitled = bool(int(callback.matches[0].group(3)))
+    language = callback.matches[0].group(4)
+    page = int(callback.matches[0].group(5))
 
     keyboard = [
         [
             (
                 lang.confirm_button,
-                f"manage episode batch confirm {anime_id} {season} {language} {page}",
+                f"manage episode batch confirm {anime_id} {season} {int(subtitled)} {language} {page}",
             ),
-            (lang.back_button, f"manage anime {anime_id} {season} {language} {page}"),
+            (
+                lang.back_button,
+                f"manage anime {anime_id} {season} {int(subtitled)} {language} {page}",
+            ),
         ]
     ]
 
@@ -743,7 +805,7 @@ async def anime_episode_batch(bot: Amime, callback: CallbackQuery):
 
 
 @Amime.on_callback_query(
-    filters.regex(r"^manage episode batch confirm (\d+) (\d+) (\w+) (\d+)")
+    filters.regex(r"^manage episode batch confirm (\d+) (\d+) (\d+) (\w+) (\d+)")
 )
 async def anime_episode_batch_confirm(bot: Amime, callback: CallbackQuery):
     message = callback.message
@@ -753,8 +815,9 @@ async def anime_episode_batch_confirm(bot: Amime, callback: CallbackQuery):
 
     anime_id = int(callback.matches[0].group(1))
     season = int(callback.matches[0].group(2))
-    language = callback.matches[0].group(3)
-    page = int(callback.matches[0].group(4))
+    subtitled = bool(int(callback.matches[0].group(3)))
+    language = callback.matches[0].group(4)
+    page = int(callback.matches[0].group(5))
 
     chat.cancel_listener()
 
@@ -781,7 +844,7 @@ async def anime_episode_batch_confirm(bot: Amime, callback: CallbackQuery):
                     [
                         (
                             lang.back_button,
-                            f"manage episode batch {anime_id} {season} {language} {page}",
+                            f"manage episode batch {anime_id} {season} {int(subtitled)} {language} {page}",
                         )
                     ]
                 ]
@@ -815,6 +878,7 @@ async def anime_episode_batch_confirm(bot: Amime, callback: CallbackQuery):
                 season=season,
                 number=number,
                 language=language,
+                subtitled=subtitled,
             )
         ):
             continue
@@ -833,6 +897,7 @@ async def anime_episode_batch_confirm(bot: Amime, callback: CallbackQuery):
             duration=video.duration // 60,
             language=language,
             unified_until=unified_until or "0",
+            subtitled=subtitled,
         )
         video_id = episode.id
 

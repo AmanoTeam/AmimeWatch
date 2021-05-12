@@ -441,6 +441,10 @@ how_to_use_text: |
 how_to_use_button:
     ❓ Como usar?
 
+subtitled_button:
+    🈁 Legendado
+
+
 # Alerts
 added_to_favorites_alert:
     Item adicionado a sua lista de favoritos com sucesso!

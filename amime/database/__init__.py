@@ -52,6 +52,7 @@ class Episodes(Model):
     duration = fields.IntField(default=24)
     language = fields.CharField(max_length=6, default="ja")
     unified_until = fields.IntField(default=0)
+    subtitled = fields.BooleanField(default=True)
 
 
 class Favorites(Model):
@@ -105,6 +106,7 @@ class Users(Model):
     language_bot = fields.CharField(max_length=6, default="en")
     language_anime = fields.CharField(max_length=6, default="en")
     is_collaborator = fields.BooleanField(default=False)
+    subtitled_anime = fields.BooleanField(default=True)
 
 
 class Viewed(Model):

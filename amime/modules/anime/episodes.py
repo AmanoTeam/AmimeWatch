@@ -41,25 +41,35 @@ async def anime_episodes(bot: Amime, callback: CallbackQuery):
 
     user_db = await Users.get(id=user.id)
     language = user_db.language_anime
+    subtitled = user_db.subtitled_anime
 
-    keyboard = [
-        [
-            (
-                f"{lang.language_button}: {lang.strings[language]['LANGUAGE_NAME']}",
-                f"episodes language {anime_id} {season} {language} {page}",
-            ),
-        ],
+    buttons = [
+        (
+            f"{lang.language_button}: {lang.strings[language]['LANGUAGE_NAME']}",
+            f"episodes language {anime_id} {season} {language} {page}",
+        ),
     ]
 
     if season > 0:
-        keyboard[-1].append(
+        buttons.append(
             (
                 f"{lang.season_button}: {season}",
                 f"episodes season {anime_id} {season} {page}",
             )
         )
 
-    episodes = await Episodes.filter(anime=anime_id, season=season, language=language)
+    buttons.append(
+        (
+            f"{lang.subtitled_button}: {lang.yes if subtitled else lang.no}",
+            f"episodes subtitled {anime_id} {season} {page}",
+        )
+    )
+
+    keyboard = array_chunk(buttons, 2)
+
+    episodes = await Episodes.filter(
+        anime=anime_id, season=season, language=language, subtitled=subtitled
+    )
     episodes = sorted(episodes, key=lambda episode: episode.number)
     episodes = [*filter(lambda episode: len(episode.file_id) > 0, episodes)]
 
@@ -134,3 +144,17 @@ async def episodes_season(bot: Amime, callback: CallbackQuery):
         lang.season_text,
         reply_markup=ikb(keyboard),
     )
+
+
+@Amime.on_callback_query(filters.regex(r"^episodes subtitled (\d+) (\d+) (\d+)"))
+async def episodes_subtitled(bot: Amime, callback: CallbackQuery):
+    message = callback.message
+    chat = message.chat
+    user = callback.from_user
+    lang = callback._lang
+
+    user_db = await Users.get(id=user.id)
+    user_db.update_from_dict({"subtitled_anime": not user_db.subtitled_anime})
+    await user_db.save()
+
+    await anime_episodes(bot, callback)

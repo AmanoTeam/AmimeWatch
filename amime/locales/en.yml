@@ -441,6 +441,9 @@ how_to_use_text: |
 how_to_use_button:
     ❓ How to use?
 
+subtitled_button:
+    🈁 Subtitled
+
 
 # Alerts
 added_to_favorites_alert:

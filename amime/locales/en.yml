@@ -361,6 +361,11 @@ report_button:
 request_content_text:
     Choose the language in which you want to view the content below.
 
+request_content_done_text: |
+    Oops! Your request for <b>{title}</b> (<code>{type}</code>) is now available!
+    
+    Use the button below to view the content.
+
 request_content_button:
     🙋‍♀️ Request content
 

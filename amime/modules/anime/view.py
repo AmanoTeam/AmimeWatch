@@ -58,8 +58,8 @@ async def anime_view(bot: Amime, union: Union[CallbackQuery, Message]):
             if user_id != user.id:
                 return
 
-        is_search = union.matches[0].group(3)
-        if bool(is_search) and not is_private:
+        to_delete = union.matches[0].group(3)
+        if bool(to_delete) and not is_private:
             await message.delete()
 
     if not bool(query):
@@ -167,7 +167,7 @@ async def anime_view(bot: Amime, union: Union[CallbackQuery, Message]):
             if anime.status.lower() == "releasing":
                 if hasattr(anime, "next_airing"):
                     next_episode = anime.next_airing.episode
-                    if not len(episodes) == (next_episode - 1):
+                    if len(episodes) < (next_episode - 1):
                         buttons.append(button)
                 else:
                     buttons.append(button)

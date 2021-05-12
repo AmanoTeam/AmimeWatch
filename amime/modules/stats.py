@@ -63,12 +63,15 @@ async def stats_view(bot: Amime, message: Message):
     text += f"\n        <b>Favorited</b>: <code>{len(favorites)}</code>"
     reports = await Reports.all()
     text += f"\n        <b>Reported</b>: <code>{len(reports)}</code>"
-    requests = await Requests.all()
-    text += f"\n        <b>Requestd</b>: <code>{len(requests)}</code>"
     viewed = await Viewed.all()
     text += f"\n        <b>Viewed</b>: <code>{len(viewed)}</code>"
     watched = await Watched.all()
     text += f"\n        <b>Watched</b>: <code>{len(watched)}</code>"
+    requests = await Requests.all()
+    requests_doned = [*filter(lambda request: request.done is True, requests)]
+    text += f"\n        <b>Requests doned</b>: <code>{len(requests_doned)}</code>"
+    requests_undoned = [*filter(lambda request: request.done is False, requests)]
+    text += f"\n        <b>Requests undoned</b>: <code>{len(requests_undoned)}</code>"
     text += "\n    <b>Collaborators</b>:"
     collaborators = await Collaborators.all()
     text += f"\n        <b>Total</b>: <code>{len(collaborators)}</code>"

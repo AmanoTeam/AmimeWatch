@@ -116,9 +116,13 @@ async def request_episodes_confirm(bot: Amime, callback: CallbackQuery):
     text += (
         f"\n    <b>Language</b>: <code>{lang.strings[language]['LANGUAGE_NAME']}</code>"
     )
-    text += "\n\n#REQUEST #EPISODES"
+    text += "\n\n#REQUEST"
 
-    await bot.send_message(CHATS["requests"], text)
+    await bot.send_message(
+        CHATS["requests"],
+        text,
+        reply_markup=ikb([[("🆙 Get", f"request get anime {anime_id} {language}")]]),
+    )
 
     await callback.answer(lang.request_sent_alert, show_alert=True)
 

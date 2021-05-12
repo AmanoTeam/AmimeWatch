@@ -361,6 +361,11 @@ report_button:
 request_content_text:
     Escolha abaixo o idioma em que você quer ver o conteúdo.
 
+request_content_done_text: |
+    Opa! O seu pedido de <b>{title}</b> (<code>{type}</code>) já se encontra disponível!
+    
+    Use o botão abaixo para ver o conteúdo.
+
 request_content_button:
     🙋‍♀️ Requisitar conteúdo
 

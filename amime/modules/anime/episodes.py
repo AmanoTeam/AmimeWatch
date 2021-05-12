@@ -73,6 +73,22 @@ async def anime_episodes(bot: Amime, callback: CallbackQuery):
     episodes = sorted(episodes, key=lambda episode: episode.number)
     episodes = [*filter(lambda episode: len(episode.file_id) > 0, episodes)]
 
+    for episode in sorted(
+        episodes,
+        key=lambda episode: episode.number,
+        reverse=True,
+    ):
+        if await Watched.get_or_none(user=user.id, episode=episode.id) is not None:
+            keyboard.append(
+                [
+                    (
+                        f"{lang.last_watched_button}: {lang.episode[0]}{episode.number}",
+                        f"episode {anime_id} {episode.season} {episode.number}",
+                    )
+                ]
+            )
+            break
+
     episodes_list = []
     for episode in episodes:
         viewed = bool(await Viewed.get_or_none(user=user.id, item=episode.id))

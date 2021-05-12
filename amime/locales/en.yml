@@ -444,6 +444,9 @@ how_to_use_button:
 subtitled_button:
     🈁 Subtitled
 
+last_watched_button:
+    🎦 Last watched
+
 
 # Alerts
 added_to_favorites_alert:

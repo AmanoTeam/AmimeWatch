@@ -68,7 +68,7 @@ async def anime_manage(bot: Amime, callback: CallbackQuery):
     buttons = [
         (
             f"{lang.language_button}: {lang.strings[language]['LANGUAGE_NAME']}",
-            f"manage anime language {anime_id} {season} {language} {page}",
+            f"manage anime language {anime_id} {season} {int(subtitled)} {language} {page}",
         ),
         (
             f"{lang.season_button}: {season}",

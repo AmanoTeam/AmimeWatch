@@ -67,9 +67,9 @@ class VideoQueue(object):
         while os.path.exists(directory):
             directory = f"./downloads/{random.randint(0, 9999)}/"
 
-        try:
-            episode = await Episodes.get(id=id)
+        episode = await Episodes.get(id=id)
 
+        try:
             path = await self.bot.download_media(video, file_name=directory)
             attempts = 0
             while not bool(path):

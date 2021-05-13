@@ -22,6 +22,7 @@
 
 import base64
 import os
+import urllib
 
 import httpx
 import pendulum
@@ -89,30 +90,49 @@ async def anime_scan(bot: Amime, message: Message):
 
         result = results[0]
 
-        text = f"<b>{result['title_romaji']}</b>"
-        if bool(result["title_native"]):
-            text += f" (<code>{result['title_native']}</code>)"
+        at = result["at"]
+        to_time = result["to"]
+        episode = result["episode"]
+        anilist_id = result["anilist_id"]
+        file_name = result["filename"]
+        from_time = result["from"]
+        similarity = result["similarity"]
+        token_thumb = result["tokenthumb"]
+        title_native = result["title_native"]
+        title_romaji = result["title_romaji"]
+
+        text = f"<b>{title_romaji}</b>"
+        if bool(title_native):
+            text += f" (<code>{title_native}</code>)"
         text += "\n"
-        at = pendulum.from_timestamp(result["at"]).to_time_string()
-        text += f"\n<b>{lang.at}</b>: <code>{at}</code>"
-        if bool(result["episode"]):
-            text += f"\n<b>{lang.episode}</b>: <code>{result['episode']}</code>"
-        percent = round(result["similarity"] * 100, 2)
-        text += f"\n<b>{lang.similarity}</b>: <code>{percent}%</code>"
+        text += f"\n<b>ID</b>: <code>{anilist_id}</code>"
+        text += f"\n<b>{lang.at}</b>: <code>{pendulum.from_timestamp(at).to_time_string()}</code>"
+        if bool(episode):
+            text += f"\n<b>{lang.episode}</b>: <code>{episode}</code>"
+        text += (
+            f"\n<b>{lang.similarity}</b>: <code>{round(similarity * 100, 2)}%</code>"
+        )
 
         await sent.edit_media(
             InputMediaPhoto(
-                f"https://img.anili.st/media/{result['anilist_id']}",
+                f"https://img.anili.st/media/{anilist_id}",
                 text,
             ),
             reply_markup=ikb(
                 [
                     [
-                        (lang.view_more_button, f"anime {result['anilist_id']}"),
+                        (lang.view_more_button, f"anime {anilist_id}"),
                     ]
                 ]
             ),
         )
+        try:
+            await sent.reply_video(
+                f"https://media.trace.moe/video/{anilist_id}/{urllib.parse.quote(file_name)}?t={at}&token={token_thumb}&size=l",
+                caption=f"<code>{file_name}</code>\n\n<code>{pendulum.from_timestamp(from_time).to_time_string()}</code> - <code>{pendulum.from_timestamp(to_time).to_time_string()}</code>",
+            )
+        except BaseException:
+            pass
 
         await client.aclose()
 

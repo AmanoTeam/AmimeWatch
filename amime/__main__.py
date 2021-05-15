@@ -20,26 +20,35 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+import asyncio
 import os
 import sys
 
 from pyrogram import idle
+from pyrogram.session import Session
 from tortoise import run_async
 
-from amime.amime import Amime
+from amime.amime import Amime, logger
 from amime.database import connect_database
 
+# Disable ugly pyrogram notice print
+Session.notice_displayed = True
 
-async def main():
-    os.system("cls||clear")
 
+async def start():
     await connect_database()
 
     test_mode = "--mode=test" in sys.argv
     amime = Amime(test_mode)
+
     await amime.start()
     await idle()
 
 
 if __name__ == "__main__":
-    run_async(main())
+    os.system("cls||clear")
+
+    try:
+        run_async(start())
+    except KeyboardInterrupt:
+        logger.warning("Forced stopped. Bye.")

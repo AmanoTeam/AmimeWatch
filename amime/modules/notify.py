@@ -69,6 +69,8 @@ async def notify_callback(bot: Amime, callback: CallbackQuery):
     if recipient_type == "group":
         if not await filters.administrator(bot, callback):
             return
+    elif content_type == "episodes":
+        callback.continue_propagation()
 
     notify = await Notify.get_or_none(
         recipient=recipient_id,

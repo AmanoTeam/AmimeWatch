@@ -126,7 +126,7 @@ async def notify_episodes_confirm(bot: Amime, callback: CallbackQuery):
             if notification.season not in seasons:
                 seasons[notification.season] = []
 
-        seasons[notification.season].append(notification.number)
+            seasons[notification.season].append(notification.number)
 
         for season in seasons.values():
             season.sort()

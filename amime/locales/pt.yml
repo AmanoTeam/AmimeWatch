@@ -369,8 +369,23 @@ request_content_done_text: |
 request_content_button:
     🙋‍♀️ Requisitar conteúdo
 
-notify_users_episodes_text: |
-    Opa! Novo(s) episódio(s) de <b>{title}</b> (<b>ID</b>: <code>{id}</code>) foram adicionado(s)!
+notify_users_anime_subtitled_text: |
+    Opa! O anime <b>{title}</b> (<b>ID</b>: <code>{id}</code>) foi adicionado legendado!
+
+notify_users_anime_dubbed_text: |
+    Opa! O anime <b>{title}</b> (<b>ID</b>: <code>{id}</code>) foi adicionado dublado!
+
+notify_users_episode_subtitled_text: |
+    Opa! O novo episódio <code>{number}</code> (legendado) de <b>{title}</b> (<b>ID</b>: <code>{id}</code>) foi adicionado!
+
+notify_users_episode_dubbed_text: |
+    Opa! O novo episódio <code>{number}</code> (dublado) de <b>{title}</b> (<b>ID</b>: <code>{id}</code>) foi adicionado!
+
+notify_users_episode_season_subtitled_text: |
+    Opa! O novo episódio <code>{number}</code> da temporada <b>{season}</b> (legendado) de <b>{title}</b> (<b>ID</b>: <code>{id}</code>) foi adicionado!
+
+notify_users_episode_season_dubbed_text: |
+    Opa! O novo episódio <code>{number}</code> da temporada <b>{season}</b> (dublado) de <b>{title}</b> (<b>ID</b>: <code>{id}</code>) foi adicionado!
 
 notify_users_button:
     🛎️ Notificar usuários
@@ -444,8 +459,8 @@ how_to_use_button:
 subtitled_button:
     🈁 Legendado
 
-last_watched_button:
-    🎦 Último assistido
+next_episode_button:
+    🎦 Próximo episódio
 
 
 # Alerts

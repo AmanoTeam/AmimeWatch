@@ -106,36 +106,36 @@ class VideoQueue(object):
                 anime = await anilist.AsyncClient().get(episode.anime, "anime")
                 await asyncio.sleep(5)
 
+            codec = None
+            softsubbed = False
+
+            proc = await asyncio.create_subprocess_shell(
+                f'ffmpeg -i "{path}" -hide_banner',
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.STDOUT,
+            )
+            stdout = (await proc.communicate())[0]
+
+            lines = stdout.decode().lower().splitlines()
+            for line in lines:
+                if (time := re.search(r"(\d+):(\d+):(\d+)", line)) :
+                    hours, minutes, seconds = time.groups()
+                    duration = 0
+                    duration += int(hours) * 60 * 60
+                    duration += int(minutes) * 60
+                    duration += int(seconds)
+                    video.duration = duration
+                if (resolution := re.search(r"(\d+)x(\d+)", line)) :
+                    width, height = resolution.groups()
+                    video.width = int(width)
+                    video.height = int(height)
+                if (codec := re.search(r"video: (\w+)", line)) :
+                    codec = codec.group(1)
+                if re.search(r"\((\w+)\): subtitle: (\w+)", line):
+                    softsubbed = True
+
             if isinstance(video, Document):
                 if extension == "mkv":
-                    codec = None
-                    softsubbed = False
-
-                    proc = await asyncio.create_subprocess_shell(
-                        f'ffmpeg -i "{path}" -hide_banner',
-                        stdout=asyncio.subprocess.PIPE,
-                        stderr=asyncio.subprocess.STDOUT,
-                    )
-                    stdout = (await proc.communicate())[0]
-
-                    lines = stdout.decode().lower().splitlines()
-                    for line in lines:
-                        if (time := re.search(r"(\d+):(\d+):(\d+)", line)) :
-                            hours, minutes, seconds = time.groups()
-                            duration = 0
-                            duration += int(hours) * 60 * 60
-                            duration += int(minutes) * 60
-                            duration += int(seconds)
-                            video.duration = duration
-                        if (resolution := re.search(r"(\d+)x(\d+)", line)) :
-                            width, height = resolution.groups()
-                            video.width = int(width)
-                            video.height = int(height)
-                        if (codec := re.search(r"video: (\w+)", line)) :
-                            codec = codec.group(1)
-                        if re.search(r"\((\w+)\): subtitle: (\w+)", line):
-                            softsubbed = True
-
                     new_path = path.replace(".mkv", ".mp4")
                     crf = "-crf 18 " if codec == "hevc" else ""
                     if softsubbed:
@@ -147,7 +147,7 @@ class VideoQueue(object):
                             else "550k"
                         )
                         proc = await asyncio.create_subprocess_shell(
-                            f'ffmpeg -i "{path}" -vf subtitles="{path}":si=0:force_style="FontName=Trebuchet MS Bold" -c:v libx264 {crf}-pix_fmt yuv420p -b:v {bitrate} -c:a aac -map 0:v -map 0:a:0 "{new_path}" -y',
+                            f'ffmpeg -i "{path}" -vf subtitles="{path}":si=0:force_style="FontName=Trebuchet MS Bold,Fontsize=24" -c:v libx264 {crf}-pix_fmt yuv420p -b:v {bitrate} -c:a aac -map 0:v -map 0:a:0 "{new_path}" -y',
                             stdout=asyncio.subprocess.PIPE,
                             stderr=asyncio.subprocess.STDOUT,
                         )
@@ -211,8 +211,8 @@ class VideoQueue(object):
                 CHATS["staff"],
                 text,
             )
-
-        shutil.rmtree(f"amime/{directory}", ignore_errors=True)
+        finally:
+            shutil.rmtree(f"amime/{directory}", ignore_errors=True)
 
         if self.queue.empty() is False:
             await self.next()

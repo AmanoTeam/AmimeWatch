@@ -123,7 +123,7 @@ async def anime_manage(bot: Amime, callback: CallbackQuery):
         buttons.append(
             (
                 lang.notify_users_button,
-                f"notify episodes {anime_id} {season} {language} {page}",
+                f"notify episodes {anime_id} {season} {int(subtitled)} {language} {page}",
             )
         )
 

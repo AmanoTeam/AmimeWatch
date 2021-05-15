@@ -20,6 +20,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+import math
+
 from pyrogram import filters
 from pyrogram.types import CallbackQuery, InputMediaPhoto
 from pyromod.helpers import array_chunk, ikb
@@ -73,20 +75,20 @@ async def anime_episodes(bot: Amime, callback: CallbackQuery):
     episodes = sorted(episodes, key=lambda episode: episode.number)
     episodes = [*filter(lambda episode: len(episode.file_id) > 0, episodes)]
 
-    for episode in sorted(
-        episodes,
-        key=lambda episode: episode.number,
-        reverse=True,
-    ):
-        if await Watched.get_or_none(user=user.id, episode=episode.id) is not None:
-            keyboard.append(
-                [
-                    (
-                        f"{lang.last_watched_button}: {lang.episode[0]}{episode.number}",
-                        f"episode {anime_id} {episode.season} {episode.number}",
-                    )
-                ]
-            )
+    for index, episode in enumerate(episodes):
+        index += 1
+
+        if await Watched.get_or_none(user=user.id, episode=episode.id) is None:
+
+            if math.ceil(index / (5 * 3)) != page:
+                keyboard.append(
+                    [
+                        (
+                            f"{lang.next_episode_button}: {lang.episode[0]}{episode.number}",
+                            f"episode {anime_id} {episode.season} {episode.number}",
+                        )
+                    ]
+                )
             break
 
     episodes_list = []

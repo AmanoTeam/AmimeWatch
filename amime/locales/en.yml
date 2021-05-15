@@ -369,8 +369,23 @@ request_content_done_text: |
 request_content_button:
     🙋‍♀️ Request content
 
-notify_users_episodes_text: |
-    Oops! New episode(s) of <b>{title}</b> (<b>ID</b>: <code>{id}</code>) have been added!
+notify_users_anime_subtitled_text: |
+    Oops! The anime <b>{title}</b> (<b>ID</b>: <code>{id}</code>) has been added subtitled!
+
+notify_users_anime_dubbed_text: |
+    Oops! The anime <b>{title}</b> (<b>ID</b>: <code>{id}</code>) has been added dubbed!
+
+notify_users_episode_subtitled_text: |
+    Oops! The new <code>{number}</code> (subtitled) episode of <b>{title}</b> (<b>ID</b>: <code>{id}</code>) has been added!
+
+notify_users_episode_dubbed_text: |
+    Oops! The new <code>{number}</code> (dubbed) episode of <b>{title}</b> (<b>ID</b>: <code>{id}</code>) has been added!
+
+notify_users_episode_season_subtitled_text: |
+    Oops! The new <code>{number}</code> episode of <b>{season}</b> (subtitled) season of <b>{title}</b> (<b>ID</b>: <code>{id}</code>) has been added!
+
+notify_users_episode_season_dubbed_text: |
+    Oops! The new <code>{number}</code> episode of <b>{season}</b> (dubbed) season of <b>{title}</b> (<b>ID</b>: <code>{id}</code>) has been added!
 
 notify_users_button:
     🛎️ Notify users
@@ -444,8 +459,8 @@ how_to_use_button:
 subtitled_button:
     🈁 Subtitled
 
-last_watched_button:
-    🎦 Last watched
+next_episode_button:
+    🎦 Next episode
 
 
 # Alerts

@@ -95,7 +95,7 @@ async def notify_episodes_confirm(bot: Amime, callback: CallbackQuery):
         if notification.number >= (anime.next_airing.episode - 1):
             if notification.season > 0:
                 if subtitled:
-                    text = lang.notify_users_episode_season_subtitled_text
+                    text = lang.notify_users_episode_season_subbed_text
                 else:
                     text = lang.notify_users_episode_season_dubbed_text
                 text = text(
@@ -106,7 +106,7 @@ async def notify_episodes_confirm(bot: Amime, callback: CallbackQuery):
                 )
             else:
                 if subtitled:
-                    text = lang.notify_users_episode_subtitled_text
+                    text = lang.notify_users_episode_subbed_text
                 else:
                     text = lang.notify_users_episode_dubbed_text
                 text = text(
@@ -115,11 +115,11 @@ async def notify_episodes_confirm(bot: Amime, callback: CallbackQuery):
 
     if text is None:
         if subtitled:
-            text = lang.notify_users_anime_subtitled_text
+            text = lang.notify_users_anime_subbed_text
         else:
             text = lang.notify_users_anime_dubbed_text
         text = text(title=anime.title.romaji, id=anime_id)
-        text += f"\n<b>{lang.episode}s</b>:"
+        text += f"\n<b>{lang.episode}s</b>:\n"
 
         seasons = {}
         for notification in notifications:
@@ -132,15 +132,15 @@ async def notify_episodes_confirm(bot: Amime, callback: CallbackQuery):
             season.sort()
 
         for season in seasons.items():
-            text += "\n    "
+            text += "    "
             if season[0] > 0:
                 text += f"<b>{lang.season[0]}{season[0]}</b>: "
             text += f"<code>{season[1][0]}"
             if len(season[1]) > 1:
                 text += f"-{season[1][-1]}"
-            text += "</code>"
+            text += "</code>\n"
 
-    text += f"\n\n<b>{lang.date}</b>: {date}"
+    text += f"\n<b>{lang.date}</b>: {date}"
 
     keyboard = [
         [

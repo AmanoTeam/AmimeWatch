@@ -118,14 +118,14 @@ class VideoQueue(object):
 
             lines = stdout.decode().lower().splitlines()
             for line in lines:
-                if (time := re.search(r"(\d+):(\d+):(\d+)", line)) :
+                if (time := re.search(r"duration: (\d+):(\d+):(\d+)", line)) :
                     hours, minutes, seconds = time.groups()
                     duration = 0
                     duration += int(hours) * 60 * 60
                     duration += int(minutes) * 60
                     duration += int(seconds)
                     video.duration = duration
-                if (resolution := re.search(r"(\d+)x(\d+)", line)) :
+                if (resolution := re.search(r", (\d+)x(\d+) \[", line)) :
                     width, height = resolution.groups()
                     video.width = int(width)
                     video.height = int(height)

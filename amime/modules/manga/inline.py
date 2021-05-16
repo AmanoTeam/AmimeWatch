@@ -68,8 +68,10 @@ async def manga_inline(bot: Amime, inline_query: InlineQuery):
                 description = re.sub(re.compile(r"<.*?>"), "", description)
                 description = description[0:260] + "..."
 
-            text = f"<b>{manga.title.romaji}</b> (<code>{manga.title.native}</code>)\n"
-            text += f"\n<b>ID</b>: <code>{manga.id}</code> (<b>MANGA</b>)"
+            text = f"<b>{manga.title.romaji}</b>"
+            if hasattr(manga.title, "native"):
+                text += f" (<code>{manga.title.native}</code>)"
+            text += f"\n\n<b>ID</b>: <code>{manga.id}</code> (<b>MANGA</b>)"
             if hasattr(manga, "score"):
                 if hasattr(manga.score, "average"):
                     text += f"\n<b>{lang.score}</b>: <code>{manga.score.average}</code>"

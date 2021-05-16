@@ -98,8 +98,10 @@ async def manga_view(bot: Amime, union: Union[CallbackQuery, Message]):
             elif hasattr(manga.cover, "medium"):
                 photo = manga.cover.medium
 
-        text = f"<b>{manga.title.romaji}</b> (<code>{manga.title.native}</code>)\n"
-        text += f"\n<b>ID</b>: <code>{manga.id}</code>"
+        text = f"<b>{manga.title.romaji}</b>"
+        if hasattr(manga.title, "native"):
+            text += f" (<code>{manga.title.native}</code>)"
+        text += f"\n\n<b>ID</b>: <code>{manga.id}</code>"
         if hasattr(manga, "score"):
             if hasattr(manga.score, "average"):
                 text += f"\n<b>{lang.score}</b>: <code>{manga.score.average}</code>"

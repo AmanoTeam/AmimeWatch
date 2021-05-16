@@ -71,8 +71,10 @@ async def anime_inline(bot: Amime, inline_query: InlineQuery):
                 description = re.sub(re.compile(r"<.*?>"), "", description)
                 description = description[0:260] + "..."
 
-            text = f"<b>{anime.title.romaji}</b> (<code>{anime.title.native}</code>)\n"
-            text += f"\n<b>ID</b>: <code>{anime.id}</code> (<b>ANIME</b>)"
+            text = f"<b>{anime.title.romaji}</b>"
+            if hasattr(anime.title, "native"):
+                text += f" (<code>{anime.title.native}</code>)"
+            text += f"\n\n<b>ID</b>: <code>{anime.id}</code> (<b>ANIME</b>)"
             if hasattr(anime, "score"):
                 if hasattr(anime.score, "average"):
                     text += f"\n<b>{lang.score}</b>: <code>{anime.score.average}</code>"

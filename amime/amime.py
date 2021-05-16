@@ -25,7 +25,7 @@ import datetime
 import logging
 import sys
 
-import aioschedule as schedule
+import aiocron
 import pyromod.listen
 from pyrogram import Client, __version__
 from pyrogram.raw.all import layer
@@ -43,7 +43,6 @@ logging.basicConfig(
 # To avoid some annoying log
 logging.getLogger("pyrogram.syncer").setLevel(logging.WARNING)
 logging.getLogger("pyrogram.client").setLevel(logging.WARNING)
-logging.getLogger("schedule").setLevel(logging.WARNING)
 
 logger = logging.getLogger(__name__)
 
@@ -88,16 +87,15 @@ class Amime(Client):
         if self.test_mode:
             await asyncio.sleep(10)
             sys.exit(0)
-        else:
+
+        aiocron.crontab("0 * * * *", func=backup.save, args=(self,), start=True)
+        aiocron.crontab("0 0 * * *", func=day_releases.load, args=(self,), start=True)
+        aiocron.crontab(
+            "*/10 * * * *", func=day_releases.reload, args=(self,), start=True
+        )
+
+        if self.start_datetime.hour > 0:
             await day_releases.load(self)
-
-            schedule.every(1).hour.do(backup.save_in_telegram, bot=self)
-            schedule.every(15).minutes.do(day_releases.reload, bot=self)
-            schedule.every().day.at("00:00").do(day_releases.load, bot=self)
-
-            while True:
-                await schedule.run_pending()
-                await asyncio.sleep(1)
 
     async def stop(self, *args):
         await super().stop(*args)

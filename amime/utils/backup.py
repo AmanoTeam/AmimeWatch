@@ -23,14 +23,12 @@
 import datetime
 import logging
 
-from pyrogram import Client
-
 from amime.config import CHATS
 
 logger = logging.getLogger(__name__)
 
 
-async def save_in_telegram(bot: Client):
+async def save(bot):
     date = datetime.datetime.now().strftime("%H:%M:%S - %d/%m/%Y")
 
     logger.warning("Saving the database in Telegram...")

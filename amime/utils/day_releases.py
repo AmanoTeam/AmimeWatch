@@ -30,13 +30,15 @@ from amime.database import Episodes
 
 
 async def load(bot):
-    animes = {}
-
     now = datetime.datetime.now().replace(tzinfo=datetime.timezone.utc)
 
     sent = await bot.send_message(CHATS["staff"], "Checking the day's releases...")
 
-    def check_repeated(episode, animes):
+    animes = {}
+
+    def check_repeated(episode):
+        nonlocal animes
+
         if episode.anime in animes.keys():
             return None
         else:
@@ -45,18 +47,17 @@ async def load(bot):
 
     async with anilist.AsyncClient() as client:
         episodes = await Episodes.all()
-        episodes = [check_repeated(episode, animes) for episode in episodes]
-        episodes = [*filter(lambda episode: episode is not None, episodes)]
+        episodes = [
+            *filter(lambda episode: check_repeated(episode) is not None, episodes)
+        ]
 
         for episode in episodes:
-            await asyncio.sleep(0.5)
-
             bot.day_releases = animes
 
             anime = await client.get(episode.anime, "anime")
             while anime is None:
                 anime = await client.get(episode.anime, "anime")
-                await asyncio.sleep(5)
+                await asyncio.sleep(3)
 
             if anime.status.lower() == "releasing":
                 if hasattr(anime, "next_airing"):
@@ -82,9 +83,9 @@ async def load(bot):
 
 
 async def reload(bot):
-    animes = bot.day_releases
-
     now = datetime.datetime.now().replace(tzinfo=datetime.timezone.utc)
+
+    animes = bot.day_releases
 
     for key, value in animes.items():
         if value[3]:

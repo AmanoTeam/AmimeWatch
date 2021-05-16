@@ -75,12 +75,16 @@ async def anime_episodes(bot: Amime, callback: CallbackQuery):
     episodes = sorted(episodes, key=lambda episode: episode.number)
     episodes = [*filter(lambda episode: len(episode.file_id) > 0, episodes)]
 
-    for index, episode in enumerate(episodes):
-        index += 1
+    for index, episode in enumerate(
+        sorted(episodes, key=lambda episode: episode.number, reverse=True)
+    ):
+        if await Watched.get_or_none(user=user.id, episode=episode.id) is not None:
+            episode = episodes[-index]
 
-        if await Watched.get_or_none(user=user.id, episode=episode.id) is None:
+            if index == 0:
+                break
 
-            if math.ceil(index / (5 * 3)) != page:
+            if math.ceil(episode.number / (5 * 3)) != page:
                 keyboard.append(
                     [
                         (

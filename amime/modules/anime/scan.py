@@ -20,7 +20,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import base64
 import os
 import urllib
 
@@ -28,7 +27,7 @@ import httpx
 import pendulum
 from pyrogram import filters
 from pyrogram.types import Document, InputMediaPhoto, Message, Video
-from pyromod.helpers import ikb
+from pyromod.helpers import bki, ikb
 
 from amime.amime import Amime
 
@@ -60,15 +59,13 @@ async def anime_scan(bot: Amime, message: Message):
     )
 
     path = await bot.download_media(media)
-    file = None
-    with open(path, "rb") as f:
-        file = base64.b64encode(f.read())
-        f.close()
 
     async with httpx.AsyncClient(http2=True) as client:
         try:
             response = await client.post(
-                "https://trace.moe/api/search", data=dict(image=file), timeout=20.0
+                "https://api.trace.moe/search?anilistInfo&cutBorders",
+                files=dict(image=open(path, "rb")),
+                timeout=20.0,
             )
         except httpx.TimeoutException:
             await sent.edit_text(lang.timed_out_text)
@@ -83,37 +80,36 @@ async def anime_scan(bot: Amime, message: Message):
             await sent.edit_text(lang.api_down_text)
             return
 
-        results = response.json()["docs"]
-        if isinstance(results, str) or results is None:
+        data = response.json()
+        results = data["result"]
+        if len(results) == 0:
             await sent.edit_text(lang.no_results_text)
             return
 
         result = results[0]
 
-        at = result["at"]
+        video = result["video"]
         to_time = result["to"]
         episode = result["episode"]
-        anilist_id = result["anilist_id"]
+        anilist_id = result["anilist"]["id"]
         file_name = result["filename"]
         from_time = result["from"]
         similarity = result["similarity"]
-        token_thumb = result["tokenthumb"]
-        title_native = result["title_native"]
-        title_romaji = result["title_romaji"]
+        title_native = result["anilist"]["title"]["native"]
+        title_romaji = result["anilist"]["title"]["romaji"]
 
         text = f"<b>{title_romaji}</b>"
         if bool(title_native):
             text += f" (<code>{title_native}</code>)"
         text += "\n"
         text += f"\n<b>ID</b>: <code>{anilist_id}</code>"
-        text += f"\n<b>{lang.at}</b>: <code>{pendulum.from_timestamp(at).to_time_string()}</code>"
-        if bool(episode):
+        if episode is not None:
             text += f"\n<b>{lang.episode}</b>: <code>{episode}</code>"
         text += (
             f"\n<b>{lang.similarity}</b>: <code>{round(similarity * 100, 2)}%</code>"
         )
 
-        await sent.edit_media(
+        sent = await sent.edit_media(
             InputMediaPhoto(
                 f"https://img.anili.st/media/{anilist_id}",
                 text,
@@ -126,13 +122,21 @@ async def anime_scan(bot: Amime, message: Message):
                 ]
             ),
         )
-        try:
-            await sent.reply_video(
-                f"https://media.trace.moe/video/{anilist_id}/{urllib.parse.quote(file_name)}?t={at}&token={token_thumb}&size=l",
-                caption=f"<code>{file_name}</code>\n\n<code>{pendulum.from_timestamp(from_time).to_time_string()}</code> - <code>{pendulum.from_timestamp(to_time).to_time_string()}</code>",
-            )
-        except BaseException:
-            pass
+
+        if video is not None:
+            try:
+                sent_video = await sent.reply_video(
+                    video,
+                    caption=f"<code>{file_name}</code>\n\n<code>{pendulum.from_timestamp(from_time).to_time_string()}</code> - <code>{pendulum.from_timestamp(to_time).to_time_string()}</code>",
+                )
+
+                keyboard = bki(sent.reply_markup)
+                keyboard[0].append(("📹 Preview", sent_video.link, "url"))
+                await sent.edit_reply_markup(
+                    reply_markup=ikb(keyboard),
+                )
+            except BaseException:
+                pass
 
         await client.aclose()
 

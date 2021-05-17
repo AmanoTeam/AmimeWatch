@@ -109,7 +109,7 @@ async def anime_inline(bot: Amime, inline_query: InlineQuery):
             results.append(
                 InlineQueryResultPhoto(
                     photo_url=photo,
-                    title=anime.title.romaji,
+                    title=f"{anime.title.romaji} | {anime.format}",
                     description=description,
                     caption=text,
                     reply_markup=ikb(keyboard),

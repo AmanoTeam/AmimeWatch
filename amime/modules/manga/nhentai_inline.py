@@ -28,6 +28,7 @@ import bs4
 import httpx
 import telegraph
 from pyrogram import filters
+from pyrogram.errors import QueryIdInvalid
 from pyrogram.types import InlineQuery, InlineQueryResultPhoto
 from pyromod.helpers import ikb
 
@@ -54,6 +55,9 @@ async def nhentai_inline(bot: Amime, inline_query: InlineQuery):
     for manga in search_results:
         if manga is None:
             continue
+
+        if len(results) >= 15:
+            break
 
         text = f"<b>{manga.title}</b>"
         text += f"\n\n<b>ID</b>: <code>{manga.id}</code> (<b>NHENTAI</b>)"
@@ -87,11 +91,14 @@ async def nhentai_inline(bot: Amime, inline_query: InlineQuery):
         )
 
     if len(results) > 0:
-        await inline_query.answer(
-            results=results,
-            is_gallery=False,
-            cache_time=3,
-        )
+        try:
+            await inline_query.answer(
+                results=results,
+                is_gallery=False,
+                cache_time=3,
+            )
+        except QueryIdInvalid:
+            pass
 
 
 async def get_data(m_id: int):

@@ -26,6 +26,7 @@ from typing import List
 
 import anilist
 from pyrogram import filters
+from pyrogram.errors import QueryIdInvalid
 from pyrogram.types import InlineQuery, InlineQueryResultPhoto
 from pyromod.helpers import ikb
 
@@ -40,7 +41,7 @@ async def character_inline(bot: Amime, inline_query: InlineQuery):
     results: List[InlineQueryResultPhoto] = []
 
     async with anilist.AsyncClient() as client:
-        search_results = await client.search(query, "character", 10)
+        search_results = await client.search(query, "character", 15)
         while search_results is None:
             search_results = await client.search(query, "character", 10)
             await asyncio.sleep(5)
@@ -95,8 +96,11 @@ async def character_inline(bot: Amime, inline_query: InlineQuery):
             )
 
     if len(results) > 0:
-        await inline_query.answer(
-            results=results,
-            is_gallery=False,
-            cache_time=3,
-        )
+        try:
+            await inline_query.answer(
+                results=results,
+                is_gallery=False,
+                cache_time=3,
+            )
+        except QueryIdInvalid:
+            pass

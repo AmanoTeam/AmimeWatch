@@ -28,6 +28,7 @@ from typing import Dict, Optional, Union
 
 import async_files
 import bs4
+import httpcore
 import httpx
 
 
@@ -149,7 +150,12 @@ class AnimesVision:
                         await file.close()
 
                 await client.aclose()
-        except (httpx.ConnectError, httpx.ReadTimeout, httpx.RemoteProtocolError):
+        except (
+            httpcore.ConnectError,
+            httpx.ConnectError,
+            httpx.ReadTimeout,
+            httpx.RemoteProtocolError,
+        ):
             shutil.rmtree(directory, ignore_errors=True)
             return await self.download(quality, number)
         except KeyError:

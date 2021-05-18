@@ -87,21 +87,22 @@ async def reload(bot):
 
     animes = bot.day_releases
 
-    for key, value in animes.items():
-        if value[3]:
-            continue
+    if animes is not None:
+        for key, value in animes.items():
+            if value[3]:
+                continue
 
-        if (
-            now.hour >= value[2].hour
-            and now.minute >= value[2].minute
-            and now.second >= value[2].second
-        ):
-            await bot.send_message(
-                CHATS["staff"],
-                f"Episode <code>{value[1]}</code> of <b>{value[0]}</b> (<code>{key}</code>) has just been released. <code>{now.strftime('%H:%M:%S')}</code>",
-            )
+            if (
+                now.hour >= value[2].hour
+                and now.minute >= value[2].minute
+                and now.second >= value[2].second
+            ):
+                await bot.send_message(
+                    CHATS["staff"],
+                    f"Episode <code>{value[1]}</code> of <b>{value[0]}</b> (<code>{key}</code>) has just been released. <code>{now.strftime('%H:%M:%S')}</code>",
+                )
 
-            animes[key][0] = f"<s>{value[0]}</s>"
-            animes[key][3] = True
+                animes[key][0] = f"<s>{value[0]}</s>"
+                animes[key][3] = True
 
-    bot.day_releases = animes
+        bot.day_releases = animes

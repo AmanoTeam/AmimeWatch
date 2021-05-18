@@ -32,7 +32,15 @@ from pyrogram.raw.all import layer
 from pyrogram.types import User
 
 from amime.config import SUDO_USERS
-from amime.utils import backup, day_releases, filters, langs, modules, video_queue
+from amime.utils import (
+    backup,
+    day_releases,
+    filters,
+    langs,
+    modules,
+    scrapper,
+    video_queue,
+)
 
 logging.basicConfig(
     level=logging.INFO,
@@ -81,6 +89,7 @@ class Amime(Client):
         langs.load()
         modules.load(self)
         self.video_queue = video_queue.VideoQueue(self)
+        self.scrapper = scrapper.Scrapper()
 
         self.day_releases = None
 

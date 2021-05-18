@@ -796,7 +796,7 @@ async def anime_episode_batch(bot: Amime, callback: CallbackQuery):
             break
 
         try:
-            msg = await chat.listen(filters.video)
+            msg = await chat.listen(filters.video | filters.document)
         except ListenerCanceled:
             break
 
@@ -854,7 +854,16 @@ async def anime_episode_batch_confirm(bot: Amime, callback: CallbackQuery):
 
     numbers_added = []
     for msg in videos:
-        video, caption = msg.video, msg.caption
+        caption = msg.caption
+
+        file_id = ""
+        duration = 0
+        if bool(msg.video):
+            video = msg.video
+            file_id = video.file_id
+            duration = video.duration
+        else:
+            video = msg.document
 
         if len(caption) == 0:
             continue
@@ -889,12 +898,12 @@ async def anime_episode_batch_confirm(bot: Amime, callback: CallbackQuery):
 
         episode = await Episodes.create(
             anime=anime_id,
-            file_id=video.file_id,
+            file_id=file_id,
             name=name or "",
             added_by=user.id,
             season=season,
             number=number,
-            duration=video.duration // 60,
+            duration=duration // 60,
             language=language,
             unified_until=unified_until or "0",
             subtitled=subtitled,

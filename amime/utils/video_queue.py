@@ -65,6 +65,7 @@ class VideoQueue(object):
 
         episode = await Episodes.get_or_none(id=id)
 
+        directory = ""
         if episode is not None:
             try:
                 if isinstance(video, str):

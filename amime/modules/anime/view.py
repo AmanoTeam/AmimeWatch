@@ -20,6 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+import asyncio
 import math
 from typing import Union
 
@@ -68,6 +69,13 @@ async def anime_view(bot: Amime, union: Union[CallbackQuery, Message]):
     async with anilist.AsyncClient() as client:
         if not query.isdecimal():
             results = await client.search(query, "anime", 10)
+            if results is None:
+                await asyncio.sleep(0.5)
+                results = await client.search(query, "anime", 10)
+
+            if results is None:
+                return
+
             if len(results) == 1:
                 anime_id = results[0].id
             else:

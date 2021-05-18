@@ -20,6 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+import asyncio
 from typing import Union
 
 import anilist
@@ -60,6 +61,13 @@ async def character_view(bot: Amime, union: Union[CallbackQuery, Message]):
     async with anilist.AsyncClient() as client:
         if not query.isdecimal():
             results = await client.search(query, "character", 10)
+            if results is None:
+                await asyncio.sleep(0.5)
+                results = await client.search(query, "character", 10)
+
+            if results is None:
+                return
+
             if len(results) == 1:
                 character_id = results[0].id
             else:

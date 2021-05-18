@@ -43,76 +43,48 @@ async def nhentai_inline(bot: Amime, inline_query: InlineQuery):
     results: List[InlineQueryResultPhoto] = []
 
     if query.isdecimal():
-        manga = await get_data(int(query))
-
-        if manga is not None:
-            text = f"<b>{manga.title}</b>"
-            text += f"\n\n<b>ID</b>: <code>{manga.id}</code> (<b>NHENTAI</b>)"
-            text += f"\n<b>{lang.artist}</b>: <a href=\"https://nhentai.net/artist/{manga.artist.replace(' ', '-')}/\">{manga.artist}</a>"
-            tags = [
-                f"<a href=\"https://nhentai.net/tag/{tag.replace(' ', '-')}/\">{tag}</a>"
-                for tag in manga.tags.split(", ")
-            ]
-            text += f"\n<b>{lang.tags}</b>: {', '.join(tags)}"
-            text += f"\n<b>{lang.page}s</b>: <code>{manga.pages}</code>"
-
-            results.append(
-                InlineQueryResultPhoto(
-                    photo_url=manga.photo,
-                    title=manga.title,
-                    description=manga.tags,
-                    caption=text,
-                    reply_markup=ikb(
-                        [
-                            [
-                                (
-                                    "👠 nHentai",
-                                    f"https://nhentai.net/g/{manga.id}",
-                                    "url",
-                                ),
-                                (lang.read_button, manga.url, "url"),
-                            ]
-                        ]
-                    ),
-                )
-            )
+        search_results = [await get_data(int(query))]
     else:
         search_results = [
             *filter(
                 lambda manga: query.lower() in manga.title.lower(), await nHentai.all()
             )
         ]
-        for manga in search_results:
-            text = f"<b>{manga.title}</b>"
-            text += f"\n\n<b>ID</b>: <code>{manga.id}</code> (<b>NHENTAI</b>)"
-            text += f"\n<b>{lang.artist}</b>: <a href=\"https://nhentai.net/artist/{manga.artist.replace(' ', '-')}/\">{manga.artist}</a>"
-            tags = [
-                f"<a href=\"https://nhentai.net/tag/{tag.replace(' ', '-')}/\">{tag}</a>"
-                for tag in manga.tags.split(", ")
-            ]
-            text += f"\n<b>{lang.tags}</b>: {', '.join(tags)}"
-            text += f"\n<b>{lang.page}s</b>: <code>{manga.pages}</code>"
 
-            results.append(
-                InlineQueryResultPhoto(
-                    photo_url=manga.photo,
-                    title=manga.title,
-                    description=manga.tags,
-                    caption=text,
-                    reply_markup=ikb(
+    for manga in search_results:
+        if manga is None:
+            continue
+
+        text = f"<b>{manga.title}</b>"
+        text += f"\n\n<b>ID</b>: <code>{manga.id}</code> (<b>NHENTAI</b>)"
+        text += f"\n<b>{lang.artist}</b>: <a href=\"https://nhentai.net/artist/{manga.artist.replace(' ', '-')}/\">{manga.artist}</a>"
+        tags = [
+            f"<a href=\"https://nhentai.net/tag/{tag.replace(' ', '-')}/\">{tag}</a>"
+            for tag in manga.tags.split(", ")
+        ]
+        text += f"\n<b>{lang.tags}</b>: {', '.join(tags)}"
+        text += f"\n<b>{lang.page}s</b>: <code>{manga.pages}</code>"
+
+        results.append(
+            InlineQueryResultPhoto(
+                photo_url=manga.photo,
+                title=manga.title,
+                description=manga.tags,
+                caption=text,
+                reply_markup=ikb(
+                    [
                         [
-                            [
-                                (
-                                    "👠 nHentai",
-                                    f"https://nhentai.net/g/{manga.id}",
-                                    "url",
-                                ),
-                                (lang.read_button, manga.url, "url"),
-                            ]
+                            (
+                                "👠 nHentai",
+                                f"https://nhentai.net/g/{manga.id}",
+                                "url",
+                            ),
+                            (lang.read_button, manga.url, "url"),
                         ]
-                    ),
-                )
+                    ]
+                ),
             )
+        )
 
     if len(results) > 0:
         await inline_query.answer(

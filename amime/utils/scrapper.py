@@ -119,8 +119,6 @@ class AnimesVision:
                 raise ValueError("Quality not found")
             files = self.players[number]
 
-        files["headers"] = {"Referer": "https://animesvision.biz"}
-
         directory = f"amime/downloads/{random.randint(0, 9999)}/"
         while os.path.exists(directory):
             directory = f"amime/downloads/{random.randint(0, 9999)}/"
@@ -137,7 +135,7 @@ class AnimesVision:
                 async with client.stream(
                     "GET",
                     url,
-                    headers=files["headers"],
+                    headers=dict(Referer="https://animesvision.biz"),
                 ) as response:
                     file_size = int(response.headers["Content-Length"])
 
@@ -151,7 +149,7 @@ class AnimesVision:
                         await file.close()
 
                 await client.aclose()
-        except (httpx.ConnectError, httpx.RemoteProtocolError):
+        except (httpx.ConnectError, httpx.ReadTimeout, httpx.RemoteProtocolError):
             shutil.rmtree(directory, ignore_errors=True)
             return await self.download(quality, number)
         except KeyError:

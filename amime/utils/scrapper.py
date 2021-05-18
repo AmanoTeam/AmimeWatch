@@ -64,8 +64,6 @@ class AnimesVision:
                 players = await self.get_players(
                     watch.find_all("div", re.compile(r"tab-pane"))
                 )
-                players["headers"] = response.headers
-                players["cookies"] = response.cookies
                 urls = players
             else:
                 urls = {}
@@ -83,8 +81,6 @@ class AnimesVision:
                     players = await self.get_players(
                         watch.find_all("div", re.compile(r"tab-pane"))
                     )
-                    players["headers"] = response.headers
-                    players["cookies"] = response.cookies
                     urls[number] = players
 
         self.players = urls
@@ -123,7 +119,7 @@ class AnimesVision:
                 raise ValueError("Quality not found")
             files = self.players[number]
 
-        files["headers"]["Referer"] = "https://animesvision.biz"
+        files["headers"] = {"Referer": "https://animesvision.biz"}
 
         directory = f"amime/downloads/{random.randint(0, 9999)}/"
         while os.path.exists(directory):
@@ -139,7 +135,9 @@ class AnimesVision:
         try:
             async with httpx.AsyncClient(http2=True) as client:
                 async with client.stream(
-                    "GET", url, headers=files["headers"], cookies=files["cookies"]
+                    "GET",
+                    url,
+                    headers=files["headers"],
                 ) as response:
                     file_size = int(response.headers["Content-Length"])
 

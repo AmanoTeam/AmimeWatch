@@ -81,6 +81,16 @@ class Notify(Model):
     language = fields.CharField(max_length=6, default="en")
 
 
+class nHentai(Model):
+    id = fields.IntField(pk=True)
+    artist = fields.TextField()
+    photo = fields.TextField()
+    title = fields.TextField()
+    pages = fields.IntField()
+    tags = fields.TextField()
+    url = fields.TextField()
+
+
 class Reports(Model):
     id = fields.IntField(pk=True)
     user = fields.IntField()

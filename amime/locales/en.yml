@@ -193,6 +193,15 @@ at:
 views:
     Views
 
+page:
+    Page
+
+artist:
+    Artist
+
+tags:
+    Tags
+
 
 # Texts & buttons
 
@@ -461,6 +470,9 @@ subtitled_button:
 
 next_episode_button:
     🎦 Next episode
+
+read_button:
+    📒 Read
 
 
 # Alerts

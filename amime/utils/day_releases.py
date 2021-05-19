@@ -36,28 +36,21 @@ async def load(bot):
 
     animes = {}
 
-    def check_repeated(episode):
-        nonlocal animes
-
+    episodes = await Episodes.all()
+    for episode in episodes:
         if episode.anime in animes.keys():
-            return None
-        else:
-            animes[episode.anime] = []
-            return episode
+            continue
+
+        animes[episode.anime] = None
 
     async with anilist.AsyncClient() as client:
-        episodes = await Episodes.all()
-        episodes = [
-            *filter(lambda episode: check_repeated(episode) is not None, episodes)
-        ]
-
-        for episode in episodes:
+        for anime_id in [*animes.keys()]:
             bot.day_releases = animes
 
-            anime = await client.get(episode.anime, "anime")
+            anime = await client.get(anime_id, "anime")
             while anime is None:
-                anime = await client.get(episode.anime, "anime")
-                await asyncio.sleep(3)
+                anime = await client.get(anime_id, "anime")
+                await asyncio.sleep(1)
 
             if anime.status.lower() == "releasing":
                 if hasattr(anime, "next_airing"):
@@ -67,7 +60,7 @@ async def load(bot):
                     ).replace(tzinfo=datetime.timezone.utc)
 
                     if date.day == now.day:
-                        animes[episode.anime] = [
+                        animes[anime_id] = [
                             anime.title.romaji,
                             number,
                             date,
@@ -75,7 +68,7 @@ async def load(bot):
                         ]
                         continue
 
-            del animes[episode.anime]
+            del animes[anime_id]
 
     await sent.edit_text(
         f"<code>{len(animes)}</code> animes have episodes to be released today, check them out using /today"
@@ -89,20 +82,21 @@ async def reload(bot):
 
     if animes is not None:
         for key, value in animes.items():
-            if value[3]:
-                continue
+            if value is not None:
+                if value[3]:
+                    continue
 
-            if (
-                now.hour >= value[2].hour
-                and now.minute >= value[2].minute
-                and now.second >= value[2].second
-            ):
-                await bot.send_message(
-                    CHATS["staff"],
-                    f"Episode <code>{value[1]}</code> of <b>{value[0]}</b> (<code>{key}</code>) has just been released. <code>{now.strftime('%H:%M:%S')}</code>",
-                )
+                if (
+                    now.hour >= value[2].hour
+                    and now.minute >= value[2].minute
+                    and now.second >= value[2].second
+                ):
+                    await bot.send_message(
+                        CHATS["staff"],
+                        f"Episode <code>{value[1]}</code> of <b>{value[0]}</b> (<code>{key}</code>) has just been released. <code>{now.strftime('%H:%M:%S')}</code>",
+                    )
 
-                animes[key][0] = f"<s>{value[0]}</s>"
-                animes[key][3] = True
+                    animes[key][0] = f"<s>{value[0]}</s>"
+                    animes[key][3] = True
 
         bot.day_releases = animes

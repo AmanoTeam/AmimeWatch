@@ -82,42 +82,44 @@ class VideoQueue(object):
                         text += f"\n    <b>ID</b>: <code>{episode.anime}</code>"
                         text += "\n\n<b>Episode</b>:"
                         if episode.season > 0:
-                            text += f"\n    <b>Season</b>: <code>{episode.season}</code>"
+                            text += (
+                                f"\n    <b>Season</b>: <code>{episode.season}</code>"
+                            )
                         text += f"\n    <b>Number</b>: <code>{episode.number}</code>"
                         text += "\n\n<b>Error</b>:"
                         text += "\n    <b>AttemptsError</b>:"
                         text += "\n        <i>The number of download attempts has been exhausted.</i>"
-    
+
                         await self.bot.send_message(
                             CHATS["staff"],
                             text,
                         )
-    
+
                         if self.queue.empty() is False:
                             await self.next()
                         return
-    
+
                     path = await self.bot.download_media(
                         video, file_name=directory + video.file_name
                     )
-    
+
                 extension = os.path.splitext(path)[1][1:].strip()
-    
+
                 anime = await anilist.AsyncClient().get(episode.anime, "anime")
                 while anime is None:
                     anime = await anilist.AsyncClient().get(episode.anime, "anime")
                     await asyncio.sleep(5)
-    
+
                 codec = None
                 softsubbed = False
-    
+
                 proc = await asyncio.create_subprocess_shell(
                     f'ffmpeg -i "{path}" -hide_banner',
                     stdout=asyncio.subprocess.PIPE,
                     stderr=asyncio.subprocess.STDOUT,
                 )
                 stdout = (await proc.communicate())[0]
-    
+
                 lines = stdout.decode().lower().splitlines()
                 for line in lines:
                     if (time := re.search(r"duration: (\d+):(\d+):(\d+)", line)) :
@@ -160,11 +162,11 @@ class VideoQueue(object):
                                 stderr=asyncio.subprocess.STDOUT,
                             )
                         await proc.communicate()
-    
+
                         os.remove(path)
                         path = new_path
                         extension = "mp4"
-    
+
                 thumb = path.replace(f".{extension}", ".jpg")
                 proc = await asyncio.create_subprocess_shell(
                     f'ffmpeg -ss 00:00:20 -i "{path}" -vf scale=320:-1 -vframes 1 -q:v 2 "{thumb}" -y',
@@ -172,14 +174,14 @@ class VideoQueue(object):
                     stderr=asyncio.subprocess.STDOUT,
                 )
                 await proc.communicate()
-    
+
                 if not os.path.exists(thumb):
                     thumb = (
                         await self.bot.download_media(video.thumbs[0])
                         if bool(video.thumbs) and len(video.thumbs) > 0
                         else None
                     )
-    
+
                 video = (
                     await self.bot.send_video(
                         CHATS["videos"],
@@ -194,8 +196,10 @@ class VideoQueue(object):
                     )
                 ).video
                 duration = video.duration // 60
-    
-                episode.update_from_dict({"file_id": video.file_id, "duration": duration})
+
+                episode.update_from_dict(
+                    {"file_id": video.file_id, "duration": duration}
+                )
                 await episode.save()
             except BaseException as excep:
                 text = "<b>Error processing an episode</b>\n"
@@ -208,7 +212,7 @@ class VideoQueue(object):
                 text += "\n\n<b>Error</b>:"
                 text += f"\n    <b>{excep.__class__.__name__}</b>:"
                 text += f"\n        <i>{excep}</i>"
-    
+
                 await self.bot.send_message(
                     CHATS["staff"],
                     text,

@@ -69,7 +69,6 @@ class VideoQueue(object):
 
         episode = await Episodes.get_or_none(id=id)
 
-        directory = ""
         if episode is not None:
             try:
                 path = await self.bot.download_media(video, file_name=directory)

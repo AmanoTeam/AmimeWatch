@@ -482,9 +482,7 @@ async def anime_episode_edit(bot: Amime, callback: CallbackQuery):
     if item == "video":
         while True:
             try:
-                answer = await chat.listen(
-                    filters.video | filters.document | filters.text
-                )
+                answer = await chat.listen(filters.video | filters.document)
             except ListenerCanceled:
                 return
 
@@ -506,9 +504,6 @@ async def anime_episode_edit(bot: Amime, callback: CallbackQuery):
                 episode["duration"] = duration // 60
             elif bool(answer.document):
                 episode["video"] = answer.document
-            elif bool(answer.text):
-                if re.match(r"^(?i)http(?:s)?(?:www\.)?(.+)\.(.+)$", answer.text):
-                    episode["video"] = answer.text
 
             if bool(answer.forward_from) and answer.forward_from.id == bot.me.id:
                 episode["update_video"] = False
@@ -623,7 +618,7 @@ async def anime_episode_save(bot: Amime, callback: CallbackQuery):
 
     video = episode["video"]
 
-    if isinstance(episode["video"], (Document, str)):
+    if isinstance(episode["video"], Document):
         episode["file_id"] = ""
     elif isinstance(episode["video"], Video):
         episode["file_id"] = episode["video"].file_id

@@ -18,7 +18,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Set up configuration
       run: |
-        curl https://nekobin.com/raw/foteqedafo -o amime.ini
+        curl https://nekobin.com/raw/woboyekiwu -o amime.ini
         curl https://nekobin.com/raw/kepirenesi -o amime/config.py
     - name: Install dependencies
       run: |

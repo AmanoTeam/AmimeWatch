@@ -201,6 +201,8 @@ class VideoQueue(object):
                     {"file_id": video.file_id, "duration": duration}
                 )
                 await episode.save()
+
+                os.remove(thumb)
             except BaseException as excep:
                 text = "<b>Error processing an episode</b>\n"
                 text += "\n<b>Anime</b>:"

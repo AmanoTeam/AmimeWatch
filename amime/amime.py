@@ -24,7 +24,6 @@ import asyncio
 import concurrent.futures
 import datetime
 import logging
-import sys
 
 import aiocron
 import pyromod.listen
@@ -57,7 +56,7 @@ logger = logging.getLogger(__name__)
 
 
 class Amime(Client):
-    def __init__(self, test_mode: bool = False):
+    def __init__(self):
         name = self.__class__.__name__.lower()
 
         super().__init__(
@@ -66,7 +65,6 @@ class Amime(Client):
             parse_mode="html",
             workers=24,
             workdir=".",
-            test_mode=test_mode,
             sleep_threshold=180,
         )
 
@@ -95,10 +93,6 @@ class Amime(Client):
         self.scrapper = scrapper.Scrapper()
 
         self.day_releases = None
-
-        if self.test_mode:
-            await asyncio.sleep(10)
-            sys.exit(0)
 
         aiocron.crontab("0 * * * *", func=backup.save, args=(self,), start=True)
         aiocron.crontab(

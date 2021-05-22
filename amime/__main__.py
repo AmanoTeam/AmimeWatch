@@ -21,7 +21,6 @@
 # SOFTWARE.
 
 import os
-import sys
 
 from pyrogram import idle
 from pyrogram.session import Session
@@ -37,8 +36,7 @@ Session.notice_displayed = True
 async def start():
     await connect_database()
 
-    test_mode = "--mode=test" in sys.argv
-    amime = Amime(test_mode)
+    amime = Amime()
 
     await amime.start()
     await idle()

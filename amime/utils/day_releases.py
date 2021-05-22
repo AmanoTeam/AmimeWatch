@@ -74,6 +74,9 @@ async def load(bot):
         f"<code>{len(animes)}</code> animes have episodes to be released today, check them out using /today"
     )
 
+    await asyncio.sleep(3600)
+    await load(bot)
+
 
 async def reload(bot):
     now = datetime.datetime.now().replace(tzinfo=datetime.timezone.utc)

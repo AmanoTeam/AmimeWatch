@@ -36,8 +36,9 @@ from amime.database import Episodes
 
 
 class VideoQueue(object):
-    def __init__(self, bot):
+    def __init__(self, bot, loop):
         self.bot = bot
+        self.loop = loop
         self.queue = asyncio.Queue()
         self.is_running = False
 
@@ -52,7 +53,7 @@ class VideoQueue(object):
             pool = concurrent.futures.ThreadPoolExecutor(
                 max_workers=self.bot.workers - 4
             )
-            future = asyncio.get_event_loop().run_in_executor(
+            future = self.loop.run_in_executor(
                 pool, asyncio.ensure_future(self.next()), id
             )
             await asyncio.gather(future, return_exceptions=True)

@@ -21,6 +21,7 @@
 # SOFTWARE.
 
 import asyncio
+import concurrent.futures
 import datetime
 import logging
 import sys
@@ -86,9 +87,11 @@ class Amime(Client):
             self.me.username,
         )
 
+        loop = asyncio.get_event_loop()
+
         langs.load()
         modules.load(self)
-        self.video_queue = video_queue.VideoQueue(self)
+        self.video_queue = video_queue.VideoQueue(self, loop)
         self.scrapper = scrapper.Scrapper()
 
         self.day_releases = None
@@ -98,13 +101,15 @@ class Amime(Client):
             sys.exit(0)
 
         aiocron.crontab("0 * * * *", func=backup.save, args=(self,), start=True)
-        aiocron.crontab("0 0 * * *", func=day_releases.load, args=(self,), start=True)
         aiocron.crontab(
             "*/10 * * * *", func=day_releases.reload, args=(self,), start=True
         )
 
-        if self.start_datetime.hour > 0:
-            await day_releases.load(self)
+        pool = concurrent.futures.ThreadPoolExecutor(max_workers=self.workers - 4)
+        future = loop.run_in_executor(
+            pool, asyncio.ensure_future(day_releases.load(self))
+        )
+        await asyncio.gather(future, return_exceptions=True)
 
     async def stop(self, *args):
         await super().stop(*args)

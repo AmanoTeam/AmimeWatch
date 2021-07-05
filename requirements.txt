@@ -2,7 +2,7 @@ aiocron==1.6
 async-files==0.4
 beautifulsoup4==4.9.3
 httpx[http2]==0.17.1
-humanize==3.6.0
+humanize==3.10.0
 langs==0.1.1
 meval==2.5
 pendulum==2.1.2

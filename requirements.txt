@@ -9,7 +9,7 @@ pendulum==2.1.2
 pyromod==1.5
 python-rapidjson==1.4
 PySocks==1.7.1
-PyYAML==5.4.1
+PyYAML==6.0
 psutil==5.8.0
 TgCrypto==1.2.2
 tortoise-orm==0.17.6

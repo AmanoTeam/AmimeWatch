@@ -14,7 +14,7 @@ psutil==5.8.0
 TgCrypto==1.2.2
 tortoise-orm==0.17.6
 telegraph==1.4.1
-typing-extensions==3.10.0.0
+typing-extensions==4.1.1
 
 git+https://github.com/pyrogram/pyrogram
 git+https://github.com/AmanoTeam/python-anilist

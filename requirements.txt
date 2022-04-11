@@ -1,6 +1,6 @@
 aiocron==1.6
 async-files==0.4
-beautifulsoup4==4.9.3
+beautifulsoup4==4.11.1
 httpx[http2]==0.17.1
 humanize==3.11.0
 langs==0.1.1

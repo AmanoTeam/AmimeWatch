@@ -13,7 +13,7 @@ PyYAML==5.4.1
 psutil==5.8.0
 TgCrypto==1.2.2
 tortoise-orm==0.17.6
-telegraph==1.4.1
+telegraph==2.2.0
 typing-extensions==3.10.0.0
 
 git+https://github.com/pyrogram/pyrogram
